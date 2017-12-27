@@ -1,19 +1,37 @@
 import React, {Component} from 'react';
-import TreeBuilder from './tree-builder';
+import {connect} from 'react-redux';
+
+import TreeBuilder from './tree-builder/tree-builder';
+import {TreeRootNodeType} from './types';
 
 import './app.css';
 
-class App extends Component {
+type PropsType = {
+  newTypeName: string,
+  typeRootNode: TreeRootNodeType
+};
+
+class App extends Component<PropsType> {
   render() {
+    const {newTypeName, typeRootNode} = this.props;
     return (
       <div className="app">
         <header className="app-header">
           <h1 className="app-title">SmartDevice</h1>
         </header>
-        <TreeBuilder />
+        <TreeBuilder
+          newNodeName={newTypeName}
+          rootNode={typeRootNode}
+          rootPropertyName="typeRootNode"
+        />
       </div>
     );
   }
 }
 
-export default App;
+const mapState = (state: StateType): Object => {
+  const {newTypeName, typeRootNode} = state;
+  return {newTypeName, typeRootNode};
+};
+
+export default connect(mapState)(App);

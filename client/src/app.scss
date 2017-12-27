@@ -16,3 +16,15 @@
 .app-intro {
   font-size: large;
 }
+
+input {
+  border: solid lightgray 1px;
+  border-radius: 4px;
+  box-shadow: none;
+  padding: 4px;
+}
+
+label {
+  font-weight: bold;
+  margin-right: 5px;
+}
