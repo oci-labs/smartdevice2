@@ -1,0 +1,53 @@
+{
+  "name": "smart-device-server",
+  "version": "1.0.0",
+  "description": "SmartDevice Express server for REST services",
+  "main": "index.js",
+  "scripts": {
+    "cover": "CI=true npm test -- --coverage",
+    "cover-open": "open coverage/lcov-report/index.html",
+    "dbsetup": "mysql --host 127.0.0.1 -P 33060 --user root < ./ddl.sql",
+    "flow": "flow",
+    "format": "prettier-eslint --write src/**/*.js",
+    "lint": "eslint --quiet src --ext .js",
+    "mysql": "mysql --host 127.0.0.1 -P 33060 --user root",
+    "postinstall": "flow-typed install",
+    "prepush": "npm run verify",
+    "start": "flow-node src/index.js",
+    "test": "jest",
+    "verify": "npm-run-all lint flow test-no-watch"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    }
+  },
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "express-healthcheck": "^0.1.0",
+    "morgan": "^1.9.0",
+    "mysql-easier": "^1.2.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.0.3",
+    "eslint": "^4.13.1",
+    "eslint-plugin-flowtype": "^2.40.1",
+    "flow-bin": "^0.61.0",
+    "flow-typed": "^2.2.3",
+    "husky": "^0.14.3",
+    "jest": "^22.0.4",
+    "jest-cli": "^22.0.4",
+    "npm-run-all": "^4.1.2",
+    "prettier": "^1.9.2",
+    "prettier-eslint-cli": "^4.7.0"
+  }
+}
