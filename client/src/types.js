@@ -5,6 +5,14 @@ export type ActionType = {
   payload?: any
 };
 
+export type TreeNodeType = {
+  children: TreeNodeType[],
+  expanded: boolean,
+  name: string,
+  parent?: TreeNodeType,
+  type?: TreeNodeType
+};
+
 export type AddNodePayloadType = {
   name: string,
   parent: TreeNodeType,
@@ -50,6 +58,24 @@ export type ModalType = {
 
 export type RoleType = 'admin' | 'service' | 'spectator';
 
+export type UiType = {
+  modal: ModalType
+};
+
+export type UserType = {
+  confirmEmail: string,
+  confirmPassword: string,
+  email: string,
+  id: number,
+  firstName: string,
+  lastName: string,
+  organization: string,
+  password: string,
+  phone: string,
+  role: RoleType,
+  version: number
+};
+
 export type StateType = {
   errors: Set<string>,
   instanceRootNode: TreeNodeType,
@@ -78,34 +104,6 @@ export type SystemType = {
 export type TreeBuilderType = {
   newNodeName: string,
   rootNode: TreeNodeType
-};
-
-/* eslint-disable no-use-before-define */
-export type TreeNodeType = {
-  children: TreeNodeType[],
-  expanded: boolean,
-  name: string,
-  parent?: TreeNodeType,
-  type?: TreeNodeType
-};
-/* eslint-enable no-use-before-define */
-
-export type UiType = {
-  modal: ModalType
-};
-
-export type UserType = {
-  confirmEmail: string,
-  confirmPassword: string,
-  email: string,
-  id: number,
-  firstName: string,
-  lastName: string,
-  organization: string,
-  password: string,
-  phone: string,
-  role: RoleType,
-  version: number
 };
 
 export type ValidationFnType = (string) => string[];
