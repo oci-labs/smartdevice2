@@ -1,11 +1,11 @@
 # generated directories
-/build
-/coverage
-/flow-typed
-/node_modules
-/reports
-/dev-certs
-/tmp
+build
+coverage
+flow-typed
+node_modules
+reports
+dev-certs
+tmp
 
 # generated files
 client/src/**/*.css
