@@ -12,7 +12,7 @@
     "lint": "eslint --quiet src --ext .js",
     "mysql": "mysql --host 127.0.0.1 -P 33060 --user root",
     "postinstall": "flow-typed install",
-    "prepush": "npm run verify",
+    "Xprepush": "npm run verify",
     "start": "flow-node src/index.js",
     "test": "jest",
     "verify": "npm-run-all lint flow test-no-watch"
