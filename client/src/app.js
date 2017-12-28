@@ -11,19 +11,21 @@ import type {TreeNodeType} from './util/tree-util';
 import './app.css';
 
 type PropsType = {
+  editNode: TreeNodeType,
   newTypeName: string,
   typeRootNode: TreeNodeType
 };
 
 class App extends Component<PropsType> {
   render() {
-    const {newTypeName, typeRootNode} = this.props;
+    const {editNode, newTypeName, typeRootNode} = this.props;
     return (
       <div className="app">
         <header className="app-header">
           <h1 className="app-title">SmartDevice</h1>
         </header>
         <TreeBuilder
+          editNode={editNode}
           newNodeName={newTypeName}
           rootNode={typeRootNode}
         />
@@ -33,8 +35,8 @@ class App extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): Object => {
-  const {newTypeName, typeRootNode} = state;
-  return {newTypeName, typeRootNode};
+  const {newTypeName, typeRootNode, ui: {editNode}} = state;
+  return {editNode, newTypeName, typeRootNode};
 };
 
 export default connect(mapState)(App);

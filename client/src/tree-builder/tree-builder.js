@@ -9,6 +9,7 @@ import {PATH_DELIMITER, type TreeNodeType} from '../util/tree-util';
 import './tree-builder.css';
 
 type PropsType = {
+  editNode: ?TreeNodeType,
   newNodeName: string,
   rootNode: TreeNodeType
 };
@@ -39,20 +40,26 @@ class TreeBuilder extends Component<PropsType> {
     dispatch('deleteNode', node);
   };
 
-  editNode = (node: TreeNodeType) => {
-    console.log('tree-builder.js editNode: node.name =', node.name);
-    dispatch('editNode', node);
-  };
+  editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
+    dispatch('editNode', event.target.value);
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewTypeName', event.target.value);
+  };
+
+  isEditing = (node: TreeNodeType) => node === this.props.editNode;
+
+  toggleEditNode = (node: TreeNodeType) => {
+    dispatch('toggleEditNode', node);
   };
 
   renderNodes = (nodes: TreeNodeType[], level: number = 0) => {
     const copy = [...nodes].sort(nodeCompare);
     return copy.map(node => (
       <div className={'tree-node tree-level-' + level} key={node.name}>
-        <div className="tree-node-name">{node.name}</div>
+        {this.isEditing(node) ?
+          <input type="text" onChange={this.editNode} /> :
+          <div className="tree-node-name">{node.name}</div>}
         <Button
           className="addNode"
           icon="plus"
@@ -66,7 +73,7 @@ class TreeBuilder extends Component<PropsType> {
         <Button
           className="editNode"
           icon="pencil"
-          onClick={() => this.editNode(node)}
+          onClick={() => this.toggleEditNode(node)}
         />
         {this.renderNodes(node.children, level + 1)}
       </div>

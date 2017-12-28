@@ -61,15 +61,13 @@ addReducer(
   }
 );
 
-addReducer(
-  'editNode',
-  (state: StateType, payload: TreeNodeType): StateType => {
-    const {name, path} = payload;
-    let newState = setUiProp(state, 'editNodeName', name);
-    newState = setUiProp(state, 'editNodePath', path);
-    return newState;
-  }
-);
+addReducer('editNode', (state: StateType, name: string): StateType => {
+  const node = state.ui.editNode;
+  if (!node) return; // should never happen
+  console.log('reducers.js editNode: name =', name);
+  node.name = name;
+  return state;
+});
 
 addReducer('setConfirmEmail', (state: StateType, value: string): StateType =>
   setUserProp(state, 'confirmEmail', value)
@@ -110,3 +108,10 @@ addReducer('setPassword', (state: StateType, value: string): StateType =>
 addReducer('setPhone', (state: StateType, value: string): StateType =>
   setUserProp(state, 'phone', value)
 );
+
+addReducer(
+  'toggleEditNode',
+  (state: StateType, node: TreeNodeType): StateType => {
+    const value = node === state.ui.editNode ? null : node;
+    return setUiProp(state, 'editNode', value);
+  });
