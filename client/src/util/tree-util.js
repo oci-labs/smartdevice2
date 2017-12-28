@@ -10,11 +10,17 @@ export type TreeNodeType = {
   type?: TreeNodeType // for instance nodes
 };
 
+/**
+ * Adds a node to an existing tree
+ * at a given path with a given name.
+ * Returns an array containing
+ * the new root node and the new node.
+ */
 export function addNode(
   rootNode: TreeNodeType,
   path: string,
   name: string
-): TreeNodeType {
+): TreeNodeType[] {
   if (!path) throw new Error('addNode requires path');
 
   const [newRootNode, node] = cloneTree(rootNode, path);
@@ -31,7 +37,7 @@ export function addNode(
   };
   node.children = node.children.concat(newNode);
 
-  return newRootNode;
+  return [newRootNode, newNode];
 }
 
 export function cloneTree(rootNode: TreeNodeType, path: string) {
@@ -72,6 +78,21 @@ export function deleteNode(
 
   const [newRootNode, node] = cloneTree(rootNode, path);
   node.children = getNodesExcept(node.children, targetNode.name);
+
+  return newRootNode;
+}
+
+export function editNode(
+  rootNode: TreeNodeType,
+  targetNode: TreeNodeType,
+  newName: string
+): TreeNodeType {
+  const {path} = targetNode;
+  if (!path) throw new Error('targetNode must have path');
+
+  const fullPath = `${path}${PATH_DELIMITER}${targetNode.name}`;
+  const [newRootNode, node] = cloneTree(rootNode, fullPath);
+  node.name = newName;
 
   return newRootNode;
 }

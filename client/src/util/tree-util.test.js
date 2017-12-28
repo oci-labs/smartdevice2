@@ -4,8 +4,9 @@ import {deepFreeze} from './object-util';
 import {
   PATH_DELIMITER,
   addNode,
-  deleteNode,
   cloneTree,
+  deleteNode,
+  editNode,
   findNode,
   getFirstPathPart,
   getNodesExcept,
@@ -37,7 +38,7 @@ describe('tree-util', () => {
 
     const path = rootName;
     const name = 'new node';
-    const newRootNode = addNode(rootNode, path, name);
+    const [newRootNode] = addNode(rootNode, path, name);
 
     const {children} = newRootNode;
     expect(children.length).toBe(1);
@@ -58,7 +59,7 @@ describe('tree-util', () => {
 
     const path = rootName;
     const name = 'new node';
-    const newRootNode = addNode(rootNode, path, name);
+    const [newRootNode] = addNode(rootNode, path, name);
     expect(() => addNode(newRootNode, path, name)).toThrow(
       `duplicate child name "${name}"`
     );
@@ -116,7 +117,7 @@ describe('tree-util', () => {
 
     const path = rootName;
     const name = 'new node';
-    let newRootNode = addNode(rootNode, path, name);
+    let [newRootNode] = addNode(rootNode, path, name);
 
     const targetNode = {children: [], name, path};
     newRootNode = deleteNode(newRootNode, targetNode);
@@ -136,6 +137,20 @@ describe('tree-util', () => {
     expect(() => deleteNode(rootNode, targetNode)).toThrow(
       'targetNode must have path'
     );
+  });
+
+  test('editNode', () => {
+    const rootName = 'typeRootNode';
+    const rootNode1 = state[rootName];
+
+    const path = rootName;
+    const name = 'some name';
+    const [rootNode2, node] = addNode(rootNode1, path, name);
+
+    const newName = 'some new name';
+    const rootNode3 = editNode(rootNode2, node, newName);
+    expect(rootNode3).toBeDefined();
+    expect(rootNode3.children[0].name).toBe(newName);
   });
 
   test('findNode when found', () => {

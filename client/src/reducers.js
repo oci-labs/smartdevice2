@@ -5,6 +5,7 @@ import {addReducer} from 'redux-easy';
 import {
   addNode,
   deleteNode,
+  editNode,
   getFirstPathPart,
   type TreeNodeType
 } from './util/tree-util';
@@ -13,6 +14,13 @@ import type {
   ModalType,
   StateType
 } from './types';
+
+function getRootNode(state: StateType, node: TreeNodeType): ?TreeNodeType {
+  const {path} = node;
+  if (!path) throw new Error('node must have path');
+  const rootName = getFirstPathPart(path);
+  return state[rootName];
+}
 
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
@@ -40,7 +48,7 @@ addReducer(
     const rootNode = state[rootName];
     if (!rootNode) throw new Error(`no root node found at "${path}"`);
 
-    const newRootNode = addNode(rootNode, path, name);
+    const [newRootNode] = addNode(rootNode, path, name);
     return {...state, [getFirstPathPart(path)]: newRootNode};
   }
 );
@@ -48,12 +56,8 @@ addReducer(
 addReducer(
   'deleteNode',
   (state: StateType, targetNode: TreeNodeType): StateType => {
-    const {path} = targetNode;
-    if (!path) {
-      throw new Error('deleteNode targetNode must have path');
-    }
-    const rootName = getFirstPathPart(path);
-    const rootNode = state[rootName];
+    const rootNode = getRootNode(state, targetNode);
+    const {path = 'none'} = targetNode;
     if (!rootNode) throw new Error(`no root node found at "${path}"`);
 
     const newRootNode = deleteNode(rootNode, targetNode);
@@ -63,10 +67,16 @@ addReducer(
 
 addReducer('editNode', (state: StateType, name: string): StateType => {
   const node = state.ui.editNode;
-  if (!node) return; // should never happen
-  console.log('reducers.js editNode: name =', name);
-  node.name = name;
-  return state;
+  if (!node) throw new Error('no node to edit');
+  const {path} = node;
+  if (!path) throw new Error('node must have path');
+
+  const rootNode = getRootNode(state, node);
+  if (!rootNode) throw new Error('root node not found');
+
+  const newRootNode = editNode(rootNode, node, name);
+  const rootName = getFirstPathPart(path);
+  return {...state, [rootName]: newRootNode};
 });
 
 addReducer('setConfirmEmail', (state: StateType, value: string): StateType =>

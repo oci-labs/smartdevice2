@@ -147,9 +147,7 @@ describe('reducer', () => {
     const [child] = newState[rootName].children;
     const childCopy = {...child, path: ''};
     action = {type: 'deleteNode', payload: childCopy};
-    expect(() => reducer(state, action)).toThrow(
-      'deleteNode targetNode must have path'
-    );
+    expect(() => reducer(state, action)).toThrow('node must have path');
   });
 
   test('setConfirmEmail', () => testSetUserProp('confirmEmail'));
