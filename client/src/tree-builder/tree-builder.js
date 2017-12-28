@@ -7,30 +7,23 @@ import Button from './button';
 
 import './tree-builder.css';
 
-import type {AddNodePayloadType, TreeNodeType} from '../types';
+import type {TreeNodeType} from '../types';
 
 type PropsType = {
   newNodeName: string,
-  rootNode: TreeNodeType,
-  rootPropertyName: string
+  rootNode: TreeNodeType
 };
 
 class TreeBuilder extends Component<PropsType> {
-  addNode = (parent: ?TreeNodeType) => {
-    const {newNodeName, rootPropertyName} = this.props;
-    if (!newNodeName) return;
 
-    const payload: AddNodePayloadType = {
-      name: newNodeName,
-      parent: parent || this.props.rootNode,
-      rootPropertyName
-    };
-    dispatch('addNode', payload);
+  addNode = (parent: TreeNodeType) => {
+    const name = this.props.newNodeName;
+    if (!name) return;
+    dispatch('addNode', {name, parent});
     dispatch('setNewNodeName', '');
-  };
+  }
 
   deleteNode = (node: TreeNodeType) => {
-    console.log('tree-builder.js deleteNode: entered');
     dispatch('deleteNode', node);
   };
 
@@ -38,9 +31,8 @@ class TreeBuilder extends Component<PropsType> {
     dispatch('setNewNodeName', event.target.value);
   };
 
-  renderNodes = (nodes: TreeNodeType[], level: number = 0) => {
-    console.log('tree-builder.js renderNodes: nodes =', nodes);
-    return nodes.map(node => (
+  renderNodes = (nodes: TreeNodeType[], level: number = 0) =>
+    nodes.map(node => (
       <div className={'tree-node tree-level-' + level} key={node.name}>
         <div className="tree-node-name">{node.name}</div>
         <Button
@@ -56,7 +48,6 @@ class TreeBuilder extends Component<PropsType> {
         {this.renderNodes(node.children, level + 1)}
       </div>
     ));
-  };
 
   render() {
     const {newNodeName, rootNode} = this.props;
@@ -71,7 +62,11 @@ class TreeBuilder extends Component<PropsType> {
             value={newNodeName}
           />
         </div>
-        <Button className="addNode" label="+" onClick={() => this.addNode()} />
+        <Button
+          className="addNode"
+          label="+"
+          onClick={() => this.addNode(rootNode)}
+        />
         {this.renderNodes(rootNode.children)}
       </div>
     );

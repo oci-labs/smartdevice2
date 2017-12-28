@@ -15,8 +15,7 @@ export type TreeNodeType = {
 
 export type AddNodePayloadType = {
   name: string,
-  parent: TreeNodeType,
-  rootPropertyName: string
+  parent: TreeNodeType
 };
 
 export type AddressType = {
@@ -29,11 +28,6 @@ export type AddressType = {
 export type AlertType = {
   count: number,
   level: number
-};
-
-export type DeleteNodePayloadType = {
-  node: TreeNodeType,
-  rootPropertyName: string
 };
 
 export type HistoryType = {

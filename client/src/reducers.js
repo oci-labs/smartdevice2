@@ -5,7 +5,6 @@ import {addReducer} from 'redux-easy';
 //import type {ModalType, StateType, TreeBuilderType, UserType} from './types';
 import type {
   AddNodePayloadType,
-  DeleteNodePayloadType,
   ModalType,
   StateType,
   TreeNodeType
@@ -36,7 +35,7 @@ function setUserProp(
 addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
-    const {name, parent, rootPropertyName} = payload;
+    const {name, parent} = payload;
 
     const newNode: TreeNodeType = {
       children: [],
@@ -59,18 +58,17 @@ addReducer(
       // Add new parent node.
       children = [...children, newParent];
 
-      newParent = {...grandparent, children: newChildren};
+      newParent = {...grandparent, children};
     }
 
+    const rootPropertyName = newParent.name;
     return {...state, [rootPropertyName]: newParent};
   }
 );
 
 addReducer(
   'deleteNode',
-  (state: StateType, payload: DeleteNodePayloadType): StateType => {
-    const {node, rootPropertyName} = payload;
-
+  (state: StateType, node: TreeNodeType): StateType => {
     // Recreate parent node with new children.
     const {parent} = node;
     const newChildren = parent ?
@@ -87,9 +85,10 @@ addReducer(
       // Add new parent node.
       children = [...children, newParent];
 
-      newParent = {...grandparent, children: newChildren};
+      newParent = {...grandparent, children};
     }
 
+    const rootPropertyName = newParent.name;
     return {...state, [rootPropertyName]: newParent};
   }
 );

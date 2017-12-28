@@ -7,14 +7,14 @@ const initialState: StateType = {
   instanceRootNode: {
     children: [],
     expanded: true,
-    name: 'root'
+    name: 'instanceRootNode'
   },
   newInstanceName: '',
   newTypeName: '',
   typeRootNode: {
     children: [],
     expanded: true,
-    name: 'root'
+    name: 'typeRootNode'
   },
   ui: {
     modal: {
