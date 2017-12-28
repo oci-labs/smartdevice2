@@ -1,14 +1,17 @@
+// @flow
+
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 import TreeBuilder from './tree-builder/tree-builder';
-import {TreeRootNodeType} from './types';
+
+import type {StateType, TreeNodeType} from './types';
 
 import './app.css';
 
 type PropsType = {
   newTypeName: string,
-  typeRootNode: TreeRootNodeType
+  typeRootNode: TreeNodeType
 };
 
 class App extends Component<PropsType> {
@@ -22,7 +25,6 @@ class App extends Component<PropsType> {
         <TreeBuilder
           newNodeName={newTypeName}
           rootNode={typeRootNode}
-          rootPropertyName="typeRootNode"
         />
       </div>
     );

@@ -20,7 +20,7 @@ class TreeBuilder extends Component<PropsType> {
     const name = this.props.newNodeName;
     if (!name) return;
     dispatch('addNode', {name, parent});
-    dispatch('setNewNodeName', '');
+    dispatch('setNewTypeName', '');
   }
 
   deleteNode = (node: TreeNodeType) => {
@@ -28,7 +28,7 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewNodeName', event.target.value);
+    dispatch('setNewTypeName', event.target.value);
   };
 
   renderNodes = (nodes: TreeNodeType[], level: number = 0) =>

@@ -70,7 +70,7 @@
     "flowtype/object-type-delimiter": ["error", "comma"],
     "flowtype/require-parameter-type": "off",
     "flowtype/require-return-type": "off",
-    "flowtype/require-valid-file-annotation": "off",
+    "flowtype/require-valid-file-annotation": ["error", "always", {"annotationStyle": "line"}],
     "flowtype/require-variable-type": "off",
     "flowtype/semi": ["error", "always"],
     "flowtype/sort-keys": "off",

@@ -9,13 +9,13 @@ export type TreeNodeType = {
   children: TreeNodeType[],
   expanded: boolean,
   name: string,
-  parent?: TreeNodeType,
-  type?: TreeNodeType
+  parentPath?: string,
+  type?: TreeNodeType // for instance nodes
 };
 
 export type AddNodePayloadType = {
   name: string,
-  parent: TreeNodeType
+  parentPath: string
 };
 
 export type AddressType = {

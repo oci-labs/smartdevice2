@@ -7,7 +7,7 @@ import {reducer, reduxSetup} from 'redux-easy';
 import initialState from './initial-state';
 import './reducers';
 
-import type {AddNodePayloadType, StateType, TreeNodeType} from './types';
+import type {AddNodePayloadType} from './types';
 
 describe('reducer', () => {
   let state;
@@ -40,15 +40,10 @@ describe('reducer', () => {
   }
 
   test('addNode 1 level deep', () => {
-    const state: StateType = initialState;
-    const root: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name: 'typeRootNode'
-    };
+    const rootName = state.typeRootNode.name;
 
-    const name = 'new node name';
-    const payload: AddNodePayloadType = {name, parent: root};
+    const name = 'new node';
+    const payload: AddNodePayloadType = {name, parentPath: rootName};
     const action = {type: 'addNode', payload};
     const newState = reducer(state, action);
     const {typeRootNode} = newState;
@@ -57,33 +52,24 @@ describe('reducer', () => {
       children: [],
       expanded: true,
       name,
-      parent: root
+      parentPath: rootName
     });
   });
 
   test('addNode 2 levels deep', () => {
-    const state: StateType = initialState;
-    const rootName = 'typeRootNode';
-    const root: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name: rootName
-    };
+    const rootName = state.typeRootNode.name;
 
     const parentName = 'parent node';
-    const parent: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name: parentName,
-      parent: root
-    };
-
-    root.children.push(parent);
+    let parentPath = rootName;
+    let payload: AddNodePayloadType = {name: parentName, parentPath};
+    let action = {type: 'addNode', payload};
+    let newState = reducer(state, action);
 
     const childName = 'child node';
-    const payload: AddNodePayloadType = {name: childName, parent};
-    const action = {type: 'addNode', payload};
-    const newState = reducer(state, action);
+    parentPath = `${rootName}/${parentName}`;
+    payload = {name: childName, parentPath};
+    action = {type: 'addNode', payload};
+    newState = reducer(newState, action);
 
     const {typeRootNode} = newState;
     expect(typeRootNode.name).toBe(rootName);
@@ -94,68 +80,77 @@ describe('reducer', () => {
     expect(child.name).toBe(childName);
   });
 
+  test('addNode missing parentPath', () => {
+    const payload: AddNodePayloadType = {name: 'some name', parentPath: ''};
+    const action = {type: 'addNode', payload};
+    expect(() => reducer(state, action)).toThrow('addNode requires parentPath');
+  });
+
   test('deleteNode 1 level deep', () => {
-    const rootNode: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name: 'typeRootNode'
-    };
+    const rootName = state.typeRootNode.name;
 
-    const name = 'new node name';
-    const child: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name,
-      parent: rootNode
-    };
+    // Add a node.
+    const name = 'new node';
+    const parentPath = rootName;
+    const payload: AddNodePayloadType = {name, parentPath};
+    let action = {type: 'addNode', payload};
+    let newState = reducer(state, action);
 
-    rootNode.children.push(child);
+    // Delete the node that was added.
+    const [child] = newState[rootName].children;
+    action = {type: 'deleteNode', payload: child};
+    newState = reducer(state, action);
 
-    const state: StateType = initialState;
-    state.typeRootNode = rootNode;
-
-    const action = {type: 'deleteNode', payload: child};
-    const newState = reducer(state, action);
-    const {typeRootNode} = newState;
-    expect(typeRootNode.children.length).toBe(0);
+    expect(newState.typeRootNode.children.length).toBe(0);
   });
 
   test('deleteNode 2 levels deep', () => {
-    const root: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name: 'typeRootNode'
-    };
+    const rootName = state.typeRootNode.name;
 
+    // Add a node.
     const parentName = 'parent node';
-    const parent: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name: parentName,
-      parent: root
-    };
+    let parentPath = rootName;
+    let payload: AddNodePayloadType = {name: parentName, parentPath};
+    let action = {type: 'addNode', payload};
+    let newState = reducer(state, action);
 
+    // Add a child to the previously added node.
     const childName = 'child node';
-    const child: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name: childName,
-      parent
-    };
+    parentPath = `${rootName}/${parentName}`;
+    payload = {name: childName, parentPath};
+    action = {type: 'addNode', payload};
+    newState = reducer(newState, action);
 
-    parent.children.push(child);
-    root.children.push(parent);
+    // Delete the child node that was added.
+    const [parent] = newState[rootName].children;
+    const [child] = parent.children;
+    action = {type: 'deleteNode', payload: child};
+    newState = reducer(newState, action);
 
-    const state: StateType = initialState;
-    state.typeRootNode = root;
-
-    const action = {type: 'deleteNode', payload: child};
-    const newState = reducer(state, action);
     const {typeRootNode} = newState;
     expect(typeRootNode.children.length).toBe(1);
     const [node] = typeRootNode.children;
     expect(node.name).toBe(parentName);
     expect(node.children.length).toBe(0);
+  });
+
+  test('deleteNode missing parentPath', () => {
+    const rootName = state.typeRootNode.name;
+
+    // Add a node.
+    const name = 'new node';
+    const parentPath = `${rootName}`;
+    const payload: AddNodePayloadType = {name, parentPath};
+    let action = {type: 'addNode', payload};
+    const newState = reducer(state, action);
+
+    // Delete the node that was added.
+    const [child] = newState[rootName].children;
+    const childCopy = {...child, parentPath: ''};
+    action = {type: 'deleteNode', payload: childCopy};
+    expect(() => reducer(state, action)).toThrow(
+      'targetNode must have parentPath'
+    );
   });
 
   test('setConfirmEmail', () => testSetUserProp('confirmEmail'));

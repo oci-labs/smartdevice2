@@ -2,6 +2,8 @@
 
 import {addReducer} from 'redux-easy';
 
+import {cloneTree, getFirstPathPart, getNodesExcept} from './util/tree-util';
+
 //import type {ModalType, StateType, TreeBuilderType, UserType} from './types';
 import type {
   AddNodePayloadType,
@@ -9,10 +11,6 @@ import type {
   StateType,
   TreeNodeType
 } from './types';
-
-function copyNodesExcept(nodes: TreeNodeType[], except: TreeNodeType) {
-  return nodes.filter(node => node.name !== except.name);
-}
 
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
@@ -35,61 +33,33 @@ function setUserProp(
 addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
-    const {name, parent} = payload;
+    const {name, parentPath} = payload;
+    if (!parentPath) throw new Error('addNode requires parentPath');
+
+    const [newRoot, node] = cloneTree(state, parentPath);
 
     const newNode: TreeNodeType = {
       children: [],
       expanded: true,
       name,
-      parent
+      parentPath
     };
-
-    // Recreate parent node with new children.
-    const newChildren = [...parent.children, newNode];
-    let newParent = {...parent, children: newChildren};
-
-    // Walk up the tree.
-    while (newParent.parent) {
-      const grandparent = newParent.parent;
-
-      // Copy current children except old parent node.
-      let children = copyNodesExcept(grandparent.children, newParent);
-
-      // Add new parent node.
-      children = [...children, newParent];
-
-      newParent = {...grandparent, children};
-    }
-
-    const rootPropertyName = newParent.name;
-    return {...state, [rootPropertyName]: newParent};
+    node.children = node.children.concat(newNode);
+    return {...state, [getFirstPathPart(parentPath)]: newRoot};
   }
 );
 
 addReducer(
   'deleteNode',
-  (state: StateType, node: TreeNodeType): StateType => {
-    // Recreate parent node with new children.
-    const {parent} = node;
-    const newChildren = parent ?
-      parent.children.filter(child => child !== node) :
-      [];
-    let newParent = {...parent, children: newChildren};
-
-    while (newParent.parent) {
-      const grandparent = newParent.parent;
-
-      // Copy current children except old parent node.
-      let children = copyNodesExcept(grandparent.children, newParent);
-
-      // Add new parent node.
-      children = [...children, newParent];
-
-      newParent = {...grandparent, children};
+  (state: StateType, targetNode: TreeNodeType): StateType => {
+    const {parentPath} = targetNode;
+    if (!parentPath) {
+      throw new Error('targetNode must have parentPath');
     }
 
-    const rootPropertyName = newParent.name;
-    return {...state, [rootPropertyName]: newParent};
+    const [newRoot, node] = cloneTree(state, parentPath);
+    node.children = getNodesExcept(node.children, targetNode.name);
+    return {...state, [getFirstPathPart(parentPath)]: newRoot};
   }
 );
 

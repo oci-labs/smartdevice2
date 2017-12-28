@@ -1,3 +1,5 @@
+// @flow
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
@@ -11,12 +13,17 @@ import './index.css';
 
 const store = reduxSetup({initialState, render});
 
+// Using this to get elements makes Flow happy.
+function getElement(id: string): Element {
+  return ((document.getElementById(id): any): Element); // type cast
+}
+
 function render() {
   ReactDOM.render(
     <Provider store={store}>
       <App />
     </Provider>,
-    document.getElementById('root')
+    getElement('root')
   );
 }
 
