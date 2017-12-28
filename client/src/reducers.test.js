@@ -43,7 +43,7 @@ describe('reducer', () => {
     const rootName = state.typeRootNode.name;
 
     const name = 'new node';
-    const payload: AddNodePayloadType = {name, parentPath: rootName};
+    const payload: AddNodePayloadType = {name, path: rootName};
     const action = {type: 'addNode', payload};
     const newState = reducer(state, action);
     const {typeRootNode} = newState;
@@ -51,7 +51,7 @@ describe('reducer', () => {
     expect(typeRootNode.children[0]).toEqual({
       children: [],
       name,
-      parentPath: rootName
+      path: rootName
     });
   });
 
@@ -59,14 +59,14 @@ describe('reducer', () => {
     const rootName = state.typeRootNode.name;
 
     const parentName = 'parent node';
-    let parentPath = rootName;
-    let payload: AddNodePayloadType = {name: parentName, parentPath};
+    let path = rootName;
+    let payload: AddNodePayloadType = {name: parentName, path};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
 
     const childName = 'child node';
-    parentPath = `${rootName}/${parentName}`;
-    payload = {name: childName, parentPath};
+    path = `${rootName}/${parentName}`;
+    payload = {name: childName, path};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
 
@@ -79,8 +79,8 @@ describe('reducer', () => {
     expect(child.name).toBe(childName);
   });
 
-  test('addNode missing parentPath', () => {
-    const payload: AddNodePayloadType = {name: 'some name', parentPath: ''};
+  test('addNode missing path', () => {
+    const payload: AddNodePayloadType = {name: 'some name', path: ''};
     const action = {type: 'addNode', payload};
     expect(() => reducer(state, action)).toThrow('path is required');
   });
@@ -90,8 +90,8 @@ describe('reducer', () => {
 
     // Add a node.
     const name = 'new node';
-    const parentPath = rootName;
-    const payload: AddNodePayloadType = {name, parentPath};
+    const path = rootName;
+    const payload: AddNodePayloadType = {name, path};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
 
@@ -108,15 +108,15 @@ describe('reducer', () => {
 
     // Add a node.
     const parentName = 'parent node';
-    let parentPath = rootName;
-    let payload: AddNodePayloadType = {name: parentName, parentPath};
+    let path = rootName;
+    let payload: AddNodePayloadType = {name: parentName, path};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
 
     // Add a child to the previously added node.
     const childName = 'child node';
-    parentPath = `${rootName}/${parentName}`;
-    payload = {name: childName, parentPath};
+    path = `${rootName}/${parentName}`;
+    payload = {name: childName, path};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
 
@@ -133,22 +133,22 @@ describe('reducer', () => {
     expect(node.children.length).toBe(0);
   });
 
-  test('deleteNode missing parentPath', () => {
+  test('deleteNode missing path', () => {
     const rootName = state.typeRootNode.name;
 
     // Add a node.
     const name = 'new node';
-    const parentPath = `${rootName}`;
-    const payload: AddNodePayloadType = {name, parentPath};
+    const path = `${rootName}`;
+    const payload: AddNodePayloadType = {name, path};
     let action = {type: 'addNode', payload};
     const newState = reducer(state, action);
 
     // Delete the node that was added.
     const [child] = newState[rootName].children;
-    const childCopy = {...child, parentPath: ''};
+    const childCopy = {...child, path: ''};
     action = {type: 'deleteNode', payload: childCopy};
     expect(() => reducer(state, action)).toThrow(
-      'deleteNode targetNode must have parentPath'
+      'deleteNode targetNode must have path'
     );
   });
 

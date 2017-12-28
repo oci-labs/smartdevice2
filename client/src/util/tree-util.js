@@ -6,23 +6,28 @@ export type TreeNodeType = {
   children: TreeNodeType[],
   expanded?: boolean,
   name: string,
-  parentPath?: string,
+  path?: string,
   type?: TreeNodeType // for instance nodes
 };
 
 export function addNode(
   rootNode: TreeNodeType,
-  parentPath: string,
+  path: string,
   name: string
 ): TreeNodeType {
-  if (!parentPath) throw new Error('addNode requires parentPath');
+  if (!path) throw new Error('addNode requires path');
 
-  const [newRootNode, node] = cloneTree(rootNode, parentPath);
+  const [newRootNode, node] = cloneTree(rootNode, path);
+
+  const {children} = node;
+  if (children.find(child => child.name === name)) {
+    throw new Error(`duplicate child name "${name}"`);
+  }
 
   const newNode: TreeNodeType = {
     children: [],
     name,
-    parentPath
+    path
   };
   node.children = node.children.concat(newNode);
 
@@ -62,10 +67,10 @@ export function deleteNode(
   rootNode: TreeNodeType,
   targetNode: TreeNodeType
 ): TreeNodeType {
-  const {parentPath} = targetNode;
-  if (!parentPath) throw new Error('targetNode must have parentPath');
+  const {path} = targetNode;
+  if (!path) throw new Error('targetNode must have path');
 
-  const [newRootNode, node] = cloneTree(rootNode, parentPath);
+  const [newRootNode, node] = cloneTree(rootNode, path);
   node.children = getNodesExcept(node.children, targetNode.name);
 
   return newRootNode;

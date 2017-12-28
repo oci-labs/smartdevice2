@@ -22,17 +22,26 @@ class TreeBuilder extends Component<PropsType> {
     const name = this.props.newNodeName;
     if (!name) return;
 
-    let parentPath = parent.parentPath ?
-      parent.parentPath + PATH_DELIMITER :
+    let path = parent.path ?
+      parent.path + PATH_DELIMITER :
       '';
-    parentPath += parent.name;
+    path += parent.name;
 
-    dispatch('addNode', {name, parentPath});
-    dispatch('setNewTypeName', '');
+    try {
+      dispatch('addNode', {name, path});
+      dispatch('setNewTypeName', '');
+    } catch (e) {
+      console.error('tree-builder.js addNode:', e.message);
+    }
   };
 
   deleteNode = (node: TreeNodeType) => {
     dispatch('deleteNode', node);
+  };
+
+  editNode = (node: TreeNodeType) => {
+    console.log('tree-builder.js editNode: node.name =', node.name);
+    dispatch('editNode', node);
   };
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
@@ -46,13 +55,18 @@ class TreeBuilder extends Component<PropsType> {
         <div className="tree-node-name">{node.name}</div>
         <Button
           className="addNode"
-          label="+"
+          icon="plus"
           onClick={() => this.addNode(node)}
         />
         <Button
           className="deleteNode"
-          label="-"
+          icon="trash-o"
           onClick={() => this.deleteNode(node)}
+        />
+        <Button
+          className="editNode"
+          icon="pencil"
+          onClick={() => this.editNode(node)}
         />
         {this.renderNodes(node.children, level + 1)}
       </div>
@@ -74,7 +88,7 @@ class TreeBuilder extends Component<PropsType> {
         </div>
         <Button
           className="addNode"
-          label="+"
+          icon="plus"
           onClick={() => this.addNode(rootNode)}
         />
         {this.renderNodes(rootNode.children)}

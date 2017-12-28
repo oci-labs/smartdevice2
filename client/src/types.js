@@ -9,7 +9,7 @@ export type ActionType = {
 
 export type AddNodePayloadType = {
   name: string,
-  parentPath: string
+  path: string
 };
 
 export type AddressType = {
@@ -47,6 +47,8 @@ export type ModalType = {
 export type RoleType = 'admin' | 'service' | 'spectator';
 
 export type UiType = {
+  editNodeName: string,
+  editNodePath: string,
   modal: ModalType
 };
 

@@ -35,9 +35,9 @@ describe('tree-util', () => {
     const rootName = 'typeRootNode';
     const rootNode = state[rootName];
 
-    const parentPath = rootName;
+    const path = rootName;
     const name = 'new node';
-    const newRootNode = addNode(rootNode, parentPath, name);
+    const newRootNode = addNode(rootNode, path, name);
 
     const {children} = newRootNode;
     expect(children.length).toBe(1);
@@ -45,11 +45,23 @@ describe('tree-util', () => {
     expect(child.name).toBe(name);
   });
 
-  test('addNode without parentPath', () => {
+  test('addNode without path', () => {
     const rootNode: TreeNodeType = {children: [], name: 'root'};
-    const parentPath = '';
+    const path = '';
     const name = 'some name';
-    expect(() => addNode(rootNode, parentPath, name)).toThrow();
+    expect(() => addNode(rootNode, path, name)).toThrow();
+  });
+
+  test('addNode duplicate child name', () => {
+    const rootName = 'typeRootNode';
+    const rootNode = state[rootName];
+
+    const path = rootName;
+    const name = 'new node';
+    const newRootNode = addNode(rootNode, path, name);
+    expect(() => addNode(newRootNode, path, name)).toThrow(
+      `duplicate child name "${name}"`
+    );
   });
 
   test('cloneTree empty', () => {
@@ -71,12 +83,12 @@ describe('tree-util', () => {
     let node = {
       children: [],
       name: name3,
-      parentPath: `${name1}${d}${name2}`
+      path: `${name1}${d}${name2}`
     };
     node = {
       children: [node],
       name: name2,
-      parentPath: name1
+      path: name1
     };
     const rootNode = {
       children: [node],
@@ -102,27 +114,27 @@ describe('tree-util', () => {
     const rootName = 'typeRootNode';
     const rootNode = state[rootName];
 
-    const parentPath = rootName;
+    const path = rootName;
     const name = 'new node';
-    let newRootNode = addNode(rootNode, parentPath, name);
+    let newRootNode = addNode(rootNode, path, name);
 
-    const targetNode = {children: [], name, parentPath};
+    const targetNode = {children: [], name, path};
     newRootNode = deleteNode(newRootNode, targetNode);
 
     const {children} = newRootNode;
     expect(children.length).toBe(0);
   });
 
-  test('deleteNode without parentPath', () => {
+  test('deleteNode without path', () => {
     const rootNode: TreeNodeType = {children: [], name: 'root'};
     const targetNode: TreeNodeType = {
       children: [],
       name: 'some name',
-      parentPath: ''
+      path: ''
     };
 
     expect(() => deleteNode(rootNode, targetNode)).toThrow(
-      'targetNode must have parentPath'
+      'targetNode must have path'
     );
   });
 

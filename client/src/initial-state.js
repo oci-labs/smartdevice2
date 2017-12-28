@@ -15,6 +15,8 @@ const initialState: StateType = {
     name: 'typeRootNode'
   },
   ui: {
+    editNodeName: '',
+    editNodePath: '',
     modal: {
       message: '',
       open: false,

@@ -9,8 +9,10 @@ import {
   type TreeNodeType
 } from './util/tree-util';
 
-//import type {ModalType, StateType, TreeBuilderType, UserType} from './types';
-import type {AddNodePayloadType, ModalType, StateType} from './types';
+import type {
+  ModalType,
+  StateType
+} from './types';
 
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
@@ -32,30 +34,40 @@ function setUserProp(
 
 addReducer(
   'addNode',
-  (state: StateType, payload: AddNodePayloadType): StateType => {
-    const {name, parentPath} = payload;
-    const rootName = getFirstPathPart(parentPath);
+  (state: StateType, node: TreeNodeType): StateType => {
+    const {name, path = ''} = node;
+    const rootName = getFirstPathPart(path);
     const rootNode = state[rootName];
-    if (!rootNode) throw new Error(`no root node found at "${parentPath}"`);
+    if (!rootNode) throw new Error(`no root node found at "${path}"`);
 
-    const newRootNode = addNode(rootNode, parentPath, name);
-    return {...state, [getFirstPathPart(parentPath)]: newRootNode};
+    const newRootNode = addNode(rootNode, path, name);
+    return {...state, [getFirstPathPart(path)]: newRootNode};
   }
 );
 
 addReducer(
   'deleteNode',
   (state: StateType, targetNode: TreeNodeType): StateType => {
-    const {parentPath} = targetNode;
-    if (!parentPath) {
-      throw new Error('deleteNode targetNode must have parentPath');
+    const {path} = targetNode;
+    if (!path) {
+      throw new Error('deleteNode targetNode must have path');
     }
-    const rootName = getFirstPathPart(parentPath);
+    const rootName = getFirstPathPart(path);
     const rootNode = state[rootName];
-    if (!rootNode) throw new Error(`no root node found at "${parentPath}"`);
+    if (!rootNode) throw new Error(`no root node found at "${path}"`);
 
     const newRootNode = deleteNode(rootNode, targetNode);
-    return {...state, [getFirstPathPart(parentPath)]: newRootNode};
+    return {...state, [getFirstPathPart(path)]: newRootNode};
+  }
+);
+
+addReducer(
+  'editNode',
+  (state: StateType, payload: TreeNodeType): StateType => {
+    const {name, path} = payload;
+    let newState = setUiProp(state, 'editNodeName', name);
+    newState = setUiProp(state, 'editNodePath', path);
+    return newState;
   }
 );
 
