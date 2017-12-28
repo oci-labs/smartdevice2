@@ -1,16 +1,10 @@
 // @flow
 
+import type {TreeNodeType} from './util/tree-util';
+
 export type ActionType = {
   type: string,
   payload?: any
-};
-
-export type TreeNodeType = {
-  children: TreeNodeType[],
-  expanded: boolean,
-  name: string,
-  parentPath?: string,
-  type?: TreeNodeType // for instance nodes
 };
 
 export type AddNodePayloadType = {

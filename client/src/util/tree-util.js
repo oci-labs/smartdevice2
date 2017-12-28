@@ -1,16 +1,39 @@
 // @flow
 
-import type {StateType, TreeNodeType} from '../types';
-
 export const PATH_DELIMITER = '/';
 
-export function cloneTree(state: StateType, path: string) {
-  const parts = path.split(PATH_DELIMITER);
-  const firstPart = parts.shift();
-  let node = state[firstPart];
-  if (!node) throw new Error(`no root node found at "${path}"`);
+export type TreeNodeType = {
+  children: TreeNodeType[],
+  expanded?: boolean,
+  name: string,
+  parentPath?: string,
+  type?: TreeNodeType // for instance nodes
+};
 
-  node = {...node}; // makes a copy
+export function addNode(
+  rootNode: TreeNodeType,
+  parentPath: string,
+  name: string
+): TreeNodeType {
+  if (!parentPath) throw new Error('addNode requires parentPath');
+
+  const [newRootNode, node] = cloneTree(rootNode, parentPath);
+
+  const newNode: TreeNodeType = {
+    children: [],
+    name,
+    parentPath
+  };
+  node.children = node.children.concat(newNode);
+
+  return newRootNode;
+}
+
+export function cloneTree(rootNode: TreeNodeType, path: string) {
+  const parts = path.split(PATH_DELIMITER);
+  parts.shift(); // removes root node name
+
+  let node = {...rootNode}; // makes a copy
   const newRoot = node;
 
   // Walk down the tree creating copies of all nodes in the path.
@@ -33,6 +56,19 @@ export function cloneTree(state: StateType, path: string) {
   // Return both the new root node and the last node copied.
   // Callers can add or delete a child in the last node copied.
   return [newRoot, node];
+}
+
+export function deleteNode(
+  rootNode: TreeNodeType,
+  targetNode: TreeNodeType
+): TreeNodeType {
+  const {parentPath} = targetNode;
+  if (!parentPath) throw new Error('targetNode must have parentPath');
+
+  const [newRootNode, node] = cloneTree(rootNode, parentPath);
+  node.children = getNodesExcept(node.children, targetNode.name);
+
+  return newRootNode;
 }
 
 export function findNode(nodes: TreeNodeType[], name: string): ?TreeNodeType {

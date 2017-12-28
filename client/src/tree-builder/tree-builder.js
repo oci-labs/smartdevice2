@@ -4,24 +4,32 @@ import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
 
 import Button from './button';
+import {PATH_DELIMITER, type TreeNodeType} from '../util/tree-util';
 
 import './tree-builder.css';
-
-import type {TreeNodeType} from '../types';
 
 type PropsType = {
   newNodeName: string,
   rootNode: TreeNodeType
 };
 
-class TreeBuilder extends Component<PropsType> {
+function nodeCompare(node1: TreeNodeType, node2: TreeNodeType) {
+  return node1.name.localeCompare(node2.name);
+}
 
+class TreeBuilder extends Component<PropsType> {
   addNode = (parent: TreeNodeType) => {
     const name = this.props.newNodeName;
     if (!name) return;
-    dispatch('addNode', {name, parent});
+
+    let parentPath = parent.parentPath ?
+      parent.parentPath + PATH_DELIMITER :
+      '';
+    parentPath += parent.name;
+
+    dispatch('addNode', {name, parentPath});
     dispatch('setNewTypeName', '');
-  }
+  };
 
   deleteNode = (node: TreeNodeType) => {
     dispatch('deleteNode', node);
@@ -32,6 +40,7 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   renderNodes = (nodes: TreeNodeType[], level: number = 0) =>
+    //nodes.sort(nodeCompare).map(node => (
     nodes.map(node => (
       <div className={'tree-node tree-level-' + level} key={node.name}>
         <div className="tree-node-name">{node.name}</div>

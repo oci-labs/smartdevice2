@@ -5,7 +5,8 @@ import {connect} from 'react-redux';
 
 import TreeBuilder from './tree-builder/tree-builder';
 
-import type {StateType, TreeNodeType} from './types';
+import type {StateType} from './types';
+import type {TreeNodeType} from './util/tree-util';
 
 import './app.css';
 

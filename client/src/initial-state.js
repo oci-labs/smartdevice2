@@ -6,14 +6,12 @@ const initialState: StateType = {
   errors: new Set(),
   instanceRootNode: {
     children: [],
-    expanded: true,
     name: 'instanceRootNode'
   },
   newInstanceName: '',
   newTypeName: '',
   typeRootNode: {
     children: [],
-    expanded: true,
     name: 'typeRootNode'
   },
   ui: {

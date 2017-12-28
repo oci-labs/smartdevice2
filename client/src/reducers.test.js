@@ -50,7 +50,6 @@ describe('reducer', () => {
     expect(typeRootNode.children.length).toBe(1);
     expect(typeRootNode.children[0]).toEqual({
       children: [],
-      expanded: true,
       name,
       parentPath: rootName
     });
@@ -83,7 +82,7 @@ describe('reducer', () => {
   test('addNode missing parentPath', () => {
     const payload: AddNodePayloadType = {name: 'some name', parentPath: ''};
     const action = {type: 'addNode', payload};
-    expect(() => reducer(state, action)).toThrow('addNode requires parentPath');
+    expect(() => reducer(state, action)).toThrow('path is required');
   });
 
   test('deleteNode 1 level deep', () => {
@@ -149,7 +148,7 @@ describe('reducer', () => {
     const childCopy = {...child, parentPath: ''};
     action = {type: 'deleteNode', payload: childCopy};
     expect(() => reducer(state, action)).toThrow(
-      'targetNode must have parentPath'
+      'deleteNode targetNode must have parentPath'
     );
   });
 

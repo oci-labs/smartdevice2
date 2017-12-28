@@ -2,15 +2,15 @@
 
 import {addReducer} from 'redux-easy';
 
-import {cloneTree, getFirstPathPart, getNodesExcept} from './util/tree-util';
+import {
+  addNode,
+  deleteNode,
+  getFirstPathPart,
+  type TreeNodeType
+} from './util/tree-util';
 
 //import type {ModalType, StateType, TreeBuilderType, UserType} from './types';
-import type {
-  AddNodePayloadType,
-  ModalType,
-  StateType,
-  TreeNodeType
-} from './types';
+import type {AddNodePayloadType, ModalType, StateType} from './types';
 
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
@@ -34,18 +34,12 @@ addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
     const {name, parentPath} = payload;
-    if (!parentPath) throw new Error('addNode requires parentPath');
+    const rootName = getFirstPathPart(parentPath);
+    const rootNode = state[rootName];
+    if (!rootNode) throw new Error(`no root node found at "${parentPath}"`);
 
-    const [newRoot, node] = cloneTree(state, parentPath);
-
-    const newNode: TreeNodeType = {
-      children: [],
-      expanded: true,
-      name,
-      parentPath
-    };
-    node.children = node.children.concat(newNode);
-    return {...state, [getFirstPathPart(parentPath)]: newRoot};
+    const newRootNode = addNode(rootNode, parentPath, name);
+    return {...state, [getFirstPathPart(parentPath)]: newRootNode};
   }
 );
 
@@ -54,12 +48,14 @@ addReducer(
   (state: StateType, targetNode: TreeNodeType): StateType => {
     const {parentPath} = targetNode;
     if (!parentPath) {
-      throw new Error('targetNode must have parentPath');
+      throw new Error('deleteNode targetNode must have parentPath');
     }
+    const rootName = getFirstPathPart(parentPath);
+    const rootNode = state[rootName];
+    if (!rootNode) throw new Error(`no root node found at "${parentPath}"`);
 
-    const [newRoot, node] = cloneTree(state, parentPath);
-    node.children = getNodesExcept(node.children, targetNode.name);
-    return {...state, [getFirstPathPart(parentPath)]: newRoot};
+    const newRootNode = deleteNode(rootNode, targetNode);
+    return {...state, [getFirstPathPart(parentPath)]: newRootNode};
   }
 );
 
