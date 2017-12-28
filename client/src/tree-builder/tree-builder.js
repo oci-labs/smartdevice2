@@ -39,9 +39,9 @@ class TreeBuilder extends Component<PropsType> {
     dispatch('setNewTypeName', event.target.value);
   };
 
-  renderNodes = (nodes: TreeNodeType[], level: number = 0) =>
-    //nodes.sort(nodeCompare).map(node => (
-    nodes.map(node => (
+  renderNodes = (nodes: TreeNodeType[], level: number = 0) => {
+    const copy = [...nodes].sort(nodeCompare);
+    return copy.map(node => (
       <div className={'tree-node tree-level-' + level} key={node.name}>
         <div className="tree-node-name">{node.name}</div>
         <Button
@@ -57,6 +57,7 @@ class TreeBuilder extends Component<PropsType> {
         {this.renderNodes(node.children, level + 1)}
       </div>
     ));
+  };
 
   render() {
     const {newNodeName, rootNode} = this.props;
