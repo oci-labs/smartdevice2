@@ -43,17 +43,18 @@ describe('reducer', () => {
 
   test('addNode 1 level deep', () => {
     // Add a root node.
-    let payload: AddNodePayloadType = {name: '', parentId: 0};
+    const parentId = 1;
+    let payload: AddNodePayloadType = {id: parentId, name: '', parentId: 0};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
-    const parentId = newState.lastNodeId;
 
     // Add a child node to root node.
+    const childId = 2;
     const name = 'new node';
-    payload = {name, parentId};
+    payload = {id: childId, name, parentId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
-    const {lastNodeId: childId, nodeMap} = newState;
+    const {nodeMap} = newState;
     const childNode = nodeMap[childId];
     expect(childNode.name).toBe(name);
     expect(childNode.parentId).toBe(parentId);
@@ -65,24 +66,25 @@ describe('reducer', () => {
 
   test('addNode 2 levels deep', () => {
     // Add a root node.
-    let payload: AddNodePayloadType = {name: '', parentId: 0};
+    const rootId = 1;
+    let payload: AddNodePayloadType = {id: rootId, name: '', parentId: 0};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
-    let parentId = newState.lastNodeId;
 
     // Add a parent node.
-    payload = {name: 'some parent', parentId};
+    const parentId = 2;
+    payload = {id: parentId, name: 'some parent', parentId: rootId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
-    parentId = newState.lastNodeId;
 
     // Add a child node.
+    const childId = 3;
     const childName = 'child node';
-    payload = {name: childName, parentId};
+    payload = {id: childId, name: childName, parentId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
 
-    const {lastNodeId: childId, nodeMap} = newState;
+    const {nodeMap} = newState;
     const childNode = nodeMap[childId];
     expect(childNode.id).toBe(childId);
     expect(childNode.name).toBe(childName);
@@ -95,11 +97,12 @@ describe('reducer', () => {
 
   test('deleteNode 1 level deep', () => {
     // Add a node.
+    const nodeId = 1;
     const name = 'new node';
-    const payload: AddNodePayloadType = {name, parentId: 0};
+    const payload: AddNodePayloadType = {id: nodeId, name, parentId: 0};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
-    const {lastNodeId: nodeId, nodeMap} = newState;
+    const {nodeMap} = newState;
     const node = nodeMap[nodeId];
     expect(node).toBeDefined();
 
@@ -111,23 +114,24 @@ describe('reducer', () => {
 
   test('deleteNode 2 levels deep', () => {
     // Add a root node.
-    let payload: AddNodePayloadType = {name: '', parentId: 0};
+    const rootId = 1;
+    let payload: AddNodePayloadType = {id: rootId, name: '', parentId: 0};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
-    const parentId = newState.lastNodeId;
 
     // Add a child node to root node.
+    const childId = 2;
     const name = 'new node';
-    payload = {name, parentId};
+    payload = {id: childId, name, parentId: rootId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
-    const {lastNodeId: nodeId, nodeMap} = newState;
-    const node = nodeMap[nodeId];
+    const {nodeMap} = newState;
+    const node = nodeMap[childId];
 
     // Delete the child node that was added.
     action = {type: 'deleteNode', payload: node};
     newState = reducer(newState, action);
-    expect(newState.nodeMap[nodeId]).not.toBeDefined();
+    expect(newState.nodeMap[childId]).not.toBeDefined();
   });
 
   test('setConfirmEmail', () => testSetUserProp('confirmEmail'));

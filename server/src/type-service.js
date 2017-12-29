@@ -20,8 +20,10 @@ async function deleteByIdHandler(
 ): Promise<void> {
   const {id} = req.params;
   try {
-    const rowCount: number = await mySql.deleteById('type', id);
-    res.send(String(rowCount));
+    // Cascading deletes in database take care of
+    // deleting all descendant types.
+    const {affectedRows} = await mySql.deleteById('type', id);
+    res.send(String(affectedRows));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
@@ -33,7 +35,8 @@ async function createHandler(
   res: express$Response
 ): Promise<void> {
   try {
-    const rows = await mySql.getAll('type');
+    const obj = JSON.parse(req.body);
+    const rows = await mySql.insert('type', obj);
     res.send(JSON.stringify(rows));
   } catch (e) {
     // istanbul ignore next
@@ -60,8 +63,25 @@ async function getByIdHandler(
 ): Promise<void> {
   const {id} = req.params;
   try {
-    const type = await mySql.getById('user', id);
+    const type = await mySql.getById('type', id);
     res.status(type ? 200 : 404).send(JSON.stringify(type));
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
+async function patchHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {id} = req.params;
+  const changes = JSON.parse(req.body);
+  try {
+    const type = await mySql.getById('type', id);
+    const newType = {...type, ...changes};
+    const {changedRows} = await mySql.updateById('type', id, newType);
+    res.status(changedRows ? 200 : 500).send(JSON.stringify(newType));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
@@ -74,6 +94,7 @@ function typeService(app: express$Application): void {
   app.delete(URL_PREFIX + '/:id', deleteByIdHandler);
   app.get(URL_PREFIX, getAllHandler);
   app.get(URL_PREFIX + '/:id', getByIdHandler);
+  app.patch(URL_PREFIX + '/:id', patchHandler);
   app.post(URL_PREFIX, createHandler);
 }
 
@@ -82,5 +103,6 @@ module.exports = {
   deleteByIdHandler,
   getAllHandler,
   getByIdHandler,
+  patchHandler,
   typeService
 };

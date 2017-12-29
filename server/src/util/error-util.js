@@ -1,3 +1,5 @@
+// @flow
+
 const inTest = process.env.NODE_ENV === 'test';
 
 // istanbul ignore next
@@ -8,7 +10,7 @@ function errorHandler(res: express$Response, error: string): void {
   throw new Error(msg);
 }
 
-function logError(msg) {
+function logError(msg: string): void {
   // istanbul ignore next
   if (!inTest) console.trace();
   // istanbul ignore next

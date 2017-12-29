@@ -29,11 +29,7 @@ function setUserProp(
   return {...state, user: {...user, [prop]: value}};
 }
 
-function validateNewName(
-  nodeMap: NodeMapType,
-  parentId: number,
-  name: string
-) {
+function validateNewName(nodeMap: NodeMapType, parentId: number, name: string) {
   if (!parentId) return; // don't need to do anything for root nodes
 
   if (!name) throw new Error('new nodes must have a name');
@@ -50,8 +46,8 @@ function validateNewName(
 addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
-    const {name, parentId} = payload;
-    const {lastNodeId, nodeMap} = state;
+    const {id, name, parentId} = payload;
+    const {nodeMap} = state;
 
     validateNewName(nodeMap, parentId, name);
 
@@ -59,7 +55,6 @@ addReducer(
     const newNodeMap = {...nodeMap};
 
     // Create the new node.
-    const id = lastNodeId + 1;
     const newNode: NodeType = {
       id,
       children: [],
@@ -78,7 +73,7 @@ addReducer(
       newParentNode.children.push(id);
     }
 
-    return {...state, lastNodeId: id, nodeMap: newNodeMap};
+    return {...state, nodeMap: newNodeMap};
   }
 );
 
@@ -122,7 +117,8 @@ addReducer(
 
     const node = nodeMap[id];
 
-    if (name !== node.name) { // changing name
+    if (name !== node.name) {
+      // changing name
       const {parentId} = node;
       validateNewName(nodeMap, parentId, name);
     }
@@ -175,6 +171,16 @@ addReducer('setNewInstanceName', (state: StateType, value: string): StateType =>
 addReducer('setNewNodeName', (state: StateType, value: string): StateType =>
   setUiProp(state, 'newNodeName', value)
 );
+
+addReducer('setNodes', (state: StateType, nodes: NodeType[]) => {
+  const nodeMap = nodes.reduce((map, node) => {
+    const {id} = node;
+    node.children = nodes.filter(n => n.parentId === id).map(n => n.id);
+    map[id] = node;
+    return map;
+  }, {});
+  return {...state, nodeMap};
+});
 
 addReducer('setPassword', (state: StateType, value: string): StateType =>
   setUserProp(state, 'password', value)

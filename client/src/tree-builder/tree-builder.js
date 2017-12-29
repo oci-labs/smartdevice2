@@ -17,26 +17,54 @@ type PropsType = {
   rootId: number
 };
 
+const URL_PREFIX = 'http://localhost:3001/types';
+
 function nodeCompare(node1: NodeType, node2: NodeType) {
   return node1.name.localeCompare(node2.name);
 }
 
 class TreeBuilder extends Component<PropsType> {
-  addNode = (parent: NodeType) => {
+
+  addNode = async (parent: NodeType) => {
     const name = this.props.newNodeName;
     if (!name) return;
 
+    const parentId = parent.id;
     try {
-      const payload: AddNodePayloadType = {name, parentId: parent.id};
+      // Add new type to database.
+      const options = {
+        method: 'POST',
+        body: JSON.stringify({name, parentId})
+      };
+      const url = URL_PREFIX;
+      const res = await fetch(url, options);
+      const id = Number(await res.text());
+
+      // Add new type to Redux state.
+      const payload: AddNodePayloadType = {id, name, parentId};
       dispatch('addNode', payload);
+
       dispatch('setNewNodeName', '');
     } catch (e) {
       console.error('tree-builder.js addNode:', e.message);
     }
   };
 
-  deleteNode = (node: NodeType) => {
-    dispatch('deleteNode', node);
+  componentDidMount() {
+    this.load();
+  }
+
+  deleteNode = async (node: NodeType) => {
+    try {
+      // Delete type from database.
+      const options = {method: 'DELETE'};
+      const url = `${URL_PREFIX}/${node.id}`;
+      await fetch(url, options);
+
+      dispatch('deleteNode', node);
+    } catch (e) {
+      console.error('tree-builder.js deleteNode:', e.message);
+    }
   };
 
   editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
@@ -56,19 +84,39 @@ class TreeBuilder extends Component<PropsType> {
 
   isEditing = (node: NodeType) => node.id === this.props.editingNodeId;
 
+  // Loads types from database.
+  load = async () => {
+    try {
+      const url = URL_PREFIX;
+      const res = await fetch(url);
+      const types = await res.json();
+      dispatch('setNodes', types);
+    } catch (e) {
+      console.error('tree-builder.js load:', e.message);
+    }
+  };
+
   moveCursor = (event: SyntheticInputEvent<HTMLInputElement>) => {
     const {target} = event;
     const {value} = target;
     target.selectionStart = value.length;
   }
 
-  saveChange = () => {
+  saveChange = async () => {
     const {editedName: name, editingNodeId: id} = this.props;
     const payload = {id, name};
     try {
+      // Update type name in database.
+      const options = {
+        method: 'PATCH',
+        body: JSON.stringify({name})
+      };
+      const url = `${URL_PREFIX}/${id}`;
+      await fetch(url, options);
+
       dispatch('saveNode', payload);
     } catch (e) {
-      console.error(e.message);
+      console.error('tree-builder.js saveChange:', e.message);
     }
   };
 
@@ -126,6 +174,7 @@ class TreeBuilder extends Component<PropsType> {
   render() {
     const {newNodeName, nodeMap, rootId} = this.props;
     const rootNode = nodeMap[rootId];
+    if (!rootNode) return null;
 
     return (
       <div className="tree-builder">

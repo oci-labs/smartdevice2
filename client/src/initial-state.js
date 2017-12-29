@@ -8,7 +8,6 @@ import type {AddNodePayloadType, StateType} from './types';
 let state: StateType = {
   errors: new Set(),
   instanceRootId: 0,
-  lastNodeId: 0,
   nodeMap: {},
   typeRootId: 0,
   ui: {
@@ -37,15 +36,23 @@ let state: StateType = {
 };
 
 // Add root node for types.
-let payload: AddNodePayloadType = {name: 'type root', parentId: 0};
+const typeRootId = 1;
+let payload: AddNodePayloadType = {
+  id: typeRootId,
+  name: 'type root',
+  parentId: 0
+};
 let action = {type: 'addNode', payload};
 state = reducer(state, action);
-const typeRootId = state.lastNodeId;
 
 // Add root node for instances.
-payload = {name: 'instance root', parentId: 0};
+const instanceRootId = 2;
+payload = {
+  id: instanceRootId,
+  name: 'instance root',
+  parentId: 0
+};
 action = {type: 'addNode', payload};
 state = reducer(state, action);
-const instanceRootId = state.lastNodeId;
 
 export default {...state, instanceRootId, typeRootId};

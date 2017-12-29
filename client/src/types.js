@@ -6,6 +6,7 @@ export type ActionType = {
 };
 
 export type AddNodePayloadType = {
+  id: number,
   name: string,
   parentId: number
 };
@@ -84,7 +85,6 @@ export type UserType = {
 export type StateType = {
   errors: Set<string>,
   instanceRootId: number,
-  lastNodeId: number,
   nodeMap: NodeMapType,
   typeRootId: number,
   ui: UiType,
