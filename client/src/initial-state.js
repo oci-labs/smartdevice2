@@ -1,27 +1,25 @@
 // @flow
 
-import type {StateType} from './types';
+import './reducers';
+import {reducer} from 'redux-easy';
 
-const initialState: StateType = {
+import type {AddNodePayloadType, StateType} from './types';
+
+let state: StateType = {
   errors: new Set(),
-  instanceRootNode: {
-    children: [],
-    name: 'instanceRootNode'
-  },
-  newInstanceName: '',
-  newTypeName: '',
-  typeRootNode: {
-    children: [],
-    name: 'typeRootNode'
-  },
+  instanceRootId: 0,
+  lastNodeId: 0,
+  nodeMap: {},
+  typeRootId: 0,
   ui: {
     editedName: '',
-    editingNode: null,
+    editingNodeId: 0,
     modal: {
       message: '',
       open: false,
       title: ''
-    }
+    },
+    newNodeName: ''
   },
   user: {
     confirmEmail: '',
@@ -38,4 +36,16 @@ const initialState: StateType = {
   }
 };
 
-export default initialState;
+// Add root node for types.
+let payload: AddNodePayloadType = {name: 'type root', parentId: 0};
+let action = {type: 'addNode', payload};
+state = reducer(state, action);
+const typeRootId = state.lastNodeId;
+
+// Add root node for instances.
+payload = {name: 'instance root', parentId: 0};
+action = {type: 'addNode', payload};
+state = reducer(state, action);
+const instanceRootId = state.lastNodeId;
+
+export default {...state, instanceRootId, typeRootId};

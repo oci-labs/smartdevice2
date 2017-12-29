@@ -4,62 +4,67 @@ import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
 
 import Button from './button';
-import {PATH_DELIMITER, type TreeNodeType} from '../util/tree-util';
 
 import './tree-builder.css';
 
+import type {AddNodePayloadType, NodeMapType, NodeType} from '../types';
+
 type PropsType = {
   editedName: string,
-  editingNode: ?TreeNodeType,
+  editingNodeId: number,
   newNodeName: string,
-  rootNode: TreeNodeType
+  nodeMap: NodeMapType,
+  rootId: number
 };
 
-function nodeCompare(node1: TreeNodeType, node2: TreeNodeType) {
+function nodeCompare(node1: NodeType, node2: NodeType) {
   return node1.name.localeCompare(node2.name);
 }
 
 class TreeBuilder extends Component<PropsType> {
-  addNode = (parent: TreeNodeType) => {
+  addNode = (parent: NodeType) => {
     const name = this.props.newNodeName;
     if (!name) return;
 
-    let path = parent.path ? parent.path + PATH_DELIMITER : '';
-    path += parent.name;
-
     try {
-      dispatch('addNode', {name, path});
-      dispatch('setNewTypeName', '');
+      const payload: AddNodePayloadType = {name, parentId: parent.id};
+      dispatch('addNode', payload);
+      dispatch('setNewNodeName', '');
     } catch (e) {
       console.error('tree-builder.js addNode:', e.message);
     }
   };
 
-  deleteNode = (node: TreeNodeType) => {
+  deleteNode = (node: NodeType) => {
     dispatch('deleteNode', node);
   };
 
   editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
-    dispatch('editNodeName', event.target.value);
+    dispatch('editNode', event.target.value);
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewTypeName', event.target.value);
+    dispatch('setNewNodeName', event.target.value);
   };
 
-  isEditing = (node: TreeNodeType) => node === this.props.editingNode;
+  isEditing = (node: NodeType) => node.id === this.props.editingNodeId;
 
-  saveChange = () => dispatch('saveNodeName');
+  saveChange = () => {
+    const {editedName: name, editingNodeId: id} = this.props;
+    const payload = {id, name};
+    dispatch('saveNode', payload);
+  };
 
-  toggleEditNode = (node: TreeNodeType) => {
+  toggleEditNode = (node: NodeType) => {
     dispatch('toggleEditNode', node);
   };
 
-  renderNodes = (nodes: TreeNodeType[], level: number = 0) => {
-    const {editedName, newNodeName} = this.props;
+  renderNodes = (children: number[], level: number = 0) => {
+    const {editedName, newNodeName, nodeMap} = this.props;
 
-    const copy = [...nodes].sort(nodeCompare);
+    const nodes = children.map(id => nodeMap[id]);
+    nodes.sort(nodeCompare);
 
-    return copy.map(node => (
+    return nodes.map(node => (
       <div className={'tree-node tree-level-' + level} key={node.name}>
         {this.isEditing(node) ? (
           <input
@@ -93,7 +98,9 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   render() {
-    const {newNodeName, rootNode} = this.props;
+    const {newNodeName, nodeMap, rootId} = this.props;
+    const rootNode = nodeMap[rootId];
+
     return (
       <div className="tree-builder">
         <div>

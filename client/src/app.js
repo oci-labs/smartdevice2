@@ -5,21 +5,27 @@ import {connect} from 'react-redux';
 
 import TreeBuilder from './tree-builder/tree-builder';
 
-import type {StateType} from './types';
-import type {TreeNodeType} from './util/tree-util';
+import type {NodeMapType, StateType} from './types';
 
 import './app.css';
 
 type PropsType = {
   editedName: string,
-  editingNode: TreeNodeType,
-  newTypeName: string,
-  typeRootNode: TreeNodeType
+  editingNodeId: number,
+  newNodeName: string,
+  nodeMap: NodeMapType,
+  typeRootId: number
 };
 
 class App extends Component<PropsType> {
   render() {
-    const {editedName, editingNode, newTypeName, typeRootNode} = this.props;
+    const {
+      editedName,
+      editingNodeId,
+      newNodeName,
+      nodeMap,
+      typeRootId
+    } = this.props;
     return (
       <div className="app">
         <header className="app-header">
@@ -27,9 +33,10 @@ class App extends Component<PropsType> {
         </header>
         <TreeBuilder
           editedName={editedName}
-          editingNode={editingNode}
-          newNodeName={newTypeName}
-          rootNode={typeRootNode}
+          editingNodeId={editingNodeId}
+          newNodeName={newNodeName}
+          nodeMap={nodeMap}
+          rootId={typeRootId}
         />
       </div>
     );
@@ -37,8 +44,12 @@ class App extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): Object => {
-  const {newTypeName, typeRootNode, ui: {editedName, editingNode}} = state;
-  return {editedName, editingNode, newTypeName, typeRootNode};
+  const {
+    nodeMap,
+    typeRootId,
+    ui: {editedName, editingNodeId, newNodeName}
+  } = state;
+  return {editedName, editingNodeId, newNodeName, nodeMap, typeRootId};
 };
 
 export default connect(mapState)(App);

@@ -8,7 +8,7 @@ import {reduxSetup} from 'redux-easy';
 import App from './App';
 import initialState from './initial-state';
 
-it('renders without crashing', () => {
+test('renders without crashing', () => {
   const store = reduxSetup({initialState, mock: true});
   const div = document.createElement('div');
   ReactDOM.render(

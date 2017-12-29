@@ -2,26 +2,14 @@
 
 import {addReducer} from 'redux-easy';
 
-import {
-  PATH_DELIMITER,
-  addNode,
-  deleteNode,
-  editNode,
-  getFirstPathPart,
-  type TreeNodeType
-} from './util/tree-util';
-
 import type {
+  AddNodePayloadType,
   ModalType,
+  NodeMapType,
+  NodeType,
+  SaveNodePayloadType,
   StateType
 } from './types';
-
-function getRootNode(state: StateType, node: TreeNodeType): ?TreeNodeType {
-  const {path} = node;
-  if (!path) throw new Error('node must have path');
-  const rootName = getFirstPathPart(path);
-  return state[rootName];
-}
 
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
@@ -41,68 +29,115 @@ function setUserProp(
   return {...state, user: {...user, [prop]: value}};
 }
 
-function updateNames(node: TreeNodeType, position: number, name: string) {
-  for (const child of node.children) {
-    const {path} = child;
-    if (path) {
-      const parts = path.split(PATH_DELIMITER);
-      parts[position] = name;
-      child.path = parts.join(PATH_DELIMITER);
-      updateNames(child, position, name);
-    }
+function validateNewName(
+  nodeMap: NodeMapType,
+  parentId: number,
+  name: string
+) {
+  if (!parentId) return; // don't need to do anything for root nodes
+
+  if (!name) throw new Error('new nodes must have a name');
+
+  const parentNode = nodeMap[parentId];
+  if (!parentNode) return;
+
+  const {children} = parentNode;
+  if (children.find(id => nodeMap[id].name === name)) {
+    throw new Error(`duplicate child name "${name}"`);
   }
 }
 
 addReducer(
   'addNode',
-  (state: StateType, node: TreeNodeType): StateType => {
-    const {name, path = ''} = node;
-    const rootName = getFirstPathPart(path);
-    const rootNode = state[rootName];
-    if (!rootNode) throw new Error(`no root node found at "${path}"`);
+  (state: StateType, payload: AddNodePayloadType): StateType => {
+    const {name, parentId} = payload;
+    const {lastNodeId, nodeMap} = state;
 
-    const [newRootNode] = addNode(rootNode, path, name);
-    return {...state, [getFirstPathPart(path)]: newRootNode};
+    validateNewName(nodeMap, parentId, name);
+
+    // nodeMap is immutable, so make a copy that can be modified.
+    const newNodeMap = {...nodeMap};
+
+    // Create the new node.
+    const id = lastNodeId + 1;
+    const newNode: NodeType = {
+      id,
+      children: [],
+      name,
+      parentId
+    };
+
+    newNodeMap[id] = newNode;
+    if (parentId) {
+      const parentNode = nodeMap[parentId];
+
+      // parentNode is immutable, so make a copy that can be modified.
+      const newParentNode = {...parentNode, children: [...parentNode.children]};
+
+      newNodeMap[parentId] = newParentNode;
+      newParentNode.children.push(id);
+    }
+
+    return {...state, lastNodeId: id, nodeMap: newNodeMap};
   }
 );
 
 addReducer(
   'deleteNode',
-  (state: StateType, targetNode: TreeNodeType): StateType => {
-    const rootNode = getRootNode(state, targetNode);
-    const {path = 'none'} = targetNode;
-    if (!rootNode) throw new Error(`no root node found at "${path}"`);
+  (state: StateType, targetNode: NodeType): StateType => {
+    const {id, parentId} = targetNode;
+    const {nodeMap} = state;
 
-    const newRootNode = deleteNode(rootNode, targetNode);
-    return {...state, [getFirstPathPart(path)]: newRootNode};
+    // nodeMap is immutable, so make a copy that can be modified.
+    const newNodeMap = {...nodeMap};
+
+    delete newNodeMap[id];
+
+    if (parentId) {
+      const parentNode = nodeMap[parentId];
+      // parentNode is immutable, so make a copy that can be modified.
+      const {children} = parentNode;
+      const newChildren = children.filter(childId => childId !== id);
+      const newParentNode = {...parentNode, children: newChildren};
+      newNodeMap[parentId] = newParentNode;
+    }
+
+    return {...state, nodeMap: newNodeMap};
   }
 );
 
-addReducer('editNodeName', (state: StateType, value: string): StateType =>
-  setUiProp(state, 'editedName', value));
+addReducer('editNode', (state: StateType, value: string): StateType =>
+  setUiProp(state, 'editedName', value)
+);
 
-addReducer('saveNodeName', (state: StateType): StateType => {
-  const {ui: {editedName, editingNode}} = state;
-  if (!editingNode) throw new Error('no node to edit');
+addReducer(
+  'saveNode',
+  (state: StateType, payload: SaveNodePayloadType): StateType => {
+    const {id, name} = payload;
+    const {nodeMap, ui} = state;
 
-  const rootNode = getRootNode(state, editingNode);
-  if (!rootNode) throw new Error('root node not found');
+    const node = nodeMap[id];
+    const {parentId} = node;
 
-  const {path} = editingNode;
-  if (!path) throw new Error('node must have path');
+    //TODO: Don't compare to current name!
+    validateNewName(nodeMap, parentId, name);
 
-  const [newRootNode, newNode] = editNode(rootNode, editingNode, editedName);
+    // nodeMap is immutable, so make a copy that can be modified.
+    const newNodeMap = {...nodeMap};
+    const newNode = {...node, name};
+    newNodeMap[id] = newNode;
 
-  if (newNode.path) {
-    // Change the path of all nodes below the one that was edited
-    // to use the new name.
-    const position = newNode.path.split(PATH_DELIMITER).length;
-    updateNames(newNode, position, editedName);
+    return {
+      ...state,
+      nodeMap: newNodeMap,
+      ui: {
+        ...ui,
+        editedName: '',
+        editingNodeId: 0
+      }
+    };
   }
-
-  const rootName = getFirstPathPart(path);
-  return {...state, [rootName]: newRootNode};
-});
+);
 
 addReducer('setConfirmEmail', (state: StateType, value: string): StateType =>
   setUserProp(state, 'confirmEmail', value)
@@ -132,8 +167,8 @@ addReducer('setNewInstanceName', (state: StateType, value: string): StateType =>
   setTopProp(state, 'newInstanceName', value)
 );
 
-addReducer('setNewTypeName', (state: StateType, value: string): StateType =>
-  setTopProp(state, 'newTypeName', value)
+addReducer('setNewNodeName', (state: StateType, value: string): StateType =>
+  setUiProp(state, 'newNodeName', value)
 );
 
 addReducer('setPassword', (state: StateType, value: string): StateType =>
@@ -144,10 +179,8 @@ addReducer('setPhone', (state: StateType, value: string): StateType =>
   setUserProp(state, 'phone', value)
 );
 
-addReducer(
-  'toggleEditNode',
-  (state: StateType, node: TreeNodeType): StateType => {
-    const value = node === state.ui.editingNode ? null : node;
-    if (value) state = setUiProp(state, 'editedName', node.name);
-    return setUiProp(state, 'editingNode', value);
-  });
+addReducer('toggleEditNode', (state: StateType, node: NodeType): StateType => {
+  const value = node.id === state.ui.editingNodeId ? 0 : node.id;
+  if (value) state = setUiProp(state, 'editedName', node.name);
+  return setUiProp(state, 'editingNodeId', value);
+});

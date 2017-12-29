@@ -17,11 +17,13 @@ describe('reducer', () => {
     reduxSetup({initialState: state});
   });
 
+  /*
   function testSetTopProp(prop: string, value: mixed) {
     const action = {type: 'set' + upperFirst(prop), payload: value};
     state = reducer(state, action);
     expect(state[prop]).toEqual(value);
   }
+  */
 
   function testSetUiProp(prop: string) {
     const type = 'set' + upperFirst(prop);
@@ -40,114 +42,92 @@ describe('reducer', () => {
   }
 
   test('addNode 1 level deep', () => {
-    const rootName = state.typeRootNode.name;
+    // Add a root node.
+    let payload: AddNodePayloadType = {name: '', parentId: 0};
+    let action = {type: 'addNode', payload};
+    let newState = reducer(state, action);
+    const parentId = newState.lastNodeId;
 
+    // Add a child node to root node.
     const name = 'new node';
-    const payload: AddNodePayloadType = {name, path: rootName};
-    const action = {type: 'addNode', payload};
-    const newState = reducer(state, action);
-    const {typeRootNode} = newState;
-    expect(typeRootNode.children.length).toBe(1);
-    expect(typeRootNode.children[0]).toEqual({
-      children: [],
-      name,
-      path: rootName
-    });
+    payload = {name, parentId};
+    action = {type: 'addNode', payload};
+    newState = reducer(newState, action);
+    const {lastNodeId: childId, nodeMap} = newState;
+    const childNode = nodeMap[childId];
+    expect(childNode.name).toBe(name);
+    expect(childNode.parentId).toBe(parentId);
+    expect(childNode.children.length).toBe(0);
+
+    const parentNode = nodeMap[parentId];
+    expect(parentNode.children).toEqual([childId]);
   });
 
   test('addNode 2 levels deep', () => {
-    const rootName = state.typeRootNode.name;
-
-    const parentName = 'parent node';
-    let path = rootName;
-    let payload: AddNodePayloadType = {name: parentName, path};
+    // Add a root node.
+    let payload: AddNodePayloadType = {name: '', parentId: 0};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
+    let parentId = newState.lastNodeId;
 
+    // Add a parent node.
+    payload = {name: 'some parent', parentId};
+    action = {type: 'addNode', payload};
+    newState = reducer(newState, action);
+    parentId = newState.lastNodeId;
+
+    // Add a child node.
     const childName = 'child node';
-    path = `${rootName}/${parentName}`;
-    payload = {name: childName, path};
+    payload = {name: childName, parentId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
 
-    const {typeRootNode} = newState;
-    expect(typeRootNode.name).toBe(rootName);
-    expect(typeRootNode.children.length).toBe(1);
-    let [child] = typeRootNode.children;
-    expect(child.name).toBe(parentName);
-    [child] = child.children;
-    expect(child.name).toBe(childName);
-  });
+    const {lastNodeId: childId, nodeMap} = newState;
+    const childNode = nodeMap[childId];
+    expect(childNode.id).toBe(childId);
+    expect(childNode.name).toBe(childName);
+    expect(childNode.parentId).toBe(parentId);
+    expect(childNode.children.length).toBe(0);
 
-  test('addNode missing path', () => {
-    const payload: AddNodePayloadType = {name: 'some name', path: ''};
-    const action = {type: 'addNode', payload};
-    expect(() => reducer(state, action)).toThrow('path is required');
+    const parentNode = nodeMap[parentId];
+    expect(parentNode.children).toEqual([childId]);
   });
 
   test('deleteNode 1 level deep', () => {
-    const rootName = state.typeRootNode.name;
-
     // Add a node.
     const name = 'new node';
-    const path = rootName;
-    const payload: AddNodePayloadType = {name, path};
+    const payload: AddNodePayloadType = {name, parentId: 0};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
+    const {lastNodeId: nodeId, nodeMap} = newState;
+    const node = nodeMap[nodeId];
+    expect(node).toBeDefined();
 
     // Delete the node that was added.
-    const [child] = newState[rootName].children;
-    action = {type: 'deleteNode', payload: child};
+    action = {type: 'deleteNode', payload: node};
     newState = reducer(state, action);
-
-    expect(newState.typeRootNode.children.length).toBe(0);
+    expect(newState.nodeMap[nodeId]).not.toBeDefined();
   });
 
   test('deleteNode 2 levels deep', () => {
-    const rootName = state.typeRootNode.name;
-
-    // Add a node.
-    const parentName = 'parent node';
-    let path = rootName;
-    let payload: AddNodePayloadType = {name: parentName, path};
+    // Add a root node.
+    let payload: AddNodePayloadType = {name: '', parentId: 0};
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
+    const parentId = newState.lastNodeId;
 
-    // Add a child to the previously added node.
-    const childName = 'child node';
-    path = `${rootName}/${parentName}`;
-    payload = {name: childName, path};
+    // Add a child node to root node.
+    const name = 'new node';
+    payload = {name, parentId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
+    const {lastNodeId: nodeId, nodeMap} = newState;
+    const node = nodeMap[nodeId];
 
     // Delete the child node that was added.
-    const [parent] = newState[rootName].children;
-    const [child] = parent.children;
-    action = {type: 'deleteNode', payload: child};
+    action = {type: 'deleteNode', payload: node};
     newState = reducer(newState, action);
-
-    const {typeRootNode} = newState;
-    expect(typeRootNode.children.length).toBe(1);
-    const [node] = typeRootNode.children;
-    expect(node.name).toBe(parentName);
-    expect(node.children.length).toBe(0);
-  });
-
-  test('deleteNode missing path', () => {
-    const rootName = state.typeRootNode.name;
-
-    // Add a node.
-    const name = 'new node';
-    const path = `${rootName}`;
-    const payload: AddNodePayloadType = {name, path};
-    let action = {type: 'addNode', payload};
-    const newState = reducer(state, action);
-
-    // Delete the node that was added.
-    const [child] = newState[rootName].children;
-    const childCopy = {...child, path: ''};
-    action = {type: 'deleteNode', payload: childCopy};
-    expect(() => reducer(state, action)).toThrow('node must have path');
+    expect(newState.nodeMap[nodeId]).not.toBeDefined();
   });
 
   test('setConfirmEmail', () => testSetUserProp('confirmEmail'));
@@ -159,8 +139,4 @@ describe('reducer', () => {
   test('setPhone', () => testSetUserProp('phone'));
 
   test('setModal', () => testSetUiProp('modal'));
-
-  test('setNewInstanceName', () =>
-    testSetTopProp('newInstanceName', 'some value'));
-  test('setNewTypeName', () => testSetTopProp('newTypeName', 'some value'));
 });

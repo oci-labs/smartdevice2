@@ -1,7 +1,5 @@
 // @flow
 
-import type {TreeNodeType} from './util/tree-util';
-
 export type ActionType = {
   type: string,
   payload?: any
@@ -9,7 +7,12 @@ export type ActionType = {
 
 export type AddNodePayloadType = {
   name: string,
-  path: string
+  parentId: number
+};
+
+export type SaveNodePayloadType = {
+  id: number,
+  name: string
 };
 
 export type AddressType = {
@@ -31,11 +34,22 @@ export type HistoryType = {
   push: Function
 };
 
+export type NodeType = {
+  id: number,
+  children: number[],
+  expanded?: boolean,
+  name: string,
+  parentId: number,
+  type?: NodeType // for instance nodes
+};
+
+export type NodeMapType = {[id: number]: NodeType};
+
 export type InstanceType = {
   children: InstanceType[],
   name: string,
   parent: InstanceType,
-  type: TreeNodeType
+  type: NodeType
 };
 
 export type ModalType = {
@@ -47,9 +61,10 @@ export type ModalType = {
 export type RoleType = 'admin' | 'service' | 'spectator';
 
 export type UiType = {
-  editingNode: ?TreeNodeType,
   editedName: string,
-  modal: ModalType
+  editingNodeId: number,
+  modal: ModalType,
+  newNodeName: string
 };
 
 export type UserType = {
@@ -68,10 +83,10 @@ export type UserType = {
 
 export type StateType = {
   errors: Set<string>,
-  instanceRootNode: TreeNodeType,
-  newInstanceName: string,
-  newTypeName: string,
-  typeRootNode: TreeNodeType,
+  instanceRootId: number,
+  lastNodeId: number,
+  nodeMap: NodeMapType,
+  typeRootId: number,
   ui: UiType,
   user: UserType
 };
@@ -93,7 +108,7 @@ export type SystemType = {
 
 export type TreeBuilderType = {
   newNodeName: string,
-  rootNode: TreeNodeType
+  rootNode: NodeType
 };
 
 export type ValidationFnType = (string) => string[];
