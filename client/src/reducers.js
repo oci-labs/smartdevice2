@@ -114,6 +114,10 @@ addReducer(
   'saveNode',
   (state: StateType, payload: SaveNodePayloadType): StateType => {
     const {id, name} = payload;
+
+    // Don't allow empty node names.
+    if (!name) return state;
+
     const {nodeMap, ui} = state;
 
     const node = nodeMap[id];
