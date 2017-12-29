@@ -11,10 +11,9 @@ export type TreeNodeType = {
 };
 
 /**
- * Adds a node to an existing tree
- * at a given path with a given name.
- * Returns an array containing
- * the new root node and the new node.
+ * Returns a cloned version of a tree where a new node
+ * with a given name is added at a given path.
+ * Also returns the new node.
  */
 export function addNode(
   rootNode: TreeNodeType,
@@ -40,6 +39,11 @@ export function addNode(
   return [newRootNode, newNode];
 }
 
+/**
+ * Creates a copy of a given tree where
+ * new versions of all nodes along a given path
+ * are created so the caller can safely modify them.
+ */
 export function cloneTree(rootNode: TreeNodeType, path: string) {
   const parts = path.split(PATH_DELIMITER);
   parts.shift(); // removes root node name
@@ -69,6 +73,9 @@ export function cloneTree(rootNode: TreeNodeType, path: string) {
   return [newRoot, node];
 }
 
+/**
+ * Returns a cloned version of a tree where a given node is deleted.
+ */
 export function deleteNode(
   rootNode: TreeNodeType,
   targetNode: TreeNodeType
@@ -82,19 +89,25 @@ export function deleteNode(
   return newRootNode;
 }
 
+/**
+ * Returns a cloned version of a tree where a given node
+ * is replaced by a new node with a given name.
+ * Also returns the new node.
+ */
 export function editNode(
   rootNode: TreeNodeType,
   targetNode: TreeNodeType,
   newName: string
-): TreeNodeType {
+): TreeNodeType[] {
   const {path} = targetNode;
   if (!path) throw new Error('targetNode must have path');
 
   const fullPath = `${path}${PATH_DELIMITER}${targetNode.name}`;
-  const [newRootNode, node] = cloneTree(rootNode, fullPath);
-  node.name = newName;
+  const [newRootNode, newNode] = cloneTree(rootNode, fullPath);
+  newNode.name = newName;
 
-  return newRootNode;
+  // Return both the new root node and the new version of the edited node.
+  return [newRootNode, newNode];
 }
 
 export function findNode(nodes: TreeNodeType[], name: string): ?TreeNodeType {

@@ -3,7 +3,6 @@
 import {deepFreeze} from './object-util';
 
 describe('object-util', () => {
-
   test('deepFreeze simple', () => {
     const obj = {foo: 1, bar: true};
     deepFreeze(obj);

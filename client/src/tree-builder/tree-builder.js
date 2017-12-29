@@ -9,7 +9,8 @@ import {PATH_DELIMITER, type TreeNodeType} from '../util/tree-util';
 import './tree-builder.css';
 
 type PropsType = {
-  editNode: ?TreeNodeType,
+  editedName: string,
+  editingNode: ?TreeNodeType,
   newNodeName: string,
   rootNode: TreeNodeType
 };
@@ -23,9 +24,7 @@ class TreeBuilder extends Component<PropsType> {
     const name = this.props.newNodeName;
     if (!name) return;
 
-    let path = parent.path ?
-      parent.path + PATH_DELIMITER :
-      '';
+    let path = parent.path ? parent.path + PATH_DELIMITER : '';
     path += parent.name;
 
     try {
@@ -41,27 +40,40 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
-    dispatch('editNode', event.target.value);
+    dispatch('editNodeName', event.target.value);
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewTypeName', event.target.value);
   };
 
-  isEditing = (node: TreeNodeType) => node === this.props.editNode;
+  isEditing = (node: TreeNodeType) => node === this.props.editingNode;
+
+  saveChange = () => dispatch('saveNodeName');
 
   toggleEditNode = (node: TreeNodeType) => {
     dispatch('toggleEditNode', node);
   };
 
   renderNodes = (nodes: TreeNodeType[], level: number = 0) => {
+    const {editedName, newNodeName} = this.props;
+
     const copy = [...nodes].sort(nodeCompare);
+
     return copy.map(node => (
       <div className={'tree-node tree-level-' + level} key={node.name}>
-        {this.isEditing(node) ?
-          <input type="text" onChange={this.editNode} /> :
-          <div className="tree-node-name">{node.name}</div>}
+        {this.isEditing(node) ? (
+          <input
+            type="text"
+            onBlur={this.saveChange}
+            onChange={this.editNode}
+            value={editedName}
+          />
+        ) : (
+          <div className="tree-node-name">{node.name}</div>
+        )}
         <Button
           className="addNode"
+          disabled={newNodeName === ''}
           icon="plus"
           onClick={() => this.addNode(node)}
         />
@@ -95,6 +107,7 @@ class TreeBuilder extends Component<PropsType> {
         </div>
         <Button
           className="addNode"
+          disabled={newNodeName === ''}
           icon="plus"
           onClick={() => this.addNode(rootNode)}
         />

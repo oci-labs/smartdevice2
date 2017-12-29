@@ -3,4 +3,8 @@
   border-radius: 4px;
   display: inline-block;
   padding: 5px;
+
+  &.disabled {
+    color: lightgray !important;
+  }
 }

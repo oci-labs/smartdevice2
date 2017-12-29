@@ -3,6 +3,7 @@
 import {addReducer} from 'redux-easy';
 
 import {
+  PATH_DELIMITER,
   addNode,
   deleteNode,
   editNode,
@@ -40,6 +41,18 @@ function setUserProp(
   return {...state, user: {...user, [prop]: value}};
 }
 
+function updateNames(node: TreeNodeType, position: number, name: string) {
+  for (const child of node.children) {
+    const {path} = child;
+    if (path) {
+      const parts = path.split(PATH_DELIMITER);
+      parts[position] = name;
+      child.path = parts.join(PATH_DELIMITER);
+      updateNames(child, position, name);
+    }
+  }
+}
+
 addReducer(
   'addNode',
   (state: StateType, node: TreeNodeType): StateType => {
@@ -65,16 +78,28 @@ addReducer(
   }
 );
 
-addReducer('editNode', (state: StateType, name: string): StateType => {
-  const node = state.ui.editNode;
-  if (!node) throw new Error('no node to edit');
-  const {path} = node;
-  if (!path) throw new Error('node must have path');
+addReducer('editNodeName', (state: StateType, value: string): StateType =>
+  setUiProp(state, 'editedName', value));
 
-  const rootNode = getRootNode(state, node);
+addReducer('saveNodeName', (state: StateType): StateType => {
+  const {ui: {editedName, editingNode}} = state;
+  if (!editingNode) throw new Error('no node to edit');
+
+  const rootNode = getRootNode(state, editingNode);
   if (!rootNode) throw new Error('root node not found');
 
-  const newRootNode = editNode(rootNode, node, name);
+  const {path} = editingNode;
+  if (!path) throw new Error('node must have path');
+
+  const [newRootNode, newNode] = editNode(rootNode, editingNode, editedName);
+
+  if (newNode.path) {
+    // Change the path of all nodes below the one that was edited
+    // to use the new name.
+    const position = newNode.path.split(PATH_DELIMITER).length;
+    updateNames(newNode, position, editedName);
+  }
+
   const rootName = getFirstPathPart(path);
   return {...state, [rootName]: newRootNode};
 });
@@ -122,6 +147,7 @@ addReducer('setPhone', (state: StateType, value: string): StateType =>
 addReducer(
   'toggleEditNode',
   (state: StateType, node: TreeNodeType): StateType => {
-    const value = node === state.ui.editNode ? null : node;
-    return setUiProp(state, 'editNode', value);
+    const value = node === state.ui.editingNode ? null : node;
+    if (value) state = setUiProp(state, 'editedName', node.name);
+    return setUiProp(state, 'editingNode', value);
   });

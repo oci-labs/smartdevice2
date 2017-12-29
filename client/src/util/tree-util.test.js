@@ -148,7 +148,7 @@ describe('tree-util', () => {
     const [rootNode2, node] = addNode(rootNode1, path, name);
 
     const newName = 'some new name';
-    const rootNode3 = editNode(rootNode2, node, newName);
+    const [rootNode3] = editNode(rootNode2, node, newName);
     expect(rootNode3).toBeDefined();
     expect(rootNode3.children[0].name).toBe(newName);
   });
