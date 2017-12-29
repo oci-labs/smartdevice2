@@ -46,12 +46,30 @@ class TreeBuilder extends Component<PropsType> {
     dispatch('setNewNodeName', event.target.value);
   };
 
+  handleEscape = (event: SyntheticInputEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape') {
+      const {editingNodeId, nodeMap} = this.props;
+      const node = nodeMap[editingNodeId];
+      this.toggleEditNode(node);
+    }
+  };
+
   isEditing = (node: NodeType) => node.id === this.props.editingNodeId;
+
+  moveCursor = (event: SyntheticInputEvent<HTMLInputElement>) => {
+    const {target} = event;
+    const {value} = target;
+    target.selectionStart = value.length;
+  }
 
   saveChange = () => {
     const {editedName: name, editingNodeId: id} = this.props;
     const payload = {id, name};
-    dispatch('saveNode', payload);
+    try {
+      dispatch('saveNode', payload);
+    } catch (e) {
+      console.error(e.message);
+    }
   };
 
   toggleEditNode = (node: NodeType) => {
@@ -69,12 +87,20 @@ class TreeBuilder extends Component<PropsType> {
         {this.isEditing(node) ? (
           <input
             type="text"
+            autoFocus
             onBlur={this.saveChange}
             onChange={this.editNode}
+            onFocus={this.moveCursor}
+            onKeyDown={this.handleEscape}
             value={editedName}
           />
         ) : (
-          <div className="tree-node-name">{node.name}</div>
+          <div
+            className="tree-node-name"
+            onClick={() => this.toggleEditNode(node)}
+          >
+            {node.name}
+          </div>
         )}
         <Button
           className="addNode"

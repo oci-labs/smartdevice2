@@ -117,10 +117,11 @@ addReducer(
     const {nodeMap, ui} = state;
 
     const node = nodeMap[id];
-    const {parentId} = node;
 
-    //TODO: Don't compare to current name!
-    validateNewName(nodeMap, parentId, name);
+    if (name !== node.name) { // changing name
+      const {parentId} = node;
+      validateNewName(nodeMap, parentId, name);
+    }
 
     // nodeMap is immutable, so make a copy that can be modified.
     const newNodeMap = {...nodeMap};
