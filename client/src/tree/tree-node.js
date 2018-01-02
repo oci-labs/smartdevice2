@@ -128,7 +128,7 @@ class TreeNode extends Component<PropsType> {
     return getSortedChildren(node, nodeMap).map(child => (
       <TreeNode
         {...this.props}
-        key={`tn${node.id}`}
+        key={'tn' + child.id}
         level={level + 1}
         node={child}
       />
