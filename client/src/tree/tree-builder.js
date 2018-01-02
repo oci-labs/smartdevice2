@@ -18,7 +18,7 @@ import type {
 
 type PropsType = {
   editedName: string,
-  editingNodeId: number,
+  editingNode: NodeType,
   kind: string,
   newNodeName: string,
   nodeMap: NodeMapType
@@ -62,8 +62,6 @@ class TreeBuilder extends Component<PropsType> {
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewNodeName', event.target.value);
   };
-
-  isEditing = (node: NodeType) => node.id === this.props.editingNodeId;
 
   // Loads nodes from database.
   load = async () => {

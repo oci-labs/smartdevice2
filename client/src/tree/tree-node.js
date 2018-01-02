@@ -16,7 +16,7 @@ import type {
 
 type PropsType = {
   editedName: string,
-  editingNodeId: number,
+  editingNode: NodeType,
   kind: string,
   level: number,
   newNodeName: string,
@@ -89,7 +89,7 @@ class TreeNode extends Component<PropsType> {
     if (event.key === 'Escape') this.toggleEditNode();
   };
 
-  isEditing = (node: NodeType) => node.id === this.props.editingNodeId;
+  isEditing = (node: NodeType) => node === this.props.editingNode;
 
   moveCursor = (event: SyntheticInputEvent<HTMLInputElement>) => {
     const {target} = event;
@@ -98,10 +98,10 @@ class TreeNode extends Component<PropsType> {
   };
 
   saveChange = async () => {
-    const {editedName: name, editingNodeId: id, kind, node} = this.props;
+    const {editedName: name, editingNode, kind, node} = this.props;
     try {
       // Update type name in database.
-      const url = `${URL_PREFIX}${kind}/${id}`;
+      const url = `${URL_PREFIX}${kind}/${editingNode.id}`;
       const options = {
         method: 'PATCH',
         body: JSON.stringify({name})

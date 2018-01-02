@@ -69,7 +69,7 @@ export type RoleType = 'admin' | 'service' | 'spectator';
 
 export type UiType = {
   editedName: string,
-  editingNodeId: number,
+  editingNode: ?NodeType,
   modal: ModalType,
   newNodeName: string
 };

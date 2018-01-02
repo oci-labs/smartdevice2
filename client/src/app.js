@@ -5,13 +5,13 @@ import {connect} from 'react-redux';
 
 import TreeBuilder from './tree/tree-builder';
 
-import type {NodeMapType, StateType} from './types';
+import type {NodeMapType, NodeType, StateType} from './types';
 
 import './app.css';
 
 type PropsType = {
   editedName: string,
-  editingNodeId: number,
+  editingNode: NodeType,
   instanceNodeMap: NodeMapType,
   newNodeName: string,
   typeNodeMap: NodeMapType
@@ -22,7 +22,7 @@ class App extends Component<PropsType> {
   render() {
     const {
       editedName,
-      editingNodeId,
+      editingNode,
       instanceNodeMap,
       newNodeName,
       typeNodeMap
@@ -35,14 +35,14 @@ class App extends Component<PropsType> {
         </header>
         <TreeBuilder
           editedName={editedName}
-          editingNodeId={editingNodeId}
+          editingNode={editingNode}
           kind="type"
           newNodeName={newNodeName}
           nodeMap={typeNodeMap}
         />
         <TreeBuilder
           editedName={editedName}
-          editingNodeId={editingNodeId}
+          editingNode={editingNode}
           kind="instance"
           newNodeName={newNodeName}
           nodeMap={instanceNodeMap}
@@ -58,11 +58,11 @@ const mapState = (state: StateType): Object => {
     instanceRootId,
     typeNodeMap,
     typeRootId,
-    ui: {editedName, editingNodeId, newNodeName}
+    ui: {editedName, editingNode, newNodeName}
   } = state;
   return {
     editedName,
-    editingNodeId,
+    editingNode,
     instanceNodeMap,
     instanceRootId,
     newNodeName,

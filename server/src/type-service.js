@@ -6,6 +6,9 @@ const {errorHandler} = require('./util/error-util');
 
 //const inTest = process.env.NODE_ENV === 'test';
 
+const NOT_FOUND = 404;
+const OK = 200;
+
 const dbConfig = {
   host: 'localhost',
   user: 'root',
@@ -66,7 +69,7 @@ async function getByIdHandler(
   const {id, kind} = req.params;
   try {
     const type = await mySql.getById(kind, id);
-    res.status(type ? 200 : 404).send(JSON.stringify(type));
+    res.status(type ? OK : NOT_FOUND).send(JSON.stringify(type));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
@@ -83,7 +86,7 @@ async function patchHandler(
     const type = await mySql.getById(kind, id);
     const newType = {...type, ...changes};
     const {changedRows} = await mySql.updateById(kind, id, newType);
-    res.status(changedRows ? 200 : 500).send(JSON.stringify(newType));
+    res.status(OK).send(JSON.stringify(newType));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);

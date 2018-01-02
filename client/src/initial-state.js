@@ -10,7 +10,7 @@ const state: StateType = {
   typeRootId: 1,
   ui: {
     editedName: '',
-    editingNodeId: 0,
+    editingNode: null,
     modal: {
       message: '',
       open: false,

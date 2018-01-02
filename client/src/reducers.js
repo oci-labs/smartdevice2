@@ -141,7 +141,7 @@ addReducer(
       ui: {
         ...ui,
         editedName: '',
-        editingNodeId: 0
+        editingNode: null
       }
     };
   }
@@ -199,9 +199,9 @@ addReducer('setPhone', (state: StateType, value: string): StateType =>
 );
 
 addReducer('toggleEditNode', (state: StateType, node: NodeType): StateType => {
-  const value = node.id === state.ui.editingNodeId ? 0 : node.id;
+  const value = node === state.ui.editingNode ? 0 : node;
   if (value) state = setUiProp(state, 'editedName', node.name);
-  return setUiProp(state, 'editingNodeId', value);
+  return setUiProp(state, 'editingNode', value);
 });
 
 addReducer(
