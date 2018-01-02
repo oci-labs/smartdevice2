@@ -12,11 +12,9 @@ import './app.css';
 type PropsType = {
   editedName: string,
   editingNodeId: number,
-  //instanceNodeMap: NodeMapType,
-  //instanceRootId: number,
+  instanceNodeMap: NodeMapType,
   newNodeName: string,
-  typeNodeMap: NodeMapType,
-  typeRootId: number
+  typeNodeMap: NodeMapType
 };
 
 class App extends Component<PropsType> {
@@ -25,11 +23,9 @@ class App extends Component<PropsType> {
     const {
       editedName,
       editingNodeId,
-      //instanceNodeMap,
-      //instanceRootId,
+      instanceNodeMap,
       newNodeName,
-      typeNodeMap,
-      typeRootId
+      typeNodeMap
     } = this.props;
 
     return (
@@ -43,18 +39,14 @@ class App extends Component<PropsType> {
           kind="type"
           newNodeName={newNodeName}
           nodeMap={typeNodeMap}
-          rootId={typeRootId}
         />
-        {/*
         <TreeBuilder
           editedName={editedName}
           editingNodeId={editingNodeId}
           kind="instance"
           newNodeName={newNodeName}
           nodeMap={instanceNodeMap}
-          rootId={instanceRootId}
         />
-        */}
       </div>
     );
   }

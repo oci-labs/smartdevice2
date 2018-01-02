@@ -149,7 +149,8 @@ insert into user (id, email, firstName, lastName, organizationId) values
   (1, 'mark@objectcomputing.com', 'Mark', 'Volkmann', 1),
   (2, 'stanleyk@objectcomputing.com', 'Kevin', 'Stanley', 1);
 
-insert into type (id, name) values (1, 'root');
+insert into type (id, name) values (0, 'root');
+insert into instance (id, name) values (0, 'root');
 
 /*
 insert into type (id, name) values (1, 'site');

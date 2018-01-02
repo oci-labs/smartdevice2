@@ -113,9 +113,4 @@ export type SystemType = {
   name: string
 };
 
-export type TreeBuilderType = {
-  newNodeName: string,
-  rootNode: NodeType
-};
-
 export type ValidationFnType = (string) => string[];

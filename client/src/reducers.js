@@ -64,6 +64,7 @@ addReducer(
     };
 
     newNodeMap[id] = newNode;
+
     if (parentId) {
       const parentNode = nodeMap[parentId];
 

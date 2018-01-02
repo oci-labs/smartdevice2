@@ -21,10 +21,10 @@ type PropsType = {
   editingNodeId: number,
   kind: string,
   newNodeName: string,
-  nodeMap: NodeMapType,
-  rootId: number
+  nodeMap: NodeMapType
 };
 
+const ROOT_ID = 1;
 const URL_PREFIX = 'http://localhost:3001/';
 
 class TreeBuilder extends Component<PropsType> {
@@ -80,8 +80,8 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   render() {
-    const {kind, newNodeName, nodeMap, rootId} = this.props;
-    const rootNode = nodeMap[rootId];
+    const {kind, newNodeName, nodeMap} = this.props;
+    const rootNode = nodeMap[ROOT_ID];
     if (!rootNode) return null;
 
     return (
