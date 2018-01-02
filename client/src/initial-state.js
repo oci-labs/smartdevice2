@@ -9,12 +9,13 @@ const state: StateType = {
   ui: {
     editedName: '',
     editingNode: null,
+    instanceName: '',
     modal: {
       message: '',
       open: false,
       title: ''
     },
-    newNodeName: ''
+    typeName: ''
   },
   user: {
     confirmEmail: '',

@@ -12,6 +12,11 @@ export type AddNodePayloadType = {
   parentId: number
 };
 
+export type NewNodeNamePayloadType = {
+  kind: string,
+  name: string
+};
+
 export type NodePayloadType = {
   kind: string,
   node: NodeType
@@ -70,8 +75,9 @@ export type RoleType = 'admin' | 'service' | 'spectator';
 export type UiType = {
   editedName: string,
   editingNode: ?NodeType,
+  instanceName: string,
   modal: ModalType,
-  newNodeName: string
+  typeName: string
 };
 
 export type UserType = {

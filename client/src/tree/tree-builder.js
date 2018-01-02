@@ -6,11 +6,12 @@ import {dispatch} from 'redux-easy';
 
 import Button from './button';
 import TreeNode from './tree-node';
+import {addNode} from './tree-util';
 
 import './tree-builder.css';
 
 import type {
-  AddNodePayloadType,
+  NewNodeNamePayloadType,
   NodeMapType,
   NodeType,
   SetNodesPayloadType
@@ -29,38 +30,15 @@ const URL_PREFIX = 'http://localhost:3001/';
 
 class TreeBuilder extends Component<PropsType> {
 
-  addNode = async (parent: NodeType) => {
-    const name = this.props.newNodeName;
-    if (!name) return;
-
-    const parentId = parent.id;
-    try {
-      // Add new node to database.
-      const options = {
-        method: 'POST',
-        body: JSON.stringify({name, parentId})
-      };
-      const {kind} = this.props;
-      const url = URL_PREFIX + kind;
-      const res = await fetch(url, options);
-      const id = Number(await res.text());
-
-      // Add new node to Redux state.
-      const payload: AddNodePayloadType = {id, kind, name, parentId};
-      dispatch('addNode', payload);
-
-      dispatch('setNewNodeName', '');
-    } catch (e) {
-      console.error('tree-builder.js addNode:', e.message);
-    }
-  };
-
   componentDidMount() {
     this.load();
   }
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewNodeName', event.target.value);
+    const {kind} = this.props;
+    const name = event.target.value;
+    const payload: NewNodeNamePayloadType = {kind, name};
+    dispatch('setNewNodeName', payload);
   };
 
   // Loads nodes from database.
@@ -97,7 +75,7 @@ class TreeBuilder extends Component<PropsType> {
           className="addNode"
           disabled={newNodeName === ''}
           icon="plus"
-          onClick={() => this.addNode(rootNode)}
+          onClick={() => addNode(kind, newNodeName, rootNode)}
         />
         <TreeNode {...this.props} key="tn0" level={0} node={rootNode} />
       </div>

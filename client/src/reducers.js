@@ -5,6 +5,7 @@ import {addReducer} from 'redux-easy';
 import type {
   AddNodePayloadType,
   ModalType,
+  NewNodeNamePayloadType,
   NodeMapType,
   NodePayloadType,
   NodeType,
@@ -12,9 +13,11 @@ import type {
   StateType
 } from './types';
 
+/*
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
 }
+*/
 
 function setUiProp(state: StateType, prop: string, value: mixed): StateType {
   const {ui} = state;
@@ -171,12 +174,12 @@ addReducer('setModal', (state: StateType, modal: ModalType) =>
   setUiProp(state, 'modal', modal)
 );
 
-addReducer('setNewInstanceName', (state: StateType, value: string): StateType =>
-  setTopProp(state, 'newInstanceName', value)
-);
-
-addReducer('setNewNodeName', (state: StateType, value: string): StateType =>
-  setUiProp(state, 'newNodeName', value)
+addReducer(
+  'setNewNodeName',
+  (state: StateType, payload: NewNodeNamePayloadType): StateType => {
+    const {kind, name} = payload;
+    return setUiProp(state, kind + 'Name', name);
+  }
 );
 
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {

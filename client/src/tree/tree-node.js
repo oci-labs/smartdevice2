@@ -4,11 +4,11 @@ import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
 
 import Button from './button';
+import {addNode} from './tree-util';
 
 import './tree-node.css';
 
 import type {
-  AddNodePayloadType,
   NodeMapType,
   NodePayloadType,
   NodeType
@@ -36,32 +36,6 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
-
-  addNode = async (parent: NodeType) => {
-    const name = this.props.newNodeName;
-    if (!name) return;
-
-    const parentId = parent.id;
-    try {
-      // Add new type to database.
-      const options = {
-        method: 'POST',
-        body: JSON.stringify({name, parentId})
-      };
-      const {kind} = this.props;
-      const url = URL_PREFIX + kind;
-      const res = await fetch(url, options);
-      const id = Number(await res.text());
-
-      // Add new type to Redux state.
-      const payload: AddNodePayloadType = {id, kind, name, parentId};
-      dispatch('addNode', payload);
-
-      dispatch('setNewNodeName', '');
-    } catch (e) {
-      console.error('tree-builder.js addNode:', e.message);
-    }
-  };
 
   deleteNode = async (node: NodeType) => {
     try {
@@ -136,7 +110,7 @@ class TreeNode extends Component<PropsType> {
   };
 
   render = () => {
-    const {editedName, level, newNodeName, node} = this.props;
+    const {editedName, kind, level, newNodeName, node} = this.props;
 
     if (!node.parentId) return this.renderChildren();
 
@@ -169,7 +143,7 @@ class TreeNode extends Component<PropsType> {
           className="addNode"
           disabled={newNodeName === ''}
           icon="plus"
-          onClick={() => this.addNode(node)}
+          onClick={() => addNode(kind, newNodeName, node)}
         />
         <Button
           className="deleteNode"
