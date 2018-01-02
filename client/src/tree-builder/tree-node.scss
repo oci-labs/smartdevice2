@@ -1,0 +1,20 @@
+.tree-node {
+  margin-left: 0 !important; //TODO: Why need !important?
+
+  .button {
+    border: none;
+  }
+
+  .deleteNode {
+    color: red;
+    cursor: pointer;
+  }
+
+  .tree-node {
+    margin-left: 20px;
+  }
+
+  .tree-node-name {
+    display: inline-block;
+  }
+}
