@@ -27,7 +27,7 @@ function setUiProp(state: StateType, prop: string, value: mixed): StateType {
 function setUserProp(
   state: StateType,
   prop: string,
-  value: number | string
+  value: number | number[] | string
 ): StateType {
   const {user} = state;
   return {...state, user: {...user, [prop]: value}};
@@ -219,5 +219,19 @@ addReducer(
     newNodeMap[node.id] = newNode;
 
     return {...state, [kind + 'NodeMap']: newNodeMap};
+  }
+);
+
+addReducer(
+  'toggleSubscribeNode',
+  (state: StateType, node: NodeType): StateType => {
+    const {subscriptions} = state.user;
+    console.log('reducers.js toggleSubscribeNode: subscriptions =', subscriptions);
+    const {id} = node;
+    const newSubscriptions = subscriptions.includes(id)
+      ? subscriptions.filter(i => i !== id)
+      : [...subscriptions, id];
+
+    return setUserProp(state, 'subscriptions', newSubscriptions);
   }
 );

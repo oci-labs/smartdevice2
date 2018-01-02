@@ -20,9 +20,10 @@ import type {
 type PropsType = {
   editedName: string,
   editingNode: NodeType,
-  kind: string,
+  kind: string, // must correspond to a database table name
   newNodeName: string,
-  nodeMap: NodeMapType
+  nodeMap: NodeMapType,
+  subscriptions: number[]
 };
 
 const ROOT_ID = 1;
@@ -76,6 +77,7 @@ class TreeBuilder extends Component<PropsType> {
           disabled={newNodeName === ''}
           icon="plus"
           onClick={() => addNode(kind, newNodeName, rootNode)}
+          tooltip="add"
         />
         <TreeNode {...this.props} key="tn0" level={0} node={rootNode} />
       </div>

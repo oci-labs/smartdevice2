@@ -4,7 +4,7 @@
     margin-left: 5px;
   }
 
-  .deleteNode {
+  .delete-node {
     color: red;
     cursor: pointer;
   }
@@ -12,6 +12,14 @@
   .expand {
     display: inline-block;
     width: 15px;
+  }
+
+  .subscribe-node {
+    color: red;
+  }
+
+  .subscribed {
+    color: green;
   }
 
   .tree-node {

@@ -9,7 +9,8 @@ type PropsType = {
   disabled?: boolean,
   icon?: string,
   label?: string,
-  onClick: Function
+  onClick: Function,
+  tooltip: string
 };
 
 export default ({
@@ -17,13 +18,14 @@ export default ({
   disabled,
   icon,
   label = '',
-  onClick
+  onClick,
+  tooltip
 }: PropsType) => {
   let classes = `button ${className}`;
   if (icon) classes += ` fa fa-${icon}`;
   if (disabled) classes += ' disabled';
   return (
-    <div className={classes} onClick={onClick}>
+    <div className={classes} onClick={onClick} title={tooltip}>
       {label}
     </div>
   );

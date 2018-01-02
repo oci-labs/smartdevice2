@@ -8,11 +8,7 @@ import {addNode} from './tree-util';
 
 import './tree-node.css';
 
-import type {
-  NodeMapType,
-  NodePayloadType,
-  NodeType
-} from '../types';
+import type {NodeMapType, NodePayloadType, NodeType} from '../types';
 
 type PropsType = {
   editedName: string,
@@ -21,7 +17,8 @@ type PropsType = {
   level: number,
   newNodeName: string,
   node: NodeType,
-  nodeMap: NodeMapType
+  nodeMap: NodeMapType,
+  subscriptions: number[]
 };
 
 const URL_PREFIX = 'http://localhost:3001/';
@@ -36,7 +33,6 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
-
   deleteNode = async (node: NodeType) => {
     try {
       // Delete type from database.
@@ -60,7 +56,7 @@ class TreeNode extends Component<PropsType> {
   };
 
   handleEscape = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape') this.toggleEditNode();
+    if (event.key === 'Escape') this.toggleEdit();
   };
 
   isEditing = (node: NodeType) => node === this.props.editingNode;
@@ -90,12 +86,14 @@ class TreeNode extends Component<PropsType> {
     }
   };
 
-  toggleEditNode = () => dispatch('toggleEditNode', this.props.node);
+  toggleEdit = () => dispatch('toggleEditNode', this.props.node);
 
-  toggleExpandNode = () => {
+  toggleExpand = () => {
     const {kind, node} = this.props;
     dispatch('toggleExpandNode', {kind, node});
   };
+
+  toggleSubscribe = () => dispatch('toggleSubscribeNode', this.props.node);
 
   renderChildren = () => {
     const {level, node, nodeMap} = this.props;
@@ -110,7 +108,14 @@ class TreeNode extends Component<PropsType> {
   };
 
   render = () => {
-    const {editedName, kind, level, newNodeName, node} = this.props;
+    const {
+      editedName,
+      kind,
+      level,
+      newNodeName,
+      node,
+      subscriptions
+    } = this.props;
 
     if (!node.parentId) return this.renderChildren();
 
@@ -118,11 +123,13 @@ class TreeNode extends Component<PropsType> {
     const triangleClasses =
       node.children.length === 0 ? '' : `fa fa-caret-${direction}`;
 
+    const subscribed = kind === 'instance' && subscriptions.includes(node.id);
+
     return (
       <div className={`tree-node tree-level-${level}`}>
         <div
           className={`expand ${triangleClasses}`}
-          onClick={this.toggleExpandNode}
+          onClick={this.toggleExpand}
         />
         {this.isEditing(node) ? (
           <input
@@ -135,26 +142,37 @@ class TreeNode extends Component<PropsType> {
             value={editedName}
           />
         ) : (
-          <div className="tree-node-name" onClick={() => this.toggleEditNode()}>
+          <div className="tree-node-name" onClick={() => this.toggleEdit()}>
             {node.name}
           </div>
         )}
         <Button
-          className="addNode"
+          className="add-node"
           disabled={newNodeName === ''}
           icon="plus"
           onClick={() => addNode(kind, newNodeName, node)}
+          tooltip="add"
         />
         <Button
-          className="deleteNode"
+          className="delete-node"
           icon="trash-o"
           onClick={() => this.deleteNode(node)}
+          tooltip="delete"
         />
         <Button
-          className="editNode"
+          className="edit-node"
           icon="pencil"
-          onClick={() => this.toggleEditNode()}
+          onClick={() => this.toggleEdit()}
+          tooltip="edit"
         />
+        {kind === 'instance' ? (
+          <Button
+            className={`subscribe-node ${subscribed ? 'subscribed' : ''}`}
+            icon="play"
+            onClick={() => this.toggleSubscribe()}
+            tooltip="subscribe"
+          />
+        ) : null}
         {node.expanded ? this.renderChildren() : null}
       </div>
     );

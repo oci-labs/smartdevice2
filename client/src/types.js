@@ -90,6 +90,7 @@ export type UserType = {
   organization: string,
   password: string,
   phone: string,
+  subscriptions: number[], // instance ids
   role: RoleType,
   version: number
 };

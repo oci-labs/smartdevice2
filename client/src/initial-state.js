@@ -28,6 +28,7 @@ const state: StateType = {
     password: '',
     phone: '',
     role: 'spectator',
+    subscriptions: [],
     version: 0
   }
 };
