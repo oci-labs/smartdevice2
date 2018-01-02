@@ -18,11 +18,11 @@ async function deleteByIdHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const {id} = req.params;
+  const {id, kind} = req.params;
   try {
     // Cascading deletes in database take care of
     // deleting all descendant types.
-    const {affectedRows} = await mySql.deleteById('type', id);
+    const {affectedRows} = await mySql.deleteById(kind, id);
     res.send(String(affectedRows));
   } catch (e) {
     // istanbul ignore next
@@ -34,9 +34,10 @@ async function createHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
+  const {kind} = req.params;
   try {
     const obj = JSON.parse(req.body);
-    const rows = await mySql.insert('type', obj);
+    const rows = await mySql.insert(kind, obj);
     res.send(JSON.stringify(rows));
   } catch (e) {
     // istanbul ignore next
@@ -48,8 +49,9 @@ async function getAllHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
+  const {kind} = req.params;
   try {
-    const rows = await mySql.getAll('type');
+    const rows = await mySql.getAll(kind);
     res.send(JSON.stringify(rows));
   } catch (e) {
     // istanbul ignore next
@@ -61,9 +63,9 @@ async function getByIdHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const {id} = req.params;
+  const {id, kind} = req.params;
   try {
-    const type = await mySql.getById('type', id);
+    const type = await mySql.getById(kind, id);
     res.status(type ? 200 : 404).send(JSON.stringify(type));
   } catch (e) {
     // istanbul ignore next
@@ -75,12 +77,12 @@ async function patchHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const {id} = req.params;
+  const {id, kind} = req.params;
   const changes = JSON.parse(req.body);
   try {
-    const type = await mySql.getById('type', id);
+    const type = await mySql.getById(kind, id);
     const newType = {...type, ...changes};
-    const {changedRows} = await mySql.updateById('type', id, newType);
+    const {changedRows} = await mySql.updateById(kind, id, newType);
     res.status(changedRows ? 200 : 500).send(JSON.stringify(newType));
   } catch (e) {
     // istanbul ignore next
@@ -89,7 +91,7 @@ async function patchHandler(
 }
 
 function typeService(app: express$Application): void {
-  const URL_PREFIX = '/types';
+  const URL_PREFIX = '/:kind';
 
   app.delete(URL_PREFIX + '/:id', deleteByIdHandler);
   app.get(URL_PREFIX, getAllHandler);

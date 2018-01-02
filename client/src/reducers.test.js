@@ -44,14 +44,19 @@ describe('reducer', () => {
   test('addNode 1 level deep', () => {
     // Add a root node.
     const parentId = 1;
-    let payload: AddNodePayloadType = {id: parentId, name: '', parentId: 0};
+    let payload: AddNodePayloadType = {
+      id: parentId,
+      kind: 'type',
+      name: '',
+      parentId: 0
+    };
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
 
     // Add a child node to root node.
     const childId = 2;
     const name = 'new node';
-    payload = {id: childId, name, parentId};
+    payload = {id: childId, kind: 'type', name, parentId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
     const {nodeMap} = newState;
@@ -67,20 +72,30 @@ describe('reducer', () => {
   test('addNode 2 levels deep', () => {
     // Add a root node.
     const rootId = 1;
-    let payload: AddNodePayloadType = {id: rootId, name: '', parentId: 0};
+    let payload: AddNodePayloadType = {
+      id: rootId,
+      kind: 'type',
+      name: '',
+      parentId: 0
+    };
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
 
     // Add a parent node.
     const parentId = 2;
-    payload = {id: parentId, name: 'some parent', parentId: rootId};
+    payload = {
+      id: parentId,
+      kind: 'type',
+      name: 'some parent',
+      parentId: rootId
+    };
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
 
     // Add a child node.
     const childId = 3;
     const childName = 'child node';
-    payload = {id: childId, name: childName, parentId};
+    payload = {id: childId, kind: 'type', name: childName, parentId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
 
@@ -99,7 +114,12 @@ describe('reducer', () => {
     // Add a node.
     const nodeId = 1;
     const name = 'new node';
-    const payload: AddNodePayloadType = {id: nodeId, name, parentId: 0};
+    const payload: AddNodePayloadType = {
+      id: nodeId,
+      kind: 'type',
+      name,
+      parentId: 0
+    };
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
     const {nodeMap} = newState;
@@ -115,14 +135,19 @@ describe('reducer', () => {
   test('deleteNode 2 levels deep', () => {
     // Add a root node.
     const rootId = 1;
-    let payload: AddNodePayloadType = {id: rootId, name: '', parentId: 0};
+    let payload: AddNodePayloadType = {
+      id: rootId,
+      kind: 'type',
+      name: '',
+      parentId: 0
+    };
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
 
     // Add a child node to root node.
     const childId = 2;
     const name = 'new node';
-    payload = {id: childId, name, parentId: rootId};
+    payload = {id: childId, kind: 'type', name, parentId: rootId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
     const {nodeMap} = newState;

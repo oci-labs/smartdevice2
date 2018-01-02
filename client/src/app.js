@@ -12,20 +12,26 @@ import './app.css';
 type PropsType = {
   editedName: string,
   editingNodeId: number,
+  instanceNodeMap: NodeMapType,
+  instanceRootId: number,
   newNodeName: string,
-  nodeMap: NodeMapType,
+  typeNodeMap: NodeMapType,
   typeRootId: number
 };
 
 class App extends Component<PropsType> {
+
   render() {
     const {
       editedName,
       editingNodeId,
+      instanceNodeMap,
+      instanceRootId,
       newNodeName,
-      nodeMap,
+      typeNodeMap,
       typeRootId
     } = this.props;
+
     return (
       <div className="app">
         <header className="app-header">
@@ -34,10 +40,21 @@ class App extends Component<PropsType> {
         <TreeBuilder
           editedName={editedName}
           editingNodeId={editingNodeId}
+          kind="type"
           newNodeName={newNodeName}
-          nodeMap={nodeMap}
+          nodeMap={typeNodeMap}
           rootId={typeRootId}
         />
+        {/*
+        <TreeBuilder
+          editedName={editedName}
+          editingNodeId={editingNodeId}
+          kind="instance"
+          newNodeName={newNodeName}
+          nodeMap={instanceNodeMap}
+          rootId={instanceRootId}
+        />
+        */}
       </div>
     );
   }
@@ -45,11 +62,21 @@ class App extends Component<PropsType> {
 
 const mapState = (state: StateType): Object => {
   const {
-    nodeMap,
+    instanceNodeMap,
+    instanceRootId,
+    typeNodeMap,
     typeRootId,
     ui: {editedName, editingNodeId, newNodeName}
   } = state;
-  return {editedName, editingNodeId, newNodeName, nodeMap, typeRootId};
+  return {
+    editedName,
+    editingNodeId,
+    instanceNodeMap,
+    instanceRootId,
+    newNodeName,
+    typeNodeMap,
+    typeRootId
+  };
 };
 
 export default connect(mapState)(App);

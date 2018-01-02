@@ -7,13 +7,19 @@ export type ActionType = {
 
 export type AddNodePayloadType = {
   id: number,
+  kind: string,
   name: string,
   parentId: number
 };
 
-export type SaveNodePayloadType = {
-  id: number,
-  name: string
+export type NodePayloadType = {
+  kind: string,
+  node: NodeType
+};
+
+export type SetNodesPayloadType = {
+  kind: string,
+  nodes: NodeType[]
 };
 
 export type AddressType = {
@@ -84,8 +90,9 @@ export type UserType = {
 
 export type StateType = {
   errors: Set<string>,
+  instanceNodeMap: NodeMapType,
   instanceRootId: number,
-  nodeMap: NodeMapType,
+  typeNodeMap: NodeMapType,
   typeRootId: number,
   ui: UiType,
   user: UserType

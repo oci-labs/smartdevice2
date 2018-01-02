@@ -1,5 +1,6 @@
 // @flow
 
+import _ from 'lodash/string';
 import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
 
@@ -8,37 +9,43 @@ import TreeNode from './tree-node';
 
 import './tree-builder.css';
 
-import type {AddNodePayloadType, NodeMapType, NodeType} from '../types';
+import type {
+  AddNodePayloadType,
+  NodeMapType,
+  NodeType,
+  SetNodesPayloadType
+} from '../types';
 
 type PropsType = {
   editedName: string,
   editingNodeId: number,
+  kind: string,
   newNodeName: string,
   nodeMap: NodeMapType,
   rootId: number
 };
 
-const URL_PREFIX = 'http://localhost:3001/types';
+const URL_PREFIX = 'http://localhost:3001/';
 
 class TreeBuilder extends Component<PropsType> {
-
   addNode = async (parent: NodeType) => {
     const name = this.props.newNodeName;
     if (!name) return;
 
     const parentId = parent.id;
     try {
-      // Add new type to database.
+      // Add new node to database.
       const options = {
         method: 'POST',
         body: JSON.stringify({name, parentId})
       };
-      const url = URL_PREFIX;
+      const {kind} = this.props;
+      const url = URL_PREFIX + kind;
       const res = await fetch(url, options);
       const id = Number(await res.text());
 
-      // Add new type to Redux state.
-      const payload: AddNodePayloadType = {id, name, parentId};
+      // Add new node to Redux state.
+      const payload: AddNodePayloadType = {id, kind, name, parentId};
       dispatch('addNode', payload);
 
       dispatch('setNewNodeName', '');
@@ -57,27 +64,29 @@ class TreeBuilder extends Component<PropsType> {
 
   isEditing = (node: NodeType) => node.id === this.props.editingNodeId;
 
-  // Loads types from database.
+  // Loads nodes from database.
   load = async () => {
     try {
-      const url = URL_PREFIX;
+      const {kind} = this.props;
+      const url = URL_PREFIX + kind;
       const res = await fetch(url);
-      const types = await res.json();
-      dispatch('setNodes', types);
+      const nodes = await res.json();
+      const payload: SetNodesPayloadType = {kind, nodes};
+      dispatch('setNodes', payload);
     } catch (e) {
       console.error('tree-builder.js load:', e.message);
     }
   };
 
   render() {
-    const {newNodeName, nodeMap, rootId} = this.props;
+    const {kind, newNodeName, nodeMap, rootId} = this.props;
     const rootNode = nodeMap[rootId];
     if (!rootNode) return null;
 
     return (
       <div className="tree-builder">
         <div>
-          <label>New Type</label>
+          <label>New {_.capitalize(kind)}</label>
           <input
             type="text"
             autoFocus
@@ -91,12 +100,7 @@ class TreeBuilder extends Component<PropsType> {
           icon="plus"
           onClick={() => this.addNode(rootNode)}
         />
-        <TreeNode
-          {...this.props}
-          key="tn0"
-          level={0}
-          node={rootNode}
-        />
+        <TreeNode {...this.props} key="tn0" level={0} node={rootNode} />
       </div>
     );
   }

@@ -7,9 +7,10 @@ import type {AddNodePayloadType, StateType} from './types';
 
 let state: StateType = {
   errors: new Set(),
-  instanceRootId: 0,
-  nodeMap: {},
-  typeRootId: 0,
+  instanceNodeMap: {},
+  instanceRootId: 2,
+  typeNodeMap: {},
+  typeRootId: 1,
   ui: {
     editedName: '',
     editingNodeId: 0,
@@ -39,6 +40,7 @@ let state: StateType = {
 const typeRootId = 1;
 let payload: AddNodePayloadType = {
   id: typeRootId,
+  kind: 'type',
   name: 'type root',
   parentId: 0
 };
@@ -49,6 +51,7 @@ state = reducer(state, action);
 const instanceRootId = 2;
 payload = {
   id: instanceRootId,
+  kind: 'instance',
   name: 'instance root',
   parentId: 0
 };

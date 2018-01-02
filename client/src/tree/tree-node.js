@@ -12,6 +12,7 @@ import type {AddNodePayloadType, NodeMapType, NodeType} from '../types';
 type PropsType = {
   editedName: string,
   editingNodeId: number,
+  kind: string,
   level: number,
   newNodeName: string,
   node: NodeType,
@@ -46,7 +47,8 @@ class TreeNode extends Component<PropsType> {
       const id = Number(await res.text());
 
       // Add new type to Redux state.
-      const payload: AddNodePayloadType = {id, name, parentId};
+      const {kind} = this.props;
+      const payload: AddNodePayloadType = {id, kind, name, parentId};
       dispatch('addNode', payload);
 
       dispatch('setNewNodeName', '');
@@ -88,8 +90,8 @@ class TreeNode extends Component<PropsType> {
   };
 
   saveChange = async () => {
-    const {editedName: name, editingNodeId: id} = this.props;
-    const payload = {id, name};
+    const {editedName: name, editingNodeId: id, kind, node} = this.props;
+    const payload = {kind, node};
     try {
       // Update type name in database.
       const options = {
@@ -107,7 +109,10 @@ class TreeNode extends Component<PropsType> {
 
   toggleEditNode = () => dispatch('toggleEditNode', this.props.node);
 
-  toggleExpandNode = () => dispatch('toggleExpandNode', this.props.node.id);
+  toggleExpandNode = () => {
+    const {kind, node} = this.props;
+    dispatch('toggleExpandNode', {kind, node});
+  };
 
   renderChildren = () => {
     const {level, node, nodeMap} = this.props;

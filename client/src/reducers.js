@@ -6,8 +6,9 @@ import type {
   AddNodePayloadType,
   ModalType,
   NodeMapType,
+  NodePayloadType,
   NodeType,
-  SaveNodePayloadType,
+  SetNodesPayloadType,
   StateType
 } from './types';
 
@@ -46,8 +47,8 @@ function validateNewName(nodeMap: NodeMapType, parentId: number, name: string) {
 addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
-    const {id, name, parentId} = payload;
-    const {nodeMap} = state;
+    const {id, kind, name, parentId} = payload;
+    const nodeMap = state[kind + 'NodeMap'];
 
     validateNewName(nodeMap, parentId, name);
 
@@ -77,15 +78,16 @@ addReducer(
       newParentNode.children.push(id);
     }
 
-    return {...state, nodeMap: newNodeMap};
+    return {...state, [kind + 'NodeMap']: newNodeMap};
   }
 );
 
 addReducer(
   'deleteNode',
-  (state: StateType, targetNode: NodeType): StateType => {
-    const {id, parentId} = targetNode;
-    const {nodeMap} = state;
+  (state: StateType, payload: NodePayloadType): StateType => {
+    const {kind, node} = payload;
+    const {id, parentId} = node;
+    const nodeMap = state[kind + 'NodeMap'];
 
     // nodeMap is immutable, so make a copy that can be modified.
     const newNodeMap = {...nodeMap};
@@ -101,7 +103,7 @@ addReducer(
       newNodeMap[parentId] = newParentNode;
     }
 
-    return {...state, nodeMap: newNodeMap};
+    return {...state, [kind + 'NodeMap']: newNodeMap};
   }
 );
 
@@ -111,15 +113,15 @@ addReducer('editNode', (state: StateType, value: string): StateType =>
 
 addReducer(
   'saveNode',
-  (state: StateType, payload: SaveNodePayloadType): StateType => {
-    const {id, name} = payload;
+  (state: StateType, payload: NodePayloadType): StateType => {
+    const {kind, node} = payload;
+    const {id, name} = node;
 
     // Don't allow empty node names.
     if (!name) return state;
 
-    const {nodeMap, ui} = state;
-
-    const node = nodeMap[id];
+    const {ui} = state;
+    const nodeMap = state[kind + 'NodeMap'];
 
     if (name !== node.name) {
       // changing name
@@ -134,7 +136,7 @@ addReducer(
 
     return {
       ...state,
-      nodeMap: newNodeMap,
+      [kind + 'NodeMap']: newNodeMap,
       ui: {
         ...ui,
         editedName: '',
@@ -176,14 +178,15 @@ addReducer('setNewNodeName', (state: StateType, value: string): StateType =>
   setUiProp(state, 'newNodeName', value)
 );
 
-addReducer('setNodes', (state: StateType, nodes: NodeType[]) => {
+addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
+  const {kind, nodes} = payload;
   const nodeMap = nodes.reduce((map, node) => {
     const {id} = node;
     node.children = nodes.filter(n => n.parentId === id).map(n => n.id);
     map[id] = node;
     return map;
   }, {});
-  return {...state, nodeMap};
+  return {...state, [kind + 'NodeMap']: nodeMap};
 });
 
 addReducer('setPassword', (state: StateType, value: string): StateType =>
@@ -200,14 +203,20 @@ addReducer('toggleEditNode', (state: StateType, node: NodeType): StateType => {
   return setUiProp(state, 'editingNodeId', value);
 });
 
-addReducer('toggleExpandNode', (state: StateType, id: number): StateType => {
-  const {nodeMap} = state;
-  const node = nodeMap[id];
+addReducer(
+  'toggleExpandNode',
+  (state: StateType, payload: NodePayloadType): StateType => {
+    const {kind, node} = payload;
+    console.log('reducers.js x: node =', node);
+    const nodeMap = state[kind + 'NodeMap'];
+    console.log('reducers.js x: nodeMap =', nodeMap);
 
-  // nodeMap is immutable, so make a copy that can be modified.
-  const newNodeMap = {...nodeMap};
-  const newNode = {...node, expanded: !node.expanded};
-  newNodeMap[id] = newNode;
+    // nodeMap is immutable, so make a copy that can be modified.
+    const newNodeMap = {...nodeMap};
+    const newNode = {...node, expanded: !node.expanded};
+    console.log('reducers.js x: newNode =', newNode);
+    newNodeMap[node.id] = newNode;
 
-  return {...state, nodeMap: newNodeMap};
-});
+    return {...state, [kind + 'NodeMap']: newNodeMap};
+  }
+);
