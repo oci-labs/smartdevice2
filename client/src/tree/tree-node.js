@@ -148,7 +148,7 @@ class TreeNode extends Component<PropsType> {
           />
         ) : (
           <div className="tree-node-name" onClick={() => this.toggleEditNode()}>
-            {node.name}-{node.id}
+            {node.name}
           </div>
         )}
         <Button

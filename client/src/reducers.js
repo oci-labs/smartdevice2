@@ -67,7 +67,11 @@ addReducer(
       const parentNode = nodeMap[parentId];
 
       // parentNode is immutable, so make a copy that can be modified.
-      const newParentNode = {...parentNode, children: [...parentNode.children]};
+      const newParentNode = {
+        ...parentNode,
+        children: [...parentNode.children],
+        expanded: true
+      };
 
       newNodeMap[parentId] = newParentNode;
       newParentNode.children.push(id);
