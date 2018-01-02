@@ -207,14 +207,11 @@ addReducer(
   'toggleExpandNode',
   (state: StateType, payload: NodePayloadType): StateType => {
     const {kind, node} = payload;
-    console.log('reducers.js x: node =', node);
     const nodeMap = state[kind + 'NodeMap'];
-    console.log('reducers.js x: nodeMap =', nodeMap);
 
     // nodeMap is immutable, so make a copy that can be modified.
     const newNodeMap = {...nodeMap};
     const newNode = {...node, expanded: !node.expanded};
-    console.log('reducers.js x: newNode =', newNode);
     newNodeMap[node.id] = newNode;
 
     return {...state, [kind + 'NodeMap']: newNodeMap};

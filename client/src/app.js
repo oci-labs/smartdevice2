@@ -12,8 +12,8 @@ import './app.css';
 type PropsType = {
   editedName: string,
   editingNodeId: number,
-  instanceNodeMap: NodeMapType,
-  instanceRootId: number,
+  //instanceNodeMap: NodeMapType,
+  //instanceRootId: number,
   newNodeName: string,
   typeNodeMap: NodeMapType,
   typeRootId: number
@@ -25,8 +25,8 @@ class App extends Component<PropsType> {
     const {
       editedName,
       editingNodeId,
-      instanceNodeMap,
-      instanceRootId,
+      //instanceNodeMap,
+      //instanceRootId,
       newNodeName,
       typeNodeMap,
       typeRootId

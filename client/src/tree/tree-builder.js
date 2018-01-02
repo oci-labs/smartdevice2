@@ -28,6 +28,7 @@ type PropsType = {
 const URL_PREFIX = 'http://localhost:3001/';
 
 class TreeBuilder extends Component<PropsType> {
+
   addNode = async (parent: NodeType) => {
     const name = this.props.newNodeName;
     if (!name) return;

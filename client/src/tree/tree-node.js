@@ -7,7 +7,12 @@ import Button from './button';
 
 import './tree-node.css';
 
-import type {AddNodePayloadType, NodeMapType, NodeType} from '../types';
+import type {
+  AddNodePayloadType,
+  NodeMapType,
+  NodePayloadType,
+  NodeType
+} from '../types';
 
 type PropsType = {
   editedName: string,
@@ -19,7 +24,7 @@ type PropsType = {
   nodeMap: NodeMapType
 };
 
-const URL_PREFIX = 'http://localhost:3001/types';
+const URL_PREFIX = 'http://localhost:3001/';
 
 function getSortedChildren(node: NodeType, nodeMap: NodeMapType): NodeType[] {
   const children = node.children.map(id => nodeMap[id]);
@@ -31,6 +36,7 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
+
   addNode = async (parent: NodeType) => {
     const name = this.props.newNodeName;
     if (!name) return;
@@ -42,12 +48,12 @@ class TreeNode extends Component<PropsType> {
         method: 'POST',
         body: JSON.stringify({name, parentId})
       };
-      const url = URL_PREFIX;
+      const {kind} = this.props;
+      const url = URL_PREFIX + kind;
       const res = await fetch(url, options);
       const id = Number(await res.text());
 
       // Add new type to Redux state.
-      const {kind} = this.props;
       const payload: AddNodePayloadType = {id, kind, name, parentId};
       dispatch('addNode', payload);
 
@@ -60,11 +66,13 @@ class TreeNode extends Component<PropsType> {
   deleteNode = async (node: NodeType) => {
     try {
       // Delete type from database.
+      const {kind} = this.props;
+      const url = `${URL_PREFIX}${kind}/${node.id}`;
       const options = {method: 'DELETE'};
-      const url = `${URL_PREFIX}/${node.id}`;
       await fetch(url, options);
 
-      dispatch('deleteNode', node);
+      const payload: NodePayloadType = {kind, node};
+      dispatch('deleteNode', payload);
     } catch (e) {
       console.error('tree-builder.js deleteNode:', e.message);
     }
@@ -91,16 +99,17 @@ class TreeNode extends Component<PropsType> {
 
   saveChange = async () => {
     const {editedName: name, editingNodeId: id, kind, node} = this.props;
-    const payload = {kind, node};
     try {
       // Update type name in database.
+      const url = `${URL_PREFIX}${kind}/${id}`;
       const options = {
         method: 'PATCH',
         body: JSON.stringify({name})
       };
-      const url = `${URL_PREFIX}/${id}`;
       await fetch(url, options);
 
+      const newNode = {...node, name};
+      const payload: NodePayloadType = {kind, node: newNode};
       dispatch('saveNode', payload);
     } catch (e) {
       console.error('tree-builder.js saveChange:', e.message);
