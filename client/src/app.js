@@ -55,19 +55,15 @@ class App extends Component<PropsType> {
 const mapState = (state: StateType): Object => {
   const {
     instanceNodeMap,
-    instanceRootId,
     typeNodeMap,
-    typeRootId,
     ui: {editedName, editingNode, newNodeName}
   } = state;
   return {
     editedName,
     editingNode,
     instanceNodeMap,
-    instanceRootId,
     newNodeName,
-    typeNodeMap,
-    typeRootId
+    typeNodeMap
   };
 };
 

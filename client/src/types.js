@@ -91,9 +91,7 @@ export type UserType = {
 export type StateType = {
   errors: Set<string>,
   instanceNodeMap: NodeMapType,
-  instanceRootId: number,
   typeNodeMap: NodeMapType,
-  typeRootId: number,
   ui: UiType,
   user: UserType
 };

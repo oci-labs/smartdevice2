@@ -5,9 +5,7 @@ import type {StateType} from './types';
 const state: StateType = {
   errors: new Set(),
   instanceNodeMap: {},
-  instanceRootId: 2,
   typeNodeMap: {},
-  typeRootId: 1,
   ui: {
     editedName: '',
     editingNode: null,
