@@ -85,7 +85,7 @@ async function patchHandler(
   try {
     const type = await mySql.getById(kind, id);
     const newType = {...type, ...changes};
-    const {changedRows} = await mySql.updateById(kind, id, newType);
+    await mySql.updateById(kind, id, newType);
     res.status(OK).send(JSON.stringify(newType));
   } catch (e) {
     // istanbul ignore next
@@ -93,7 +93,7 @@ async function patchHandler(
   }
 }
 
-function typeService(app: express$Application): void {
+function treeService(app: express$Application): void {
   const URL_PREFIX = '/:kind';
 
   app.delete(URL_PREFIX + '/:id', deleteByIdHandler);
@@ -109,5 +109,5 @@ module.exports = {
   getAllHandler,
   getByIdHandler,
   patchHandler,
-  typeService
+  treeService
 };

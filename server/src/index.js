@@ -6,7 +6,7 @@ const express = require('express');
 const healthCheck = require('express-healthcheck');
 const morgan = require('morgan');
 
-const {typeService} = require('./type-service');
+const {treeService} = require('./tree-service');
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.set('etag', 'strong');
 
 //const healthCheckPath = /^\/$/;
 
-typeService(app);
+treeService(app);
 
 // Logging
 // The provided options are combined, common, dev, short, and tiny.
