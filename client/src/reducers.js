@@ -195,3 +195,15 @@ addReducer('toggleEditNode', (state: StateType, node: NodeType): StateType => {
   if (value) state = setUiProp(state, 'editedName', node.name);
   return setUiProp(state, 'editingNodeId', value);
 });
+
+addReducer('toggleExpandNode', (state: StateType, id: number): StateType => {
+  const {nodeMap} = state;
+  const node = nodeMap[id];
+
+  // nodeMap is immutable, so make a copy that can be modified.
+  const newNodeMap = {...nodeMap};
+  const newNode = {...node, expanded: !node.expanded};
+  newNodeMap[id] = newNode;
+
+  return {...state, nodeMap: newNodeMap};
+});

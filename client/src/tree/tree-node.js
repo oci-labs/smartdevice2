@@ -5,7 +5,7 @@ import {dispatch} from 'redux-easy';
 
 import Button from './button';
 
-import './tree-builder.css';
+import './tree-node.css';
 
 import type {AddNodePayloadType, NodeMapType, NodeType} from '../types';
 
@@ -20,10 +20,7 @@ type PropsType = {
 
 const URL_PREFIX = 'http://localhost:3001/types';
 
-function getSortedChildren(
-  node: NodeType,
-  nodeMap: NodeMapType
-): NodeType[] {
+function getSortedChildren(node: NodeType, nodeMap: NodeMapType): NodeType[] {
   const children = node.children.map(id => nodeMap[id]);
   return children.sort(nodeCompare);
 }
@@ -33,7 +30,6 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
-
   addNode = async (parent: NodeType) => {
     const name = this.props.newNodeName;
     if (!name) return;
@@ -80,9 +76,7 @@ class TreeNode extends Component<PropsType> {
   };
 
   handleEscape = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape') {
-      this.toggleEditNode(this.props.node);
-    }
+    if (event.key === 'Escape') this.toggleEditNode();
   };
 
   isEditing = (node: NodeType) => node.id === this.props.editingNodeId;
@@ -91,7 +85,7 @@ class TreeNode extends Component<PropsType> {
     const {target} = event;
     const {value} = target;
     target.selectionStart = value.length;
-  }
+  };
 
   saveChange = async () => {
     const {editedName: name, editingNodeId: id} = this.props;
@@ -111,19 +105,20 @@ class TreeNode extends Component<PropsType> {
     }
   };
 
-  toggleEditNode = (node: NodeType) => {
-    dispatch('toggleEditNode', node);
-  };
+  toggleEditNode = () => dispatch('toggleEditNode', this.props.node);
+
+  toggleExpandNode = () => dispatch('toggleExpandNode', this.props.node.id);
 
   renderChildren = () => {
     const {level, node, nodeMap} = this.props;
-    return getSortedChildren(node, nodeMap).map(child =>
+    return getSortedChildren(node, nodeMap).map(child => (
       <TreeNode
         {...this.props}
         key={`tn${node.id}`}
         level={level + 1}
         node={child}
-      />);
+      />
+    ));
   };
 
   render = () => {
@@ -131,8 +126,16 @@ class TreeNode extends Component<PropsType> {
 
     if (!node.parentId) return this.renderChildren();
 
+    const direction = node.expanded ? 'down' : 'right';
+    const triangleClasses =
+      node.children.length === 0 ? '' : `fa fa-caret-${direction}`;
+
     return (
       <div className={`tree-node tree-level-${level}`}>
+        <div
+          className={`expand ${triangleClasses}`}
+          onClick={this.toggleExpandNode}
+        />
         {this.isEditing(node) ? (
           <input
             type="text"
@@ -144,10 +147,7 @@ class TreeNode extends Component<PropsType> {
             value={editedName}
           />
         ) : (
-          <div
-            className="tree-node-name"
-            onClick={() => this.toggleEditNode(node)}
-          >
+          <div className="tree-node-name" onClick={() => this.toggleEditNode()}>
             {node.name}-{node.id}
           </div>
         )}
@@ -165,9 +165,9 @@ class TreeNode extends Component<PropsType> {
         <Button
           className="editNode"
           icon="pencil"
-          onClick={() => this.toggleEditNode(node)}
+          onClick={() => this.toggleEditNode()}
         />
-        {this.renderChildren()}
+        {node.expanded ? this.renderChildren() : null}
       </div>
     );
   };

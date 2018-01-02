@@ -1,13 +1,17 @@
 .tree-node {
-  margin-left: 0 !important; //TODO: Why need !important?
-
   .button {
     border: none;
+    margin-left: 5px;
   }
 
   .deleteNode {
     color: red;
     cursor: pointer;
+  }
+
+  .expand {
+    display: inline-block;
+    width: 15px;
   }
 
   .tree-node {

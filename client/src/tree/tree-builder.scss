@@ -7,8 +7,9 @@
     cursor: pointer;
   }
 
-  .button {
+  & > .button {
     border: none;
+    padding-left: 0;
   }
 
   .deleteNode {
@@ -18,22 +19,5 @@
 
   & > .tree-node {
     margin-left: 0 !important; //TODO: Why need !important?
-  }
-
-  .tree-node {
-    margin-left: 20px;
-  }
-
-  .tree-node-name {
-    display: inline-block;
-  }
-
-  .tree-level-0 {
-  }
-
-  .tree-level-1 {
-  }
-
-  .tree-level-2 {
   }
 }

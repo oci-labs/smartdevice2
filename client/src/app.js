@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import TreeBuilder from './tree-builder/tree-builder';
+import TreeBuilder from './tree/tree-builder';
 
 import type {NodeMapType, StateType} from './types';
 
