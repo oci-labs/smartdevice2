@@ -13,16 +13,16 @@ const URL_PREFIX = `http://${HOST}:${PORT}/`;
 
 type TestDescType = {
   tableName: string,
-  initialObject: Object,
-  modifiedObject: Object,
+  oldObject: Object,
+  newObject: Object,
   setupFn?: Function,
   teardownFn?: Function
 };
 
 describe('crudService', () => {
-  let alertTypeId1, alertTypeId2, typeId1, typeId2;
+  let alertTypeId1, alertTypeId2, instanceId, typeId1, typeId2;
 
-  async function setupTypes() {
+  async function setupTypes(oldObject, newObject) {
     const url = URL_PREFIX + 'type';
 
     // Create a row in the type table.
@@ -30,12 +30,14 @@ describe('crudService', () => {
     let res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     typeId1 = res.body;
+    oldObject.typeId = typeId1;
 
     // Create another row in the type table.
     options = {body: {name: 't2'}, json: true};
     res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     typeId2 = res.body;
+    newObject.typeId = typeId2;
   }
 
   async function teardownTypes() {
@@ -48,7 +50,7 @@ describe('crudService', () => {
     expect(res.statusCode).toBe(200);
   }
 
-  async function setupAlertTypes() {
+  async function setupAlertTypes(oldObject, newObject) {
     const url = URL_PREFIX + 'alert_type';
 
     // Create a row in the alert_type table.
@@ -56,12 +58,14 @@ describe('crudService', () => {
     let res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     alertTypeId1 = res.body;
+    oldObject.alertTypeId = alertTypeId1;
 
     // Create another row in the alert_type table.
     options = {body: {name: 'at2'}, json: true};
     res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     alertTypeId2 = res.body;
+    newObject.alertTypeId = alertTypeId2;
   }
 
   async function teardownAlertTypes() {
@@ -74,9 +78,9 @@ describe('crudService', () => {
     expect(res.statusCode).toBe(200);
   }
 
-  async function alertConditionSetup() {
-    await setupTypes();
-    await setupAlertTypes();
+  async function alertConditionSetup(oldObject, newObject) {
+    await setupTypes(oldObject, newObject);
+    await setupAlertTypes(oldObject, newObject);
   }
 
   async function alertConditionTeardown() {
@@ -84,36 +88,47 @@ describe('crudService', () => {
     await teardownAlertTypes();
   }
 
+  async function setupInstance(oldObject, newObject) {
+    const url = URL_PREFIX + 'instance';
+
+    // Create a row in the instance table.
+    const options = {body: {name: 'i1'}, json: true};
+    const res = await got.post(url, options);
+    expect(res.statusCode).toBe(200);
+    instanceId = res.body;
+
+    oldObject.instanceId = instanceId;
+    newObject.instanceId = instanceId;
+  }
+
+  async function teardownInstance() {
+    const url = URL_PREFIX + 'instance/';
+    const res = await got.delete(url + instanceId);
+    expect(res.statusCode).toBe(200);
+  }
+
   testTable({
     tableName: 'alert_type',
-    initialObject: {name: 'n1'},
-    modifiedObject: {name: 'n2'}
+    oldObject: {name: 'n1'},
+    newObject: {name: 'n2'}
   });
 
   testTable({
     tableName: 'alert_condition',
-    initialObject: {
-      typeId: typeId1,
-      expression: 'e1',
-      alertTypeId: alertTypeId1
-    },
-    modifiedObject: {
-      typeId: typeId2,
-      expression: 'e2',
-      alertTypeId: alertTypeId2
-    },
+    oldObject: {expression: 'e1'},
+    newObject: {expression: 'e2'},
     setupFn: alertConditionSetup,
     teardownFn: alertConditionTeardown
   });
 
   testTable({
     tableName: 'instance',
-    initialObject: {
+    oldObject: {
       internalId: 'ii1',
       typeId: typeId1,
       name: 'n1'
     },
-    modifiedObject: {
+    newObject: {
       internalId: 'ii2',
       typeId: typeId2,
       name: 'n2'
@@ -123,16 +138,24 @@ describe('crudService', () => {
   });
 
   testTable({
+    tableName: 'instance_data',
+    oldObject: {dataKey: 'p1', dataValue: 'v1'},
+    newObject: {dataKey: 'p2', dataValue: 'v2'},
+    setupFn: setupInstance,
+    teardownFn: teardownInstance
+  });
+
+  testTable({
     tableName: 'type',
-    initialObject: {name: 'n1'},
-    modifiedObject: {name: 'n2'}
+    oldObject: {name: 'n1'},
+    newObject: {name: 'n2'}
   });
 
   function testTable(desc: TestDescType) {
     const {
       setupFn,
-      initialObject,
-      modifiedObject,
+      oldObject,
+      newObject,
       tableName,
       teardownFn
     } = desc;
@@ -157,10 +180,10 @@ describe('crudService', () => {
       }
 
       beforeEach(async () => {
-        if (setupFn) await setupFn();
+        if (setupFn) await setupFn(oldObject, newObject);
 
         // Test postHandler.
-        const options = {body: initialObject, json: true};
+        const options = {body: oldObject, json: true};
         const res = await got.post(urlPrefix, options);
         expect(res.statusCode).toBe(200);
         id = res.body;
@@ -173,19 +196,19 @@ describe('crudService', () => {
         expect(res.statusCode).toBe(200);
       });
 
-      test('getByIdHandler', async () => {
-        const res = await got.get(urlPrefix + '/' + id);
-        expect(res.statusCode).toBe(200);
-        const object = JSON.parse(res.body);
-        compareObjects(initialObject, object);
-      });
-
       test('getAllHandler', async () => {
         const res = await got.get(urlPrefix);
         expect(res.statusCode).toBe(200);
         const objects = JSON.parse(res.body);
         const object = objects.find(obj => obj.id === id);
-        compareObjects(initialObject, object);
+        compareObjects(oldObject, object);
+      });
+
+      test('getByIdHandler', async () => {
+        const res = await got.get(urlPrefix + '/' + id);
+        expect(res.statusCode).toBe(200);
+        const object = JSON.parse(res.body);
+        compareObjects(oldObject, object);
       });
 
       test('deleteByIdHandler', async done => {
@@ -201,14 +224,14 @@ describe('crudService', () => {
       });
 
       test('patchHandler', async () => {
-        const options = {body: modifiedObject, json: true};
+        const options = {body: newObject, json: true};
         let res = await got.patch(urlPrefix + '/' + id, options);
         expect(res.statusCode).toBe(200);
 
         res = await got.get(urlPrefix + '/' + id);
         expect(res.statusCode).toBe(200);
         const object = JSON.parse(res.body);
-        compareObjects(modifiedObject, object);
+        compareObjects(newObject, object);
       });
     });
   }

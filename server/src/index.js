@@ -43,6 +43,7 @@ treeService(app, mySql);
 crudService(app, mySql, 'alert_type');
 crudService(app, mySql, 'alert_condition');
 crudService(app, mySql, 'instance');
+crudService(app, mySql, 'instance_data');
 crudService(app, mySql, 'type');
 
 // Logging

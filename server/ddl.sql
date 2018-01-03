@@ -67,6 +67,7 @@ create table alert_condition (
 );
 
 create table instance_data (
+  id int auto_increment primary key,
   instanceId int,
   dataKey text, -- "key" is a reserved word
   dataValue text, -- "value" is a reserved word
