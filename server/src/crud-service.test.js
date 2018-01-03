@@ -11,60 +11,132 @@ const HOST = 'localhost';
 const PORT = 3001;
 const URL_PREFIX = `http://${HOST}:${PORT}/`;
 
+type TestDescType = {
+  tableName: string,
+  initialObject: Object,
+  modifiedObject: Object,
+  setupFn?: Function,
+  teardownFn?: Function
+};
+
 describe('crudService', () => {
   let alertTypeId1, alertTypeId2, typeId1, typeId2;
 
-  async function alertConditionSetup() {
-    // Delete all rows in the type table.
-    let url = URL_PREFIX + 'type';
-    let res = await got.delete(url);
-    expect(res.statusCode).toBe(200);
+  async function setupTypes() {
+    const url = URL_PREFIX + 'type';
 
-    // Create a new row in the type table.
+    // Create a row in the type table.
     let options = {body: {name: 't1'}, json: true};
-    res = await got.post(url, options);
+    let res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     typeId1 = res.body;
 
-    // Create a new row in the type table.
+    // Create another row in the type table.
     options = {body: {name: 't2'}, json: true};
     res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     typeId2 = res.body;
+  }
 
-    // Delete all rows in the alert_type table.
-    url = URL_PREFIX + 'alert_type';
-    res = await got.delete(url);
+  async function teardownTypes() {
+    const url = URL_PREFIX + 'type/';
+
+    let res = await got.delete(url + typeId1);
     expect(res.statusCode).toBe(200);
 
-    // Create a new row in the alert_type table.
-    options = {body: {name: 'at1'}, json: true};
-    res = await got.post(url, options);
+    res = await got.delete(url + typeId2);
+    expect(res.statusCode).toBe(200);
+  }
+
+  async function setupAlertTypes() {
+    const url = URL_PREFIX + 'alert_type';
+
+    // Create a row in the alert_type table.
+    let options = {body: {name: 'at1'}, json: true};
+    let res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     alertTypeId1 = res.body;
 
-    // Create a new row in the alert_type table.
+    // Create another row in the alert_type table.
     options = {body: {name: 'at2'}, json: true};
     res = await got.post(url, options);
     expect(res.statusCode).toBe(200);
     alertTypeId2 = res.body;
   }
 
-  testTable('alert_type', {name: 'n1'}, {name: 'n2'});
+  async function teardownAlertTypes() {
+    const url = URL_PREFIX + 'alert_type/';
 
-  testTable(
-    'alert_condition',
-    {typeId: typeId1, expression: 'e1', alertTypeId: alertTypeId1},
-    {typeId: typeId2, expression: 'e2', alertTypeId: alertTypeId2},
-    alertConditionSetup
-  );
+    let res = await got.delete(url + alertTypeId1);
+    expect(res.statusCode).toBe(200);
 
-  function testTable(
-    tableName: string,
-    initialObject,
-    modifiedObject,
-    setupFn
-  ) {
+    res = await got.delete(url + alertTypeId2);
+    expect(res.statusCode).toBe(200);
+  }
+
+  async function alertConditionSetup() {
+    await setupTypes();
+    await setupAlertTypes();
+  }
+
+  async function alertConditionTeardown() {
+    await teardownTypes();
+    await teardownAlertTypes();
+  }
+
+  testTable({
+    tableName: 'alert_type',
+    initialObject: {name: 'n1'},
+    modifiedObject: {name: 'n2'}
+  });
+
+  testTable({
+    tableName: 'alert_condition',
+    initialObject: {
+      typeId: typeId1,
+      expression: 'e1',
+      alertTypeId: alertTypeId1
+    },
+    modifiedObject: {
+      typeId: typeId2,
+      expression: 'e2',
+      alertTypeId: alertTypeId2
+    },
+    setupFn: alertConditionSetup,
+    teardownFn: alertConditionTeardown
+  });
+
+  testTable({
+    tableName: 'instance',
+    initialObject: {
+      internalId: 'ii1',
+      typeId: typeId1,
+      name: 'n1'
+    },
+    modifiedObject: {
+      internalId: 'ii2',
+      typeId: typeId2,
+      name: 'n2'
+    },
+    setupFn: setupTypes,
+    teardownFn: teardownTypes
+  });
+
+  testTable({
+    tableName: 'type',
+    initialObject: {name: 'n1'},
+    modifiedObject: {name: 'n2'}
+  });
+
+  function testTable(desc: TestDescType) {
+    const {
+      setupFn,
+      initialObject,
+      modifiedObject,
+      tableName,
+      teardownFn
+    } = desc;
+
     describe('for table ' + tableName, () => {
       const urlPrefix = `${URL_PREFIX}${tableName}`;
       let id;
@@ -87,15 +159,18 @@ describe('crudService', () => {
       beforeEach(async () => {
         if (setupFn) await setupFn();
 
-        // Test deleteAllHandler.
-        let res = await got.delete(urlPrefix);
-        expect(res.statusCode).toBe(200);
-
         // Test postHandler.
         const options = {body: initialObject, json: true};
-        res = await got.post(urlPrefix, options);
+        const res = await got.post(urlPrefix, options);
         expect(res.statusCode).toBe(200);
         id = res.body;
+      });
+
+      afterEach(async () => {
+        if (teardownFn) await teardownFn();
+
+        const res = await got.delete(urlPrefix + '/' + id);
+        expect(res.statusCode).toBe(200);
       });
 
       test('getByIdHandler', async () => {
@@ -109,8 +184,7 @@ describe('crudService', () => {
         const res = await got.get(urlPrefix);
         expect(res.statusCode).toBe(200);
         const objects = JSON.parse(res.body);
-        expect(objects.length).toBe(1);
-        const [object] = objects;
+        const object = objects.find(obj => obj.id === id);
         compareObjects(initialObject, object);
       });
 
