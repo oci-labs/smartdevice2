@@ -1,4 +1,7 @@
 .app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   text-align: center;
 }
 
@@ -17,6 +20,19 @@
   font-size: large;
 }
 
+#body {
+  display: flex;
+  flex-grow: 1;
+
+  & > section {
+    padding: 10px;
+
+    h3 {
+      margin-top: 0;
+    }
+  }
+}
+
 input {
   border: solid lightgray 1px;
   border-radius: 4px;
@@ -29,7 +45,32 @@ label {
   margin-right: 5px;
 }
 
+#left {
+  border-right: solid blue 3px;
+  width: 300px;
+}
+
+#middle {
+  flex-grow: 1;
+}
+
+#right {
+  border-left: solid blue 3px;
+  width: 300px;
+}
+
 .tree-builder {
+  display: block;
   margin-right: 20px;
   vertical-align: top;
+}
+
+.tree-radio {
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: left;
+
+  input:nth-child(2) {
+    margin-left: 20px;
+  }
 }

@@ -182,6 +182,10 @@ addReducer(
   }
 );
 
+addReducer('setTreeType', (state: StateType, value: string): StateType =>
+  setUiProp(state, 'treeType', value)
+);
+
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
   const {kind, nodes} = payload;
   const nodeMap = nodes.reduce((map, node) => {
@@ -226,7 +230,6 @@ addReducer(
   'toggleSubscribeNode',
   (state: StateType, node: NodeType): StateType => {
     const {subscriptions} = state.user;
-    console.log('reducers.js toggleSubscribeNode: subscriptions =', subscriptions);
     const {id} = node;
     const newSubscriptions = subscriptions.includes(id)
       ? subscriptions.filter(i => i !== id)

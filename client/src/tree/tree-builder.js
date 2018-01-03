@@ -32,7 +32,13 @@ const URL_PREFIX = 'http://localhost:3001/';
 class TreeBuilder extends Component<PropsType> {
 
   componentDidMount() {
-    this.load();
+    this.load(this.props.kind);
+  }
+
+  componentWillReceiveProps(nextProps: PropsType) {
+    const currentKind = this.props.kind;
+    const newKind = nextProps.kind;
+    if (newKind !== currentKind) this.load(newKind);
   }
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
@@ -43,9 +49,8 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   // Loads nodes from database.
-  load = async () => {
+  load = async (kind: string) => {
     try {
-      const {kind} = this.props;
       const url = URL_PREFIX + kind;
       const res = await fetch(url);
       const nodes = await res.json();

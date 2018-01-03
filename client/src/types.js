@@ -72,11 +72,14 @@ export type ModalType = {
 
 export type RoleType = 'admin' | 'service' | 'spectator';
 
+export type TreeType = 'type' | 'instance';
+
 export type UiType = {
   editedName: string,
   editingNode: ?NodeType,
   instanceName: string,
   modal: ModalType,
+  treeType: TreeType,
   typeName: string
 };
 
