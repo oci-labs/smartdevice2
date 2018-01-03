@@ -5,8 +5,18 @@ const cors = require('cors');
 const express = require('express');
 const healthCheck = require('express-healthcheck');
 const morgan = require('morgan');
+const MySqlConnection = require('mysql-easier');
 
+const crudService = require('./crud-service');
 const {treeService} = require('./tree-service');
+
+const dbConfig = {
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'smartdevice'
+};
+const mySql = new MySqlConnection(dbConfig);
 
 const app = express();
 
@@ -29,7 +39,8 @@ app.set('etag', 'strong');
 
 //const healthCheckPath = /^\/$/;
 
-treeService(app);
+treeService(app, mySql);
+crudService(app, mySql, 'alert_type');
 
 // Logging
 // The provided options are combined, common, dev, short, and tiny.

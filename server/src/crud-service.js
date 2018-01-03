@@ -7,7 +7,7 @@ const {errorHandler} = require('./util/error-util');
 const NOT_FOUND = 404;
 const OK = 200;
 
-function crud(
+function crudService(
   app: express$Application,
   mySql: MySqlConnection,
   tableName: string
@@ -106,4 +106,4 @@ function crud(
   app.post(URL_PREFIX, postHandler);
 }
 
-module.exports = crud;
+module.exports = crudService;

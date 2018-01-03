@@ -8,7 +8,7 @@ import type {
   NodeType
 } from '../types';
 
-const URL_PREFIX = 'http://localhost:3001/';
+export const URL_PREFIX = 'http://localhost:3001/tree/';
 
 export async function addNode(kind: string, name: string, parent: NodeType) {
   if (!name) return;

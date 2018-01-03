@@ -6,7 +6,7 @@ import {dispatch} from 'redux-easy';
 
 import Button from './button';
 import TreeNode from './tree-node';
-import {addNode} from './tree-util';
+import {URL_PREFIX, addNode} from './tree-util';
 
 import './tree-builder.css';
 
@@ -27,7 +27,6 @@ type PropsType = {
 };
 
 const ROOT_ID = 1;
-const URL_PREFIX = 'http://localhost:3001/';
 
 class TreeBuilder extends Component<PropsType> {
 

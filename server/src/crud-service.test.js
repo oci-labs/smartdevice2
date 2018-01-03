@@ -7,17 +7,22 @@ const HOST = 'localhost';
 const PORT = 3001;
 const URL_PREFIX = `http://${HOST}:${PORT}/${TABLE}`;
 
+/**
+ * The server must be running when this test is run
+ * because it sends HTTP requests to it.
+ */
 describe('crud-service', () => {
   const name = 'some alert type';
   let id;
 
   beforeEach(async () => {
-    // Exercises deleteAllHandler
-    await got.delete(URL_PREFIX);
+    // Test deleteAllHandler.
+    let res = await got.delete(URL_PREFIX);
+    expect(res.statusCode).toBe(200);
 
     // Test postHandler.
     const options = {body: {name}, json: true};
-    const res = await got.post(URL_PREFIX, options);
+    res = await got.post(URL_PREFIX, options);
     id = res.body;
     expect(res.statusCode).toBe(200);
   });

@@ -9,15 +9,8 @@ const {errorHandler} = require('./util/error-util');
 const NOT_FOUND = 404;
 const OK = 200;
 
-const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'smartdevice'
-};
-const mySql = new MySqlConnection(dbConfig);
-
 async function deleteByIdHandler(
+  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -34,6 +27,7 @@ async function deleteByIdHandler(
 }
 
 async function createHandler(
+  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -49,6 +43,7 @@ async function createHandler(
 }
 
 async function getAllHandler(
+  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -63,6 +58,7 @@ async function getAllHandler(
 }
 
 async function getByIdHandler(
+  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -77,6 +73,7 @@ async function getByIdHandler(
 }
 
 async function patchHandler(
+  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -93,14 +90,14 @@ async function patchHandler(
   }
 }
 
-function treeService(app: express$Application): void {
-  const URL_PREFIX = '/:kind';
+function treeService(app: express$Application, mySql: MySqlConnection): void {
+  const URL_PREFIX = '/tree/:kind';
 
-  app.delete(URL_PREFIX + '/:id', deleteByIdHandler);
-  app.get(URL_PREFIX, getAllHandler);
-  app.get(URL_PREFIX + '/:id', getByIdHandler);
-  app.patch(URL_PREFIX + '/:id', patchHandler);
-  app.post(URL_PREFIX, createHandler);
+  app.delete(URL_PREFIX + '/:id', deleteByIdHandler.bind(null, mySql));
+  app.get(URL_PREFIX, getAllHandler.bind(null, mySql));
+  app.get(URL_PREFIX + '/:id', getByIdHandler.bind(null, mySql));
+  app.patch(URL_PREFIX + '/:id', patchHandler.bind(null, mySql));
+  app.post(URL_PREFIX, createHandler.bind(null, mySql));
 }
 
 module.exports = {
