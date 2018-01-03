@@ -41,6 +41,8 @@ app.set('etag', 'strong');
 
 treeService(app, mySql);
 crudService(app, mySql, 'alert_type');
+crudService(app, mySql, 'alert_condition');
+crudService(app, mySql, 'type');
 
 // Logging
 // The provided options are combined, common, dev, short, and tiny.
