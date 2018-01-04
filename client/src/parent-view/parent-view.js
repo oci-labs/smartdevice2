@@ -4,35 +4,58 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 //import {dispatch} from 'redux-easy';
 
-import type {NodeType, StateType} from '../types';
+import Node from './node';
+import type {NodeMapType, NodeType, StateType, TreeType} from '../types';
 
 import './parent-view.css';
 
 type PropsType = {
-  instanceNode: ?NodeType
+  instanceNodeMap: NodeMapType,
+  instanceNode: ?NodeType,
+  treeType: TreeType
 };
 
 class ParentView extends Component<PropsType> {
-  render() {
-    const {instanceNode} = this.props;
+  renderChild = (id: number) => {
+    const {instanceNodeMap} = this.props;
+    const node = instanceNodeMap[id];
+    return <Node node={node} />;
+  };
+
+  renderGuts = () => {
+    const {instanceNode, treeType} = this.props;
+    if (treeType !== 'instance') return null;
+
+    return [
+      <h3 key="title">Parent View</h3>,
+      instanceNode
+        ? this.renderSelection(instanceNode)
+        : this.renderNoSelection()
+    ];
+  };
+
+  renderNoSelection = () => <div>Select an instance from the left nav.</div>;
+
+  renderSelection = (node: NodeType) => {
+    const {children} = node;
     return (
-      <section className="parent-view">
-        <h3>Parent View</h3>
-        {instanceNode ? (
-          <div>You selected {instanceNode.name}.</div>
-        ) : (
-          <div>Select an instance from the left nav.</div>
-        )}
-      </section>
+      <div>
+        <div>You selected {node.name}.</div>
+        {children.map(id => this.renderChild(id))}
+      </div>
     );
+  };
+
+  render() {
+    return <section className="parent-view">{this.renderGuts()}</section>;
   }
 }
 
 const mapState = (state: StateType): Object => {
   const {instanceNodeMap, ui} = state;
-  const {selectedInstanceNodeId} = ui;
+  const {selectedInstanceNodeId, treeType} = ui;
   const instanceNode = instanceNodeMap[selectedInstanceNodeId];
-  return {instanceNode};
+  return {instanceNode, instanceNodeMap, treeType};
 };
 
 export default connect(mapState)(ParentView);

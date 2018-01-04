@@ -1,0 +1,17 @@
+$borderSize: 5px;
+$radius: 50px;
+$size: $radius * 2 - $borderSize * 2;
+
+.node {
+  display: inline-block;
+  margin: 20px;
+
+  .circle {
+    border: solid lightgray $borderSize;
+    border-radius: $radius;
+    height: $size;
+    line-height: $size;
+    margin-bottom: 10px;
+    width: $size;
+  }
+}
