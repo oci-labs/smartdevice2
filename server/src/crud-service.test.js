@@ -233,6 +233,19 @@ describe('crudService', () => {
         const object = JSON.parse(res.body);
         compareObjects(newObject, object);
       });
+
+      test('queryHandler', async () => {
+        const whereClause = 'id = 1';
+        const options = {
+          body: whereClause,
+          headers: {'Content-Type': 'text/plain'}
+        };
+        const res = await got.get(urlPrefix + '/query', options);
+        expect(res.statusCode).toBe(200);
+
+        const rows = JSON.parse(res.body);
+        if (rows.length) expect(rows[0].id).toBe(1);
+      });
     });
   }
 });

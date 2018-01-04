@@ -7,12 +7,20 @@ const {errorHandler} = require('./util/error-util');
 const NOT_FOUND = 404;
 const OK = 200;
 
+/**
+ * This implements CRUD REST services for a given database table.
+ * It currently has the following limitations:
+ * 1) Only MySQL databases are supported.
+ * 2) The table must have an "id" column
+ *    that is an "int auto_increment primary key".
+ */
 function crudService(
   app: express$Application,
   mySql: MySqlConnection,
   tableName: string
 ) {
 
+  /* This code works, but should it be provided?
   async function deleteAllHandler(
     req: express$Request,
     res: express$Response
@@ -25,6 +33,7 @@ function crudService(
       errorHandler(res, e);
     }
   }
+  */
 
   async function deleteByIdHandler(
     req: express$Request,
@@ -97,10 +106,27 @@ function crudService(
     }
   }
 
+  async function queryHandler(
+    req: express$Request,
+    res: express$Response
+  ): Promise<void> {
+    const whereClause = req.body;
+    //TODO: Should we be concerned about SQL injection here?
+    const sql = `select * from ${tableName} where ${whereClause}`;
+    try {
+      const rows = await mySql.query(sql);
+      res.send(JSON.stringify(rows));
+    } catch (e) {
+      // istanbul ignore next
+      errorHandler(res, e);
+    }
+  }
+
   const URL_PREFIX = '/' + tableName;
-  app.delete(URL_PREFIX, deleteAllHandler);
+  //app.delete(URL_PREFIX, deleteAllHandler);
   app.delete(URL_PREFIX + '/:id', deleteByIdHandler);
   app.get(URL_PREFIX, getAllHandler);
+  app.get(URL_PREFIX + '/query', queryHandler);
   app.get(URL_PREFIX + '/:id', getByIdHandler);
   app.patch(URL_PREFIX + '/:id', patchHandler);
   app.post(URL_PREFIX, postHandler);
