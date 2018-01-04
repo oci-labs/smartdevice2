@@ -99,6 +99,18 @@ describe('crudService', () => {
     await userTeardown();
   }
 
+  async function subscriptionSetup(oldObject, newObject) {
+    await alertTypesSetup(oldObject, newObject);
+    await instanceSetup(oldObject, newObject);
+    await userSetup(oldObject, newObject);
+  }
+
+  async function subscriptionTeardown() {
+    await alertTypesTeardown();
+    await instanceTeardown();
+    await userTeardown();
+  }
+
   async function typesSetup(oldObject, newObject) {
     const url = URL_PREFIX + 'type';
 
@@ -205,6 +217,14 @@ describe('crudService', () => {
     newObject: {durationMs: 2},
     setupFn: snoozeSetup,
     teardownFn: snoozeTeardown
+  });
+
+  testTable({
+    tableName: 'subscription',
+    oldObject: {},
+    newObject: {},
+    setupFn: subscriptionSetup,
+    teardownFn: subscriptionTeardown
   });
 
   testTable({
