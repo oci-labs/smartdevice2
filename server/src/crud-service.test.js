@@ -22,35 +22,33 @@ type TestDescType = {
 describe('crudService', () => {
   let alertTypeId1, alertTypeId2, instanceId, typeId1, typeId2;
 
-  async function setupTypes(oldObject, newObject) {
-    const url = URL_PREFIX + 'type';
+  async function alertSetup(oldObject, newObject) {
+    await alertTypesSetup(oldObject, newObject);
+    await instanceSetup(oldObject, newObject);
 
-    // Create a row in the type table.
-    let options = {body: {name: 't1'}, json: true};
-    let res = await got.post(url, options);
-    expect(res.statusCode).toBe(200);
-    typeId1 = res.body;
-    oldObject.typeId = typeId1;
+    oldObject.alertTypeId = alertTypeId1;
+    oldObject.instanceId = instanceId;
 
-    // Create another row in the type table.
-    options = {body: {name: 't2'}, json: true};
-    res = await got.post(url, options);
-    expect(res.statusCode).toBe(200);
-    typeId2 = res.body;
-    newObject.typeId = typeId2;
+    newObject.alertTypeId = alertTypeId2;
+    newObject.instanceId = instanceId;
   }
 
-  async function teardownTypes() {
-    const url = URL_PREFIX + 'type/';
-
-    let res = await got.delete(url + typeId1);
-    expect(res.statusCode).toBe(200);
-
-    res = await got.delete(url + typeId2);
-    expect(res.statusCode).toBe(200);
+  async function alertTeardown() {
+    await alertTypesTeardown();
+    await instanceTeardown();
   }
 
-  async function setupAlertTypes(oldObject, newObject) {
+  async function alertConditionSetup(oldObject, newObject) {
+    await typesSetup(oldObject, newObject);
+    await alertTypesSetup(oldObject, newObject);
+  }
+
+  async function alertConditionTeardown() {
+    await typesTeardown();
+    await alertTypesTeardown();
+  }
+
+  async function alertTypesSetup(oldObject, newObject) {
     const url = URL_PREFIX + 'alert_type';
 
     // Create a row in the alert_type table.
@@ -68,7 +66,7 @@ describe('crudService', () => {
     newObject.alertTypeId = alertTypeId2;
   }
 
-  async function teardownAlertTypes() {
+  async function alertTypesTeardown() {
     const url = URL_PREFIX + 'alert_type/';
 
     let res = await got.delete(url + alertTypeId1);
@@ -78,17 +76,7 @@ describe('crudService', () => {
     expect(res.statusCode).toBe(200);
   }
 
-  async function alertConditionSetup(oldObject, newObject) {
-    await setupTypes(oldObject, newObject);
-    await setupAlertTypes(oldObject, newObject);
-  }
-
-  async function alertConditionTeardown() {
-    await teardownTypes();
-    await teardownAlertTypes();
-  }
-
-  async function setupInstance(oldObject, newObject) {
+  async function instanceSetup(oldObject, newObject) {
     const url = URL_PREFIX + 'instance';
 
     // Create a row in the instance table.
@@ -101,11 +89,47 @@ describe('crudService', () => {
     newObject.instanceId = instanceId;
   }
 
-  async function teardownInstance() {
+  async function instanceTeardown() {
     const url = URL_PREFIX + 'instance/';
     const res = await got.delete(url + instanceId);
     expect(res.statusCode).toBe(200);
   }
+
+  async function typesSetup(oldObject, newObject) {
+    const url = URL_PREFIX + 'type';
+
+    // Create a row in the type table.
+    let options = {body: {name: 't1'}, json: true};
+    let res = await got.post(url, options);
+    expect(res.statusCode).toBe(200);
+    typeId1 = res.body;
+    oldObject.typeId = typeId1;
+
+    // Create another row in the type table.
+    options = {body: {name: 't2'}, json: true};
+    res = await got.post(url, options);
+    expect(res.statusCode).toBe(200);
+    typeId2 = res.body;
+    newObject.typeId = typeId2;
+  }
+
+  async function typesTeardown() {
+    const url = URL_PREFIX + 'type/';
+
+    let res = await got.delete(url + typeId1);
+    expect(res.statusCode).toBe(200);
+
+    res = await got.delete(url + typeId2);
+    expect(res.statusCode).toBe(200);
+  }
+
+  testTable({
+    tableName: 'alert',
+    oldObject: {description: 'd1'},
+    newObject: {description: 'd2'},
+    setupFn: alertSetup,
+    teardownFn: alertTeardown
+  });
 
   testTable({
     tableName: 'alert_type',
@@ -133,16 +157,16 @@ describe('crudService', () => {
       typeId: typeId2,
       name: 'n2'
     },
-    setupFn: setupTypes,
-    teardownFn: teardownTypes
+    setupFn: typesSetup,
+    teardownFn: typesTeardown
   });
 
   testTable({
     tableName: 'instance_data',
     oldObject: {dataKey: 'p1', dataValue: 'v1'},
     newObject: {dataKey: 'p2', dataValue: 'v2'},
-    setupFn: setupInstance,
-    teardownFn: teardownInstance
+    setupFn: instanceSetup,
+    teardownFn: instanceTeardown
   });
 
   testTable({

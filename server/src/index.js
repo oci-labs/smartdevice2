@@ -40,6 +40,7 @@ app.set('etag', 'strong');
 //const healthCheckPath = /^\/$/;
 
 treeService(app, mySql);
+crudService(app, mySql, 'alert');
 crudService(app, mySql, 'alert_type');
 crudService(app, mySql, 'alert_condition');
 crudService(app, mySql, 'instance');
