@@ -1,3 +1,5 @@
+-- TODO: Add lots of "not null" constraints!
+
 drop database if exists smartdevice;
 create database smartdevice;
 

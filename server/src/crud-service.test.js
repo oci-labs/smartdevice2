@@ -20,17 +20,11 @@ type TestDescType = {
 };
 
 describe('crudService', () => {
-  let alertTypeId1, alertTypeId2, instanceId, typeId1, typeId2;
+  let alertTypeId1, alertTypeId2, instanceId, typeId1, typeId2, userId;
 
   async function alertSetup(oldObject, newObject) {
     await alertTypesSetup(oldObject, newObject);
     await instanceSetup(oldObject, newObject);
-
-    oldObject.alertTypeId = alertTypeId1;
-    oldObject.instanceId = instanceId;
-
-    newObject.alertTypeId = alertTypeId2;
-    newObject.instanceId = instanceId;
   }
 
   async function alertTeardown() {
@@ -95,6 +89,16 @@ describe('crudService', () => {
     expect(res.statusCode).toBe(200);
   }
 
+  async function snoozeSetup(oldObject, newObject) {
+    await instanceSetup(oldObject, newObject);
+    await userSetup(oldObject, newObject);
+  }
+
+  async function snoozeTeardown() {
+    await instanceTeardown();
+    await userTeardown();
+  }
+
   async function typesSetup(oldObject, newObject) {
     const url = URL_PREFIX + 'type';
 
@@ -120,6 +124,32 @@ describe('crudService', () => {
     expect(res.statusCode).toBe(200);
 
     res = await got.delete(url + typeId2);
+    expect(res.statusCode).toBe(200);
+  }
+
+  async function userSetup(oldObject, newObject) {
+    const url = URL_PREFIX + 'user';
+
+    // Create a row in the instance table.
+    const user = {
+      email: 'mark@email.com',
+      encryptedPassword: 'querty',
+      firstName: 'Mark',
+      lastName: 'Volkmann'
+    };
+
+    const options = {body: user, json: true};
+    const res = await got.post(url, options);
+    expect(res.statusCode).toBe(200);
+    userId = res.body;
+
+    oldObject.userId = userId;
+    newObject.userId = userId;
+  }
+
+  async function userTeardown() {
+    const url = URL_PREFIX + 'user/';
+    const res = await got.delete(url + userId);
     expect(res.statusCode).toBe(200);
   }
 
@@ -170,9 +200,35 @@ describe('crudService', () => {
   });
 
   testTable({
+    tableName: 'snooze',
+    oldObject: {durationMs: 1},
+    newObject: {durationMs: 2},
+    setupFn: snoozeSetup,
+    teardownFn: snoozeTeardown
+  });
+
+  testTable({
     tableName: 'type',
     oldObject: {name: 'n1'},
     newObject: {name: 'n2'}
+  });
+
+  const oldUser = {
+    email: 'mark@email.com',
+    encryptedPassword: 'querty',
+    firstName: 'Mark',
+    lastName: 'Volkmann'
+  };
+  const newUser = {
+    email: 'kevin@email.com',
+    encryptedPassword: 'beetle',
+    firstName: 'Kevin',
+    lastName: 'Stanley'
+  };
+  testTable({
+    tableName: 'user',
+    oldObject: oldUser,
+    newObject: newUser
   });
 
   function testTable(desc: TestDescType) {

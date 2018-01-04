@@ -45,7 +45,9 @@ crudService(app, mySql, 'alert_type');
 crudService(app, mySql, 'alert_condition');
 crudService(app, mySql, 'instance');
 crudService(app, mySql, 'instance_data');
+crudService(app, mySql, 'snooze');
 crudService(app, mySql, 'type');
+crudService(app, mySql, 'user');
 
 // Logging
 // The provided options are combined, common, dev, short, and tiny.
