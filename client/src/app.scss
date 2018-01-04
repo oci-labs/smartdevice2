@@ -45,11 +45,11 @@
     width: 300px;
   }
 
-  #middle {
+  .parent-view {
     flex-grow: 1;
   }
 
-  #right {
+  .child-view {
     border-left: solid blue 3px;
     width: 300px;
   }

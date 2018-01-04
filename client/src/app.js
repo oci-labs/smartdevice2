@@ -4,6 +4,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 import LeftNav from './left-nav/left-nav';
+import ParentView from './parent-view/parent-view';
+import ChildView from './child-view/child-view';
 
 import type {StateType} from './types';
 
@@ -21,12 +23,8 @@ class App extends Component<PropsType> {
         </header>
         <section id="body">
           <LeftNav />
-          <section id="middle">
-            <h3>Middle</h3>
-          </section>
-          <section id="right">
-            <h3>Right</h3>
-          </section>
+          <ParentView />
+          <ChildView />
         </section>
       </div>
     );
