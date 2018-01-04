@@ -2,9 +2,9 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-//import {dispatch} from 'redux-easy';
 
 import type {NodeType, StateType} from '../types';
+import {OK, handleError} from '../util/error-util';
 
 import './child-view.css';
 
@@ -12,12 +12,38 @@ type PropsType = {
   node: NodeType
 };
 
+export const URL_PREFIX = 'http://localhost:3001/';
+
 class ChildView extends Component<PropsType> {
+
+  async componentWillReceiveProps(nextProps: PropsType) {
+    const {node} = nextProps;
+    console.log('child-view.js x: node =', node);
+    if (!node) return;
+
+    const url = `${URL_PREFIX}alerts/${node.id}`;
+    const options = {method: 'GET'};
+    const res = await fetch(url, options);
+    if (res.status === OK) {
+      const alerts = await res.json();
+      console.log('child-view.js x: alerts =', alerts);
+      //TODO: Put these in Redux.
+    } else {
+      handleError(res.statusText);
+    }
+  }
+
   renderGuts = () => {
     const {node} = this.props;
     if (!node) return null;
 
-    return <div>{node.name}</div>;
+    return (
+      <div>
+        <div className="node-name">{node.name}</div>
+        <h3>Alerts</h3>
+        {/* Iterate over alerts in Redux. */}
+      </div>
+    );
   };
 
   render() {

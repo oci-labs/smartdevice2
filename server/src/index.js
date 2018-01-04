@@ -7,6 +7,7 @@ const healthCheck = require('express-healthcheck');
 const morgan = require('morgan');
 const MySqlConnection = require('mysql-easier');
 
+const {alertService} = require('./alert-service');
 const crudService = require('./crud-service');
 const {treeService} = require('./tree-service');
 
@@ -39,6 +40,7 @@ app.set('etag', 'strong');
 
 //const healthCheckPath = /^\/$/;
 
+alertService(app, mySql);
 treeService(app, mySql);
 crudService(app, mySql, 'alert');
 crudService(app, mySql, 'alert_type');
