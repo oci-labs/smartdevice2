@@ -2,7 +2,7 @@
 
 import _ from 'lodash/string';
 import React, {Component} from 'react';
-import {dispatch} from 'redux-easy';
+import {dispatch, getState} from 'redux-easy';
 
 import Button from './button';
 import TreeNode from './tree-node';
@@ -30,6 +30,12 @@ type PropsType = {
 
 const ROOT_ID = 1;
 
+function haveNodeMap(kind: TreeType): boolean {
+  const prop = kind + 'NodeMap';
+  const nodeMap = getState()[prop];
+  return Object.keys(nodeMap).length > 0;
+}
+
 class TreeBuilder extends Component<PropsType> {
   componentDidMount() {
     this.load(this.props.kind);
@@ -50,6 +56,8 @@ class TreeBuilder extends Component<PropsType> {
 
   // Loads nodes from database.
   load = async (kind: TreeType) => {
+    if (haveNodeMap(kind)) return;
+
     try {
       const url = URL_PREFIX + kind;
       const res = await fetch(url);

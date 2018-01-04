@@ -198,12 +198,14 @@ addReducer('setTreeType', (state: StateType, value: string): StateType =>
 
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
   const {kind, nodes} = payload;
+
   const nodeMap = nodes.reduce((map, node) => {
     const {id} = node;
     node.children = nodes.filter(n => n.parentId === id).map(n => n.id);
     map[id] = node;
     return map;
   }, {});
+
   return {...state, [kind + 'NodeMap']: nodeMap};
 });
 
