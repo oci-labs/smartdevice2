@@ -2,22 +2,22 @@
   display: inline-block;
   text-align: left;
 
-  .addNode {
-    color: green;
-    cursor: pointer;
-  }
-
   & > .button {
     border: none;
     padding-left: 0;
   }
 
-  .deleteNode {
-    color: red;
+  & > .tree-node {
+    margin-left: 0 !important; //TODO: Why need !important?
+  }
+
+  .addNode {
+    color: green;
     cursor: pointer;
   }
 
-  & > .tree-node {
-    margin-left: 0 !important; //TODO: Why need !important?
+  .deleteNode {
+    color: red;
+    cursor: pointer;
   }
 }

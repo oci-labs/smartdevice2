@@ -1,0 +1,17 @@
+.left-nav {
+  .tree-builder {
+    display: block;
+    margin-right: 20px;
+    vertical-align: top;
+  }
+
+  .tree-radio {
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: left;
+
+    input:nth-child(2) {
+      margin-left: 20px;
+    }
+  }
+}
