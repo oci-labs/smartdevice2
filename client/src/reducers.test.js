@@ -1,7 +1,7 @@
 // @flow
 
-import {cloneDeep} from 'lodash/lang';
-import {upperFirst} from 'lodash/string';
+import cloneDeep from 'lodash/clonedeep';
+import upperFirst from 'lodash/upperfirst';
 import {reducer, reduxSetup} from 'redux-easy';
 
 import initialState from './initial-state';

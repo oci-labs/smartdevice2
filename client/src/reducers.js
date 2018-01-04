@@ -1,6 +1,6 @@
 // @flow
 
-import {upperFirst} from 'lodash/string';
+import upperFirst from 'lodash/upperFirst';
 import {addReducer} from 'redux-easy';
 
 import type {

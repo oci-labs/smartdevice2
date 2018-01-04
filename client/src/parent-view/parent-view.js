@@ -1,29 +1,25 @@
 // @flow
 
+import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 import Node from './node';
-import type {NodeMapType, NodeType, StateType, TreeType} from '../types';
+import type {NodeMapType, NodeType, StateType} from '../types';
 
 import './parent-view.css';
 
 type PropsType = {
   instanceNodeMap: NodeMapType,
-  instanceNode: ?NodeType,
-  treeType: TreeType
+  instanceNode: ?NodeType
 };
 
 class ParentView extends Component<PropsType> {
-  renderChild = (id: number) => {
-    const {instanceNodeMap} = this.props;
-    const node = instanceNodeMap[id];
-    return <Node node={node} />;
-  };
+  renderChild = (child: NodeType) =>
+    <Node key={child.id} node={child} />;
 
   renderGuts = () => {
-    const {instanceNode, treeType} = this.props;
-    if (treeType !== 'instance') return null;
+    const {instanceNode} = this.props;
 
     return [
       <h3 key="title">Parent View</h3>,
@@ -38,11 +34,14 @@ class ParentView extends Component<PropsType> {
   );
 
   renderSelection = (node: NodeType) => {
+    const {instanceNodeMap} = this.props;
     const {children} = node;
+    const childNodes = children.map(id => instanceNodeMap[id]);
+    const sortedChildren = sortBy(childNodes, ['name']);
     return (
-      <div>
+      <div key={node.id}>
         <div>You selected {node.name}.</div>
-        {children.map(id => this.renderChild(id))}
+        {sortedChildren.map(child => this.renderChild(child))}
       </div>
     );
   };

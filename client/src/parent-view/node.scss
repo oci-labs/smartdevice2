@@ -5,6 +5,7 @@ $size: $radius * 2 - $borderSize * 2;
 .node {
   display: inline-block;
   margin: 20px;
+  text-align: center;
 
   .circle {
     border: solid lightgray $borderSize;

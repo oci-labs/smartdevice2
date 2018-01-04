@@ -1,6 +1,6 @@
 // @flow
 
-import _ from 'lodash/string';
+import capitalize from 'lodash/capitalize';
 import React, {Component} from 'react';
 import {dispatch, getState} from 'redux-easy';
 
@@ -77,7 +77,7 @@ class TreeBuilder extends Component<PropsType> {
     return (
       <div className="tree-builder">
         <div>
-          <label>New {_.capitalize(kind)}</label>
+          <label>New {capitalize(kind)}</label>
           <input
             type="text"
             autoFocus

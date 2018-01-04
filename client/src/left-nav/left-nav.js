@@ -1,6 +1,6 @@
 // @flow
 
-import {upperFirst} from 'lodash/string';
+import upperFirst from 'lodash/upperFirst';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
