@@ -8,16 +8,17 @@ import {URL_PREFIX, addNode} from './tree-util';
 
 import './tree-node.css';
 
-import type {NodeMapType, NodePayloadType, NodeType} from '../types';
+import type {NodeMapType, NodePayloadType, NodeType, TreeType} from '../types';
 
 type PropsType = {
   editedName: string,
-  editingNode: NodeType,
-  kind: string,
+  editingNode: ?NodeType,
+  kind: TreeType,
   level: number,
   newNodeName: string,
   node: NodeType,
   nodeMap: NodeMapType,
+  selectedNodeId: number,
   subscriptions: number[]
 };
 
@@ -31,6 +32,7 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
+
   deleteNode = async (node: NodeType) => {
     try {
       // Delete type from database.
@@ -67,6 +69,8 @@ class TreeNode extends Component<PropsType> {
 
   saveChange = async () => {
     const {editedName: name, editingNode, kind, node} = this.props;
+    if (!editingNode) return;
+
     try {
       // Update type name in database.
       const url = `${URL_PREFIX}${kind}/${editingNode.id}`;
@@ -82,6 +86,12 @@ class TreeNode extends Component<PropsType> {
     } catch (e) {
       console.error('tree-builder.js saveChange:', e.message);
     }
+  };
+
+  selectNode = () => {
+    const {kind, node} = this.props;
+    const payload: NodePayloadType = {kind, node};
+    dispatch('setSelectedNode', payload);
   };
 
   toggleEdit = () => dispatch('toggleEditNode', this.props.node);
@@ -112,6 +122,7 @@ class TreeNode extends Component<PropsType> {
       level,
       newNodeName,
       node,
+      selectedNodeId,
       subscriptions
     } = this.props;
 
@@ -122,9 +133,11 @@ class TreeNode extends Component<PropsType> {
       node.children.length === 0 ? '' : `fa fa-caret-${direction}`;
 
     const subscribed = kind === 'instance' && subscriptions.includes(node.id);
+    const classes = ['tree-node', `tree-level-${level}`];
+    if (node.id === selectedNodeId) classes.push('selected');
 
     return (
-      <div className={`tree-node tree-level-${level}`}>
+      <div className={classes.join(' ')}>
         <div
           className={`expand ${triangleClasses}`}
           onClick={this.toggleExpand}
@@ -140,7 +153,11 @@ class TreeNode extends Component<PropsType> {
             value={editedName}
           />
         ) : (
-          <div className="tree-node-name" onClick={() => this.toggleEdit()}>
+          <div
+            className="tree-node-name"
+            onClick={this.selectNode}
+            onDoubleClick={this.toggleEdit}
+          >
             {node.name}
           </div>
         )}

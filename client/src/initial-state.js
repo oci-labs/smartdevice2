@@ -15,6 +15,8 @@ const state: StateType = {
       open: false,
       title: ''
     },
+    selectedInstanceNodeId: 0,
+    selectedTypeNodeId: 0,
     treeType: 'instance',
     typeName: ''
   },

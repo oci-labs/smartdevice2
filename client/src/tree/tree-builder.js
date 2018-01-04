@@ -14,22 +14,23 @@ import type {
   NewNodeNamePayloadType,
   NodeMapType,
   NodeType,
-  SetNodesPayloadType
+  SetNodesPayloadType,
+  TreeType
 } from '../types';
 
 type PropsType = {
   editedName: string,
-  editingNode: NodeType,
-  kind: string, // must correspond to a database table name
+  editingNode: ?NodeType,
+  kind: TreeType,
   newNodeName: string,
   nodeMap: NodeMapType,
+  selectedNodeId: number,
   subscriptions: number[]
 };
 
 const ROOT_ID = 1;
 
 class TreeBuilder extends Component<PropsType> {
-
   componentDidMount() {
     this.load(this.props.kind);
   }
@@ -48,7 +49,7 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   // Loads nodes from database.
-  load = async (kind: string) => {
+  load = async (kind: TreeType) => {
     try {
       const url = URL_PREFIX + kind;
       const res = await fetch(url);
@@ -83,7 +84,12 @@ class TreeBuilder extends Component<PropsType> {
           onClick={() => addNode(kind, newNodeName, rootNode)}
           tooltip="add"
         />
-        <TreeNode {...this.props} key="tn0" level={0} node={rootNode} />
+        <TreeNode
+          {...this.props}
+          key="tn0"
+          level={0}
+          node={rootNode}
+        />
       </div>
     );
   }

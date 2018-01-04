@@ -7,23 +7,23 @@ export type ActionType = {
 
 export type AddNodePayloadType = {
   id: number,
-  kind: string,
+  kind: TreeType,
   name: string,
   parentId: number
 };
 
 export type NewNodeNamePayloadType = {
-  kind: string,
+  kind: TreeType,
   name: string
 };
 
 export type NodePayloadType = {
-  kind: string,
+  kind: TreeType,
   node: NodeType
 };
 
 export type SetNodesPayloadType = {
-  kind: string,
+  kind: TreeType,
   nodes: NodeType[]
 };
 
@@ -52,6 +52,7 @@ export type NodeType = {
   expanded?: boolean,
   name: string,
   parentId: number,
+  selected?: boolean,
   type?: NodeType // for instance nodes
 };
 
@@ -72,6 +73,7 @@ export type ModalType = {
 
 export type RoleType = 'admin' | 'service' | 'spectator';
 
+// These strings must correspond to the name of a database table.
 export type TreeType = 'type' | 'instance';
 
 export type UiType = {
@@ -79,6 +81,8 @@ export type UiType = {
   editingNode: ?NodeType,
   instanceName: string,
   modal: ModalType,
+  selectedInstanceNodeId: number,
+  selectedTypeNodeId: number,
   treeType: TreeType,
   typeName: string
 };

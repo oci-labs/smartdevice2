@@ -1,5 +1,6 @@
 // @flow
 
+import {upperFirst} from 'lodash/string';
 import {addReducer} from 'redux-easy';
 
 import type {
@@ -147,6 +148,15 @@ addReducer(
         editingNode: null
       }
     };
+  }
+);
+
+addReducer(
+  'setSelectedNode',
+  (state: StateType, payload: NodePayloadType): StateType => {
+    const {kind, node} = payload;
+    const prop = `selected${upperFirst(kind)}NodeId`;
+    return setUiProp(state, prop, node ? node.id : 0);
   }
 );
 

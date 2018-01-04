@@ -7,9 +7,10 @@ import {reducer, reduxSetup} from 'redux-easy';
 import initialState from './initial-state';
 import './reducers';
 
-import type {AddNodePayloadType} from './types';
+import type {AddNodePayloadType, NodePayloadType, NodeType} from './types';
 
 describe('reducer', () => {
+  const kind = 'type';
   let state;
 
   beforeEach(() => {
@@ -59,13 +60,13 @@ describe('reducer', () => {
     payload = {id: childId, kind: 'type', name, parentId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
-    const {nodeMap} = newState;
-    const childNode = nodeMap[childId];
+    const {typeNodeMap} = newState;
+    const childNode = typeNodeMap[childId];
     expect(childNode.name).toBe(name);
     expect(childNode.parentId).toBe(parentId);
     expect(childNode.children.length).toBe(0);
 
-    const parentNode = nodeMap[parentId];
+    const parentNode = typeNodeMap[parentId];
     expect(parentNode.children).toEqual([childId]);
   });
 
@@ -99,14 +100,14 @@ describe('reducer', () => {
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
 
-    const {nodeMap} = newState;
-    const childNode = nodeMap[childId];
+    const {typeNodeMap} = newState;
+    const childNode = typeNodeMap[childId];
     expect(childNode.id).toBe(childId);
     expect(childNode.name).toBe(childName);
     expect(childNode.parentId).toBe(parentId);
     expect(childNode.children.length).toBe(0);
 
-    const parentNode = nodeMap[parentId];
+    const parentNode = typeNodeMap[parentId];
     expect(parentNode.children).toEqual([childId]);
   });
 
@@ -116,20 +117,23 @@ describe('reducer', () => {
     const name = 'new node';
     const payload: AddNodePayloadType = {
       id: nodeId,
-      kind: 'type',
+      kind,
       name,
       parentId: 0
     };
     let action = {type: 'addNode', payload};
     let newState = reducer(state, action);
-    const {nodeMap} = newState;
-    const node = nodeMap[nodeId];
+
+    // Get the new node.
+    const {typeNodeMap} = newState;
+    const node = typeNodeMap[nodeId];
     expect(node).toBeDefined();
 
     // Delete the node that was added.
-    action = {type: 'deleteNode', payload: node};
+    const payload2: NodePayloadType = {kind, node};
+    action = {type: 'deleteNode', payload: payload2};
     newState = reducer(state, action);
-    expect(newState.nodeMap[nodeId]).not.toBeDefined();
+    expect(newState.typeNodeMap[nodeId]).not.toBeDefined();
   });
 
   test('deleteNode 2 levels deep', () => {
@@ -150,13 +154,14 @@ describe('reducer', () => {
     payload = {id: childId, kind: 'type', name, parentId: rootId};
     action = {type: 'addNode', payload};
     newState = reducer(newState, action);
-    const {nodeMap} = newState;
-    const node = nodeMap[childId];
+    const {typeNodeMap} = newState;
+    const node = typeNodeMap[childId];
 
     // Delete the child node that was added.
-    action = {type: 'deleteNode', payload: node};
+    const payload2: NodePayloadType = {kind, node};
+    action = {type: 'deleteNode', payload: payload2};
     newState = reducer(newState, action);
-    expect(newState.nodeMap[childId]).not.toBeDefined();
+    expect(newState.typeNodeMap[childId]).not.toBeDefined();
   });
 
   test('setConfirmEmail', () => testSetUserProp('confirmEmail'));
@@ -168,4 +173,18 @@ describe('reducer', () => {
   test('setPhone', () => testSetUserProp('phone'));
 
   test('setModal', () => testSetUiProp('modal'));
+  test('setSelectedNode', () => {
+    //testSetUiProp('selectedNode'));
+    const id = 999;
+    const node: NodeType = {
+      id,
+      children: [],
+      name: 'some node',
+      parentId: 0
+    };
+    const payload: NodePayloadType = {kind, node};
+    const action = {type: 'setSelectedNode', payload};
+    const newState = reducer(state, action);
+    expect(newState.ui.selectedTypeNodeId).toBe(id);
+  });
 });

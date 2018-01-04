@@ -1,42 +1,46 @@
 // @flow
 
+import {upperFirst} from 'lodash/string';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import TreeBuilder from './tree/tree-builder';
 
-import type {NodeMapType, NodeType, StateType, TreeType} from './types';
+import type {NodeMapType, StateType, TreeType, UiType} from './types';
 
 import './app.css';
 
 type PropsType = {
-  editedName: string,
-  editingNode: NodeType,
-  instanceName: string,
   instanceNodeMap: NodeMapType,
   subscriptions: number[],
   treeType: TreeType,
-  typeName: string,
-  typeNodeMap: NodeMapType
+  typeNodeMap: NodeMapType,
+  ui: UiType
 };
 
 class App extends Component<PropsType> {
 
   getTree = () => {
     const {
+      instanceNodeMap,
+      subscriptions,
+      typeNodeMap,
+      ui
+    } = this.props;
+    const {
       editedName,
       editingNode,
       instanceName,
-      instanceNodeMap,
-      subscriptions,
       typeName,
-      typeNodeMap,
       treeType
-    } = this.props;
+    } = ui;
+
     const isType = treeType === 'type';
     const newNodeName = isType ? typeName : instanceName;
     const nodeMap = isType ? typeNodeMap : instanceNodeMap;
+    const prop = `selected${upperFirst(treeType)}NodeId`;
+    const selectedNodeId = ui[prop];
 
     return (
       <TreeBuilder
@@ -45,6 +49,7 @@ class App extends Component<PropsType> {
         kind={treeType}
         newNodeName={newNodeName}
         nodeMap={nodeMap}
+        selectedNodeId={selectedNodeId}
         subscriptions={subscriptions}
       />
     );
@@ -54,7 +59,7 @@ class App extends Component<PropsType> {
     dispatch('setTreeType', e.target.value);
 
   render() {
-    const {treeType} = this.props;
+    const {treeType} = this.props.ui;
 
     return (
       <div className="app">
@@ -99,18 +104,14 @@ const mapState = (state: StateType): Object => {
   const {
     instanceNodeMap,
     typeNodeMap,
-    ui: {editedName, editingNode, instanceName, typeName, treeType},
+    ui,
     user: {subscriptions}
   } = state;
   return {
-    editedName,
-    editingNode,
-    instanceName,
     instanceNodeMap,
     subscriptions,
-    treeType,
-    typeName,
-    typeNodeMap
+    typeNodeMap,
+    ui
   };
 };
 

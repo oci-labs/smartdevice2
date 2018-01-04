@@ -1,4 +1,10 @@
 .tree-node {
+  &.selected {
+    & > .tree-node-name {
+      background-color: lightblue;
+    }
+  }
+
   .button {
     border: none;
     margin-left: 5px;
