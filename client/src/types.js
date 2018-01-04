@@ -81,6 +81,7 @@ export type UiType = {
   editingNode: ?NodeType,
   instanceName: string,
   modal: ModalType,
+  selectedChildNodeId: number,
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,
   treeType: TreeType,
@@ -112,7 +113,7 @@ export type StateType = {
 
 export type StoreType = {
   getActions(): ActionType[],
-  getState(): Object,
+  getState(): StateType,
   subscribe: Function
 };
 

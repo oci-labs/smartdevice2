@@ -152,6 +152,16 @@ addReducer(
 );
 
 addReducer(
+  'setSelectedChildNode',
+  (state: StateType, node: NodeType): StateType => {
+    const prop = 'selectedChildNodeId';
+    const oldSelectedId = state.ui[prop];
+    const newSelectedId = node && node.id !== oldSelectedId ? node.id : 0;
+    return setUiProp(state, prop, newSelectedId);
+  }
+);
+
+addReducer(
   'setSelectedNode',
   (state: StateType, payload: NodePayloadType): StateType => {
     const {kind, node} = payload;

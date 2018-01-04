@@ -92,12 +92,7 @@ class TreeBuilder extends Component<PropsType> {
           onClick={() => addNode(kind, newNodeName, rootNode)}
           tooltip="add"
         />
-        <TreeNode
-          {...this.props}
-          key="tn0"
-          level={0}
-          node={rootNode}
-        />
+        <TreeNode {...this.props} key="tn0" level={0} node={rootNode} />
       </div>
     );
   }

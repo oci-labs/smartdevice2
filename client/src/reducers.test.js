@@ -173,8 +173,25 @@ describe('reducer', () => {
   test('setPhone', () => testSetUserProp('phone'));
 
   test('setModal', () => testSetUiProp('modal'));
+
+  test('setSelectedChildNode', () => {
+    const id = 999;
+    const node: NodeType = {
+      id,
+      children: [],
+      name: 'some node',
+      parentId: 0
+    };
+    const action = {type: 'setSelectedChildNode', payload: node};
+    let newState = reducer(state, action);
+    expect(newState.ui.selectedChildNodeId).toBe(id);
+
+    // Toggle off.
+    newState = reducer(newState, action);
+    expect(newState.ui.selectedChildNodeId).toBe(0);
+  });
+
   test('setSelectedNode', () => {
-    //testSetUiProp('selectedNode'));
     const id = 999;
     const node: NodeType = {
       id,
@@ -184,7 +201,11 @@ describe('reducer', () => {
     };
     const payload: NodePayloadType = {kind, node};
     const action = {type: 'setSelectedNode', payload};
-    const newState = reducer(state, action);
+    let newState = reducer(state, action);
     expect(newState.ui.selectedTypeNodeId).toBe(id);
+
+    // Toggle off.
+    newState = reducer(newState, action);
+    expect(newState.ui.selectedTypeNodeId).toBe(0);
   });
 });

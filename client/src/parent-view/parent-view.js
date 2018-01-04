@@ -2,7 +2,6 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-//import {dispatch} from 'redux-easy';
 
 import Node from './node';
 import type {NodeMapType, NodeType, StateType, TreeType} from '../types';
@@ -34,7 +33,9 @@ class ParentView extends Component<PropsType> {
     ];
   };
 
-  renderNoSelection = () => <div>Select an instance from the left nav.</div>;
+  renderNoSelection = () => (
+    <div key="no-selection">Select an instance from the left nav.</div>
+  );
 
   renderSelection = (node: NodeType) => {
     const {children} = node;
@@ -51,7 +52,7 @@ class ParentView extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): Object => {
+const mapState = (state: StateType): PropsType => {
   const {instanceNodeMap, ui} = state;
   const {selectedInstanceNodeId, treeType} = ui;
   const instanceNode = instanceNodeMap[selectedInstanceNodeId];

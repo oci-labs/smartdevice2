@@ -1,7 +1,7 @@
 // @flow
 
 import React, {Component} from 'react';
-//import {dispatch} from 'redux-easy';
+import {dispatch} from 'redux-easy';
 
 import type {NodeType} from '../types';
 
@@ -12,14 +12,16 @@ type PropsType = {
 };
 
 class Node extends Component<PropsType> {
+  select = () => {
+    const {node} = this.props;
+    dispatch('setSelectedChildNode', node);
+  };
 
   render() {
     const {node} = this.props;
     return (
-      <div className="node">
-        <div className="circle">
-          {node.name}
-        </div>
+      <div className="node" onClick={this.select}>
+        <div className="circle">{node.name}</div>
         {node.name}
       </div>
     );

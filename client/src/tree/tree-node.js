@@ -32,7 +32,6 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
-
   deleteNode = async (node: NodeType) => {
     try {
       // Delete type from database.
