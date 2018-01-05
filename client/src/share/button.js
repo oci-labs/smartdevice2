@@ -5,7 +5,7 @@ import React from 'react';
 import './button.css';
 
 type PropsType = {
-  className: string,
+  className?: string,
   disabled?: boolean,
   icon?: string,
   label?: string,
@@ -21,7 +21,8 @@ export default ({
   onClick,
   tooltip
 }: PropsType) => {
-  let classes = `button ${className}`;
+  let classes = 'button';
+  if (className) classes += ` ${className}`;
   if (icon) classes += ` fa fa-${icon}`;
   if (disabled) classes += ' disabled';
   return (

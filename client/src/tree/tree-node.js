@@ -3,8 +3,8 @@
 import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
 
-import Button from './button';
 import {addNode} from './tree-util';
+import Button from '../share/button';
 import {getUrlPrefix} from '../util/rest-util';
 
 import './tree-node.css';

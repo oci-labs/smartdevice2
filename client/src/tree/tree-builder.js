@@ -4,9 +4,9 @@ import capitalize from 'lodash/capitalize';
 import React, {Component} from 'react';
 import {dispatch, getState} from 'redux-easy';
 
-import Button from './button';
 import TreeNode from './tree-node';
 import {addNode} from './tree-util';
+import Button from '../share/button';
 import {getUrlPrefix} from '../util/rest-util';
 
 import './tree-builder.css';

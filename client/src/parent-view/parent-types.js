@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
+import Button from '../share/button';
 import {handleError} from '../util/error-util';
 import {getUrlPrefix} from '../util/rest-util';
 
@@ -20,6 +21,10 @@ type PropsType = {
 const URL_PREFIX = getUrlPrefix();
 
 class ParentTypes extends Component<PropsType> {
+
+  addProp = () => {
+    console.log('parent-types.js addProp: entered');
+  };
 
   async componentWillReceiveProps(nextProps) {
     const {typeNode} = nextProps;
@@ -37,6 +42,10 @@ class ParentTypes extends Component<PropsType> {
       handleError('failed to get properties for type ' + typeNode.name);
     }
   }
+
+  deleteProp = () => {
+    console.log('parent-types.js deleteProp: entered');
+  };
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewPropName', e.target.value);
@@ -81,7 +90,21 @@ class ParentTypes extends Component<PropsType> {
                   value={newPropType}
                 />
               </td>
-              <td>Actions</td>
+              <td>
+                <Button
+                  className="add-prop"
+                  disabled={newPropName === '' || newPropType === ''}
+                  icon="plus"
+                  onClick={this.addProp}
+                  tooltip="add property"
+                />
+                <Button
+                  className="delete-prop"
+                  icon="trash-o"
+                  onClick={this.deleteProp}
+                  tooltip="delete property"
+                />
+              </td>
             </tr>
           </tbody>
         </table>

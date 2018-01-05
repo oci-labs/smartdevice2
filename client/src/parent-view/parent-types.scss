@@ -1,3 +1,11 @@
 .parent-types {
   text-align: left;
+
+  .button {
+    border: none;
+  }
+
+  .delete-prop {
+    color: red;
+  }
 }
