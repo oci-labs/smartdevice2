@@ -233,6 +233,14 @@ describe('crudService', () => {
     newObject: {name: 'n2'}
   });
 
+  testTable({
+    tableName: 'type_data',
+    oldObject: {kind: 'number', name: 'n1'},
+    newObject: {kind: 'boolean', name: 'n2'},
+    setupFn: typesSetup,
+    teardownFn: typesTeardown
+  });
+
   const oldUser = {
     email: 'mark@email.com',
     encryptedPassword: 'querty',

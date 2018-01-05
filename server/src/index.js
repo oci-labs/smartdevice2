@@ -50,6 +50,7 @@ crudService(app, mySql, 'instance_data');
 crudService(app, mySql, 'snooze');
 crudService(app, mySql, 'subscription');
 crudService(app, mySql, 'type');
+crudService(app, mySql, 'type_data');
 crudService(app, mySql, 'user');
 
 // Logging

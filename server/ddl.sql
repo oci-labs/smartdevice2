@@ -24,6 +24,16 @@ create table type (
     on delete cascade
 );
 
+create table type_data (
+  id int auto_increment primary key,
+  kind text,
+  name text,
+  typeId int null,
+  foreign key (typeId)
+    references type (id)
+    on delete cascade
+);
+
 create table instance (
   id int auto_increment primary key,
   internalId text,
