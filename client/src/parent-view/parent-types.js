@@ -51,7 +51,6 @@ class ParentTypes extends Component<PropsType, MyStateType> {
     const res = await fetch(url, options);
     if (res.ok) {
       dispatch('setNewPropName', '');
-      dispatch('setNewPropType', '');
     } else {
       handleError(`failed to create new property for type "${typeNode.name}"`);
     }
@@ -62,13 +61,11 @@ class ParentTypes extends Component<PropsType, MyStateType> {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {typeNode, ui: {newPropName, newPropType}} = nextProps;
+    const {typeNode, ui: {newPropName}} = nextProps;
     if (!typeNode) return;
 
     // If a new prop was just added ...
-    if (newPropName === '' && newPropType === '') {
-      this.loadTypeProps(typeNode);
-    }
+    if (newPropName === '') this.loadTypeProps(typeNode);
   }
 
   async loadTypeProps(typeNode: ?NodeType) {
@@ -150,16 +147,19 @@ class ParentTypes extends Component<PropsType, MyStateType> {
           />
         </td>
         <td>
-          <input
-            type="text"
+          <select
             onChange={this.propTypeChange}
             value={newPropType}
-          />
+          >
+            <option>boolean</option>
+            <option>number</option>
+            <option>text</option>
+          </select>
         </td>
-        <td>
+        <td className="actions-column">
           <Button
             className="add-prop"
-            disabled={newPropName === '' || newPropType === ''}
+            disabled={newPropName === ''}
             icon="plus"
             onClick={this.addProp}
             tooltip="add property"
@@ -173,7 +173,7 @@ class ParentTypes extends Component<PropsType, MyStateType> {
     <tr key={typeProp.name}>
       <td>{typeProp.name}</td>
       <td>{typeProp.kind}</td>
-      <td>
+      <td className="actions-column">
         <Button
           className="delete-prop"
           icon="trash-o"

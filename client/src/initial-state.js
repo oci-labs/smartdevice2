@@ -16,7 +16,7 @@ const state: StateType = {
       title: ''
     },
     newPropName: '',
-    newPropType: '',
+    newPropType: 'number',
     selectedChildNodeId: 0,
     selectedInstanceNodeId: 0,
     selectedTypeNodeId: 0,

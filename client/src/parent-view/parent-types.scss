@@ -1,6 +1,10 @@
 .parent-types {
   text-align: left;
 
+  .actions-column {
+    text-align: center;
+  }
+
   .add-prop {
     color: green;
   }
