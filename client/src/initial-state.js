@@ -3,7 +3,10 @@
 import type {StateType} from './types';
 
 const state: StateType = {
+  allAlerts: [],
   errors: new Set(),
+  instanceAlerts: [],
+  instanceData: [],
   instanceNodeMap: {},
   typeNodeMap: {},
   ui: {

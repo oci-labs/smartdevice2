@@ -15,6 +15,30 @@ type PropsType = {
 
 const URL_PREFIX = getUrlPrefix();
 
+async function getAlerts(node: NodeType) {
+  const url = `${URL_PREFIX}alerts/${node.id}`;
+  const options = {method: 'GET'};
+  const res = await fetch(url, options);
+  if (res.status !== OK) {
+    return handleError(res.statusText);
+  }
+
+  const alerts = await res.json();
+  return alerts;
+}
+
+async function getData(node: NodeType) {
+  const url = `${URL_PREFIX}instances/${node.id}/data`;
+  const options = {method: 'GET'};
+  const res = await fetch(url, options);
+  if (res.status !== OK) {
+    return handleError(res.statusText);
+  }
+
+  const data = await res.json();
+  return data;
+}
+
 class ChildView extends Component<PropsType> {
 
   async componentWillReceiveProps(nextProps: PropsType) {
@@ -22,16 +46,13 @@ class ChildView extends Component<PropsType> {
     console.log('child-view.js x: node =', node);
     if (!node) return;
 
-    const url = `${URL_PREFIX}alerts/${node.id}`;
-    const options = {method: 'GET'};
-    const res = await fetch(url, options);
-    if (res.status === OK) {
-      const alerts = await res.json();
-      console.log('child-view.js x: alerts =', alerts);
-      //TODO: Put these in Redux.
-    } else {
-      handleError(res.statusText);
-    }
+    const alerts = await getAlerts(node);
+    //TODO: Put these in Redux.
+    console.log('child-view.js componentWillReceiveProps: alerts =', alerts);
+
+    const data = await getData(node);
+    //TODO: Put these in Redux.
+    console.log('child-view.js componentWillReceiveProps: data =', data);
   }
 
   renderGuts = () => {

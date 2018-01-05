@@ -36,8 +36,9 @@ export type AddressType = {
 };
 
 export type AlertType = {
-  count: number,
-  level: number
+  instanceId: number,
+  message: string,
+  severity?: number
 };
 
 export type HistoryType = {
@@ -58,6 +59,11 @@ export type NodeType = {
 };
 
 export type NodeMapType = {[id: number]: NodeType};
+
+export type InstanceDataType = {
+  dataKey: string,
+  dataValue: string
+};
 
 export type InstanceType = {
   children: InstanceType[],
@@ -107,7 +113,10 @@ export type UserType = {
 };
 
 export type StateType = {
+  allAlerts: AlertType[],
   errors: Set<string>,
+  instanceAlerts: AlertType[],
+  instanceData: InstanceDataType[],
   instanceNodeMap: NodeMapType,
   typeNodeMap: NodeMapType,
   ui: UiType,

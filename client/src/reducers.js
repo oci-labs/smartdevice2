@@ -7,6 +7,8 @@ import {showModal} from './share/sd-modal';
 
 import type {
   AddNodePayloadType,
+  AlertType,
+  InstanceDataType,
   ModalType,
   NewNodeNamePayloadType,
   NodeMapType,
@@ -16,11 +18,9 @@ import type {
   StateType
 } from './types';
 
-/*
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
 }
-*/
 
 function setUiProp(state: StateType, prop: string, value: mixed): StateType {
   const {ui} = state;
@@ -158,6 +158,18 @@ addReducer(
       }
     };
   }
+);
+
+addReducer('setAllAlerts', (state: StateType, alerts: AlertType[]) =>
+  setTopProp(state, 'allAlerts', alerts)
+);
+
+addReducer('setInstanceAlerts', (state: StateType, alerts: AlertType[]) =>
+  setTopProp(state, 'instanceAlerts', alerts)
+);
+
+addReducer('setInstanceData', (state: StateType, data: InstanceDataType[]) =>
+  setTopProp(state, 'instanceData', data)
 );
 
 addReducer(

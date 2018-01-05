@@ -9,6 +9,7 @@ const MySqlConnection = require('mysql-easier');
 
 const {alertService} = require('./alert-service');
 const crudService = require('./crud-service');
+const {instanceService} = require('./instance-service');
 const {treeService} = require('./tree-service');
 const {typeService} = require('./type-service');
 
@@ -42,6 +43,7 @@ app.set('etag', 'strong');
 //const healthCheckPath = /^\/$/;
 
 alertService(app, mySql);
+instanceService(app, mySql);
 treeService(app, mySql);
 typeService(app, mySql);
 crudService(app, mySql, 'alert');
