@@ -19,6 +19,15 @@ const URL_PREFIX = getUrlPrefix() + 'tree/';
 
 let typeId;
 
+/**
+ * Gets the type name for an instance node.
+ */
+export function getType(node: NodeType) {
+  const {typeNodeMap} = getState();
+  const typeNode = typeNodeMap[node.typeId];
+  return typeNode.name;
+}
+
 function handleTypeChange(event) {
   typeId = event.target.value;
 }

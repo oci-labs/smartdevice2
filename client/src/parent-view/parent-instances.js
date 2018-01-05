@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 import Node from './node';
+import {getType} from '../tree/tree-util';
 import type {NodeMapType, NodeType, StateType} from '../types';
 
 import './parent-instances.css';
@@ -31,9 +32,10 @@ class ParentInstances extends Component<PropsType> {
     const {children} = instanceNode;
     const childNodes = children.map(id => instanceNodeMap[id]);
     const sortedChildren = sortBy(childNodes, ['name']);
+    const type = getType(instanceNode);
     return (
       <div key={instanceNode.id}>
-        <div>You selected {instanceNode.name}.</div>
+        <div>You selected {type} {instanceNode.name}.</div>
         {sortedChildren.map(child => this.renderChild(child))}
       </div>
     );

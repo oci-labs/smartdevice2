@@ -2,6 +2,7 @@
 
 import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
+import {getType} from '../tree/tree-util';
 
 import type {NodeType} from '../types';
 
@@ -22,7 +23,7 @@ class Node extends Component<PropsType> {
     return (
       <div className="node" onClick={this.select}>
         <div className="circle">{node.name}</div>
-        {node.name}
+        {getType(node)}
       </div>
     );
   }
