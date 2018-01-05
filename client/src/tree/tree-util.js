@@ -89,8 +89,9 @@ export function addNode(kind: TreeType, name: string, parent: NodeType) {
     childTypes = childTypeIds.map(id => typeNodeMap[id]);
   } else {
     // Find the root type node.
-    const typeNodes: NodeType[] =
-      ((Object.values(typeNodeMap): any): NodeType[]);
+    const typeNodes: NodeType[] = ((Object.values(
+      typeNodeMap
+    ): any): NodeType[]);
     const rootTypeNode = typeNodes.find(typeNode => !typeNode.parentId);
     if (!rootTypeNode) throw new Error('failed to find root type node');
 
@@ -113,8 +114,8 @@ async function reallyAddNode(
   kind: TreeType,
   name: string,
   parent: NodeType,
-  typeId?: number) {
-
+  typeId?: number
+) {
   const parentId = parent.id;
 
   try {

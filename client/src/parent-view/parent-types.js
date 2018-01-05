@@ -26,7 +26,6 @@ type MyStateType = {
 const URL_PREFIX = getUrlPrefix();
 
 class ParentTypes extends Component<PropsType, MyStateType> {
-
   state: MyStateType = {
     typeProps: []
   };
@@ -147,10 +146,7 @@ class ParentTypes extends Component<PropsType, MyStateType> {
           />
         </td>
         <td>
-          <select
-            onChange={this.propTypeChange}
-            value={newPropType}
-          >
+          <select onChange={this.propTypeChange} value={newPropType}>
             <option>boolean</option>
             <option>number</option>
             <option>text</option>

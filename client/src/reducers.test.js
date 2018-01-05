@@ -43,7 +43,6 @@ describe('reducer', () => {
   }
 
   function addRootNode() {
-    // Add root node.
     const parentId = ROOT_ID;
     const typeNode = {
       id: parentId,

@@ -16,16 +16,13 @@ type PropsType = {
 };
 
 class ParentInstances extends Component<PropsType> {
-  renderChild = (child: NodeType) =>
-    <Node key={child.id} node={child} />;
+  renderChild = (child: NodeType) => <Node key={child.id} node={child} />;
 
   renderSelection = () => {
     const {instanceNode, instanceNodeMap} = this.props;
     if (!instanceNode) {
       return (
-        <div key="no-selection">
-          Select an instance from the left nav.
-        </div>
+        <div key="no-selection">Select an instance from the left nav.</div>
       );
     }
 
@@ -35,7 +32,9 @@ class ParentInstances extends Component<PropsType> {
     const type = getType(instanceNode);
     return (
       <div key={instanceNode.id}>
-        <div>You selected {type} {instanceNode.name}.</div>
+        <div>
+          You selected {type} {instanceNode.name}.
+        </div>
         {sortedChildren.map(child => this.renderChild(child))}
       </div>
     );

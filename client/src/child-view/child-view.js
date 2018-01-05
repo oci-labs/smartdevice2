@@ -2,6 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {dispatch} from 'redux-easy';
 
 import type {NodeType, StateType} from '../types';
 import {OK, handleError} from '../util/error-util';
@@ -40,18 +41,17 @@ async function getData(node: NodeType) {
 }
 
 class ChildView extends Component<PropsType> {
-
   async componentWillReceiveProps(nextProps: PropsType) {
     const {node} = nextProps;
     console.log('child-view.js x: node =', node);
     if (!node) return;
 
     const alerts = await getAlerts(node);
-    //TODO: Put these in Redux.
+    dispatch('setInstanceAlerts', alerts);
     console.log('child-view.js componentWillReceiveProps: alerts =', alerts);
 
     const data = await getData(node);
-    //TODO: Put these in Redux.
+    dispatch('setInstanceData', data);
     console.log('child-view.js componentWillReceiveProps: data =', data);
   }
 

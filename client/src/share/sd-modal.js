@@ -57,7 +57,9 @@ class SdModal extends Component<PropsType> {
       >
         <header>
           <div className="title">{title}</div>
-          <div className="close" onClick={this.onCloseModal}>&#10005;</div>
+          <div className="close" onClick={this.onCloseModal}>
+            &#10005;
+          </div>
         </header>
         <section className="body">
           {message ? <p>{message}</p> : null}
