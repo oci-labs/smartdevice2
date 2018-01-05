@@ -51,7 +51,7 @@ function validateNewName(nodeMap: NodeMapType, parentId: number, name: string) {
 addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
-    const {id, kind, name, parentId} = payload;
+    const {id, kind, name, parentId, typeId} = payload;
     const nodeMap = state[kind + 'NodeMap'];
 
     validateNewName(nodeMap, parentId, name);
@@ -64,7 +64,8 @@ addReducer(
       id,
       children: [],
       name,
-      parentId
+      parentId,
+      typeId
     };
 
     newNodeMap[id] = newNode;

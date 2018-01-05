@@ -5,6 +5,7 @@ import React, {Component} from 'react';
 import LeftNav from './left-nav/left-nav';
 import ParentView from './parent-view/parent-view';
 import ChildView from './child-view/child-view';
+import SdModal from './share/sd-modal';
 
 import './app.css';
 
@@ -23,6 +24,7 @@ class App extends Component<PropsType> {
           <ParentView />
           <ChildView />
         </section>
+        <SdModal />
       </div>
     );
   }

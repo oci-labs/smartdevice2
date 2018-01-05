@@ -185,7 +185,7 @@ class TreeNode extends Component<PropsType> {
         {kind === 'instance' ? (
           <Button
             className={`subscribe-node ${subscribed ? 'subscribed' : ''}`}
-            icon="play"
+            icon="binoculars"
             onClick={() => this.toggleSubscribe()}
             tooltip="subscribe"
           />

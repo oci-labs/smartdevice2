@@ -1,0 +1,21 @@
+.sd-modal {
+  background: white;
+  border: solid #ccc 1px;
+  border-radius: 4px;
+  bottom: auto;
+  left: 50%;
+  overflow: auto;
+  padding: 20px;
+  position: absolute;
+  right: auto;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  .close {
+    cursor: pointer;
+  }
+
+  p, .title {
+    cursor: default;
+  }
+}

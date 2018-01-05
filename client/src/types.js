@@ -9,7 +9,8 @@ export type AddNodePayloadType = {
   id: number,
   kind: TreeType,
   name: string,
-  parentId: number
+  parentId: number,
+  typeId?: number
 };
 
 export type NewNodeNamePayloadType = {
@@ -53,7 +54,7 @@ export type NodeType = {
   name: string,
   parentId: number,
   selected?: boolean,
-  type?: NodeType // for instance nodes
+  typeId?: number // for instance nodes
 };
 
 export type NodeMapType = {[id: number]: NodeType};
