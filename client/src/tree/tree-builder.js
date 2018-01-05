@@ -88,7 +88,7 @@ class TreeBuilder extends Component<PropsType> {
           />
         </div>
         <Button
-          className="addNode"
+          className="add-node"
           disabled={newNodeName === ''}
           icon="plus"
           onClick={() => addNode(kind, newNodeName, rootNode)}

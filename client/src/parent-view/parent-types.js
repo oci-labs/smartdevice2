@@ -1,6 +1,7 @@
 // @flow
 
-//import sortBy from 'lodash/sortBy';
+import sortBy from 'lodash/sortBy';
+import without from 'lodash/without';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
@@ -9,7 +10,7 @@ import Button from '../share/button';
 import {handleError} from '../util/error-util';
 import {getUrlPrefix} from '../util/rest-util';
 
-import type {NodeType, StateType, UiType} from '../types';
+import type {NodeType, StateType, TypePropType, UiType} from '../types';
 
 import './parent-types.css';
 
@@ -18,33 +19,84 @@ type PropsType = {
   ui: UiType
 };
 
+type MyStateType = {
+  typeProps: TypePropType[]
+};
+
 const URL_PREFIX = getUrlPrefix();
 
-class ParentTypes extends Component<PropsType> {
+class ParentTypes extends Component<PropsType, MyStateType> {
 
-  addProp = () => {
-    console.log('parent-types.js addProp: entered');
+  state: MyStateType = {
+    typeProps: []
   };
 
-  async componentWillReceiveProps(nextProps) {
-    const {typeNode} = nextProps;
+  addProp = async () => {
+    const {typeNode, ui: {newPropName, newPropType}} = this.props;
     if (!typeNode) return;
 
-    const oldTypeNode = this.props.typeNode;
-    if (oldTypeNode && typeNode.id === oldTypeNode.id) return;
+    const typeData = {
+      kind: newPropType,
+      name: newPropName,
+      typeId: typeNode.id
+    };
+    const url = `${URL_PREFIX}type_data`;
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(typeData),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+    const res = await fetch(url, options);
+    if (res.ok) {
+      dispatch('setNewPropName', '');
+      dispatch('setNewPropType', '');
+    } else {
+      handleError(`failed to create new property for type "${typeNode.name}"`);
+    }
+  };
+
+  componentWillMount() {
+    this.loadTypeProps(this.props.typeNode);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {typeNode, ui: {newPropName, newPropType}} = nextProps;
+    if (!typeNode) return;
+
+    // If a new prop was just added ...
+    if (newPropName === '' && newPropType === '') {
+      this.loadTypeProps(typeNode);
+    }
+  }
+
+  async loadTypeProps(typeNode: ?NodeType) {
+    if (!typeNode) return;
 
     const url = `${URL_PREFIX}types/${typeNode.id}/data`;
     const res = await fetch(url);
     if (res.ok) {
       const typeProps = await res.json();
-      console.log('parent-types.js x: typeProps =', typeProps);
+      // $FlowFixMe
+      const sortedTypeProps = sortBy(typeProps, ['name']);
+      this.setState({typeProps: sortedTypeProps});
     } else {
       handleError('failed to get properties for type ' + typeNode.name);
     }
   }
 
-  deleteProp = () => {
-    console.log('parent-types.js deleteProp: entered');
+  deleteProp = async (typeProp: TypePropType) => {
+    const url = `${URL_PREFIX}type_data/${typeProp.id}`;
+    const options = {method: 'DELETE'};
+    const res = await fetch(url, options);
+    if (res.ok) {
+      let {typeProps} = this.state;
+      typeProps = without(typeProps, typeProp);
+      this.setState({typeProps});
+    } else {
+      handleError('failed to delete type property ' + typeProp.name);
+    }
   };
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -56,61 +108,81 @@ class ParentTypes extends Component<PropsType> {
   };
 
   renderGuts() {
-    const {typeNode, ui} = this.props;
+    const {typeNode} = this.props;
     if (!typeNode) {
       return <div key="no-selection">Select a type from the left nav.</div>;
     }
 
-    const {newPropName, newPropType} = ui;
-
+    const {typeProps} = this.state;
     return (
       <div>
         <h3>Properties for type &quot;{typeNode.name}&quot;</h3>
         <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Data Type</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
+          {this.renderTableHead()}
           <tbody>
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  onChange={this.propNameChange}
-                  value={newPropName}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  onChange={this.propTypeChange}
-                  value={newPropType}
-                />
-              </td>
-              <td>
-                <Button
-                  className="add-prop"
-                  disabled={newPropName === '' || newPropType === ''}
-                  icon="plus"
-                  onClick={this.addProp}
-                  tooltip="add property"
-                />
-                <Button
-                  className="delete-prop"
-                  icon="trash-o"
-                  onClick={this.deleteProp}
-                  tooltip="delete property"
-                />
-              </td>
-            </tr>
+            {this.renderTableInputRow()}
+            {typeProps.map(typeProp => this.renderTableRow(typeProp))}
           </tbody>
         </table>
       </div>
     );
   }
+
+  renderTableHead = () => (
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Data Type</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+  );
+
+  renderTableInputRow = () => {
+    const {ui: {newPropName, newPropType}} = this.props;
+    return (
+      <tr>
+        <td>
+          <input
+            type="text"
+            onChange={this.propNameChange}
+            value={newPropName}
+          />
+        </td>
+        <td>
+          <input
+            type="text"
+            onChange={this.propTypeChange}
+            value={newPropType}
+          />
+        </td>
+        <td>
+          <Button
+            className="add-prop"
+            disabled={newPropName === '' || newPropType === ''}
+            icon="plus"
+            onClick={this.addProp}
+            tooltip="add property"
+          />
+        </td>
+      </tr>
+    );
+  };
+
+  renderTableRow = (typeProp: TypePropType) => (
+    <tr key={typeProp.name}>
+      <td>{typeProp.name}</td>
+      <td>{typeProp.kind}</td>
+      <td>
+        <Button
+          className="delete-prop"
+          icon="trash-o"
+          onClick={() => this.deleteProp(typeProp)}
+          tooltip="delete property"
+        />
+      </td>
+    </tr>
+  );
 
   render() {
     return <div className="parent-types">{this.renderGuts()}</div>;

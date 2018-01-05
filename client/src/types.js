@@ -128,4 +128,10 @@ export type SystemType = {
   name: string
 };
 
+export type TypePropType = {
+  id: number,
+  name: string,
+  kind: string
+};
+
 export type ValidationFnType = (string) => string[];
