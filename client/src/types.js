@@ -81,6 +81,8 @@ export type UiType = {
   editingNode: ?NodeType,
   instanceName: string,
   modal: ModalType,
+  newPropName: string,
+  newPropType: string,
   selectedChildNodeId: number,
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,

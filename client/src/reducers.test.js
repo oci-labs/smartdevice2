@@ -173,6 +173,8 @@ describe('reducer', () => {
   test('setPhone', () => testSetUserProp('phone'));
 
   test('setModal', () => testSetUiProp('modal'));
+  test('setNewPropName', () => testSetUiProp('newPropName'));
+  test('setNewPropType', () => testSetUiProp('newPropType'));
 
   test('setSelectedChildNode', () => {
     const id = 999;

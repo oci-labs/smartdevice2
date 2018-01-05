@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 
 import type {NodeType, StateType} from '../types';
 import {OK, handleError} from '../util/error-util';
+import {getUrlPrefix} from '../util/rest-util';
 
 import './child-view.css';
 
@@ -12,7 +13,7 @@ type PropsType = {
   node: NodeType
 };
 
-export const URL_PREFIX = 'http://localhost:3001/';
+const URL_PREFIX = getUrlPrefix();
 
 class ChildView extends Component<PropsType> {
 

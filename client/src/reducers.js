@@ -205,6 +205,14 @@ addReducer(
   }
 );
 
+addReducer('setNewPropName', (state: StateType, value: string) =>
+  setUiProp(state, 'newPropName', value)
+);
+
+addReducer('setNewPropType', (state: StateType, value: string) =>
+  setUiProp(state, 'newPropType', value)
+);
+
 addReducer('setTreeType', (state: StateType, value: string): StateType =>
   setUiProp(state, 'treeType', value)
 );

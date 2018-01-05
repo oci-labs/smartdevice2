@@ -10,6 +10,7 @@ const MySqlConnection = require('mysql-easier');
 const {alertService} = require('./alert-service');
 const crudService = require('./crud-service');
 const {treeService} = require('./tree-service');
+const {typeService} = require('./type-service');
 
 const dbConfig = {
   host: 'localhost',
@@ -42,6 +43,7 @@ app.set('etag', 'strong');
 
 alertService(app, mySql);
 treeService(app, mySql);
+typeService(app, mySql);
 crudService(app, mySql, 'alert');
 crudService(app, mySql, 'alert_type');
 crudService(app, mySql, 'alert_condition');

@@ -15,6 +15,8 @@ const state: StateType = {
       open: false,
       title: ''
     },
+    newPropName: '',
+    newPropType: '',
     selectedChildNodeId: 0,
     selectedInstanceNodeId: 0,
     selectedTypeNodeId: 0,

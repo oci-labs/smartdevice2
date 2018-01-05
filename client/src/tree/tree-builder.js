@@ -6,7 +6,8 @@ import {dispatch, getState} from 'redux-easy';
 
 import Button from './button';
 import TreeNode from './tree-node';
-import {URL_PREFIX, addNode} from './tree-util';
+import {addNode} from './tree-util';
+import {getUrlPrefix} from '../util/rest-util';
 
 import './tree-builder.css';
 
@@ -29,6 +30,7 @@ type PropsType = {
 };
 
 const ROOT_ID = 1;
+const URL_PREFIX = getUrlPrefix() + 'tree/';
 
 function haveNodeMap(kind: TreeType): boolean {
   const prop = kind + 'NodeMap';

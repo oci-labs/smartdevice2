@@ -4,7 +4,8 @@ import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
 
 import Button from './button';
-import {URL_PREFIX, addNode} from './tree-util';
+import {addNode} from './tree-util';
+import {getUrlPrefix} from '../util/rest-util';
 
 import './tree-node.css';
 
@@ -21,6 +22,8 @@ type PropsType = {
   selectedNodeId: number,
   subscriptions: number[]
 };
+
+const URL_PREFIX = getUrlPrefix() + 'tree/';
 
 function getSortedChildren(node: NodeType, nodeMap: NodeMapType): NodeType[] {
   const children = node.children.map(id => nodeMap[id]);

@@ -2,6 +2,8 @@
 
 import {dispatch} from 'redux-easy';
 
+import {getUrlPrefix} from '../util/rest-util';
+
 import type {
   AddNodePayloadType,
   NewNodeNamePayloadType,
@@ -9,7 +11,7 @@ import type {
   TreeType
 } from '../types';
 
-export const URL_PREFIX = 'http://localhost:3001/tree/';
+const URL_PREFIX = getUrlPrefix() + 'tree/';
 
 export async function addNode(kind: TreeType, name: string, parent: NodeType) {
   if (!name) return;
