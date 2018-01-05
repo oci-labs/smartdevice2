@@ -3,6 +3,8 @@
 import upperFirst from 'lodash/upperFirst';
 import {addReducer} from 'redux-easy';
 
+import {showModal} from './share/sd-modal';
+
 import type {
   AddNodePayloadType,
   ModalType,
@@ -34,7 +36,7 @@ function setUserProp(
   return {...state, user: {...user, [prop]: value}};
 }
 
-function validateNewName(nodeMap: NodeMapType, parentId: number, name: string) {
+function validNewName(nodeMap: NodeMapType, parentId: number, name: string) {
   if (!parentId) return; // don't need to do anything for root nodes
 
   if (!name) throw new Error('new nodes must have a name');
@@ -43,9 +45,15 @@ function validateNewName(nodeMap: NodeMapType, parentId: number, name: string) {
   if (!parentNode) return;
 
   const {children} = parentNode;
-  if (children.find(id => nodeMap[id].name === name)) {
-    throw new Error(`duplicate child name "${name}"`);
+  const inUse = children.find(id => nodeMap[id].name === name);
+  if (inUse) {
+    showModal(
+      'Duplicate Child Name',
+      `The name "${name}" is already in use ` +
+      `by a child of "${parentNode.name}".`);
   }
+
+  return !inUse;
 }
 
 addReducer(
@@ -54,7 +62,7 @@ addReducer(
     const {id, kind, name, parentId, typeId} = payload;
     const nodeMap = state[kind + 'NodeMap'];
 
-    validateNewName(nodeMap, parentId, name);
+    if (!validNewName(nodeMap, parentId, name)) return state;
 
     // nodeMap is immutable, so make a copy that can be modified.
     const newNodeMap = {...nodeMap};
@@ -132,7 +140,7 @@ addReducer(
     if (name !== node.name) {
       // changing name
       const {parentId} = node;
-      validateNewName(nodeMap, parentId, name);
+      if (!validNewName(nodeMap, parentId, name)) return state;
     }
 
     // nodeMap is immutable, so make a copy that can be modified.

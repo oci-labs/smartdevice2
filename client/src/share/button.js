@@ -10,7 +10,7 @@ type PropsType = {
   icon?: string,
   label?: string,
   onClick: Function,
-  tooltip: string
+  tooltip?: string
 };
 
 export default ({

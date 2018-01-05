@@ -1,21 +1,56 @@
 .sd-modal {
+  $spacing: 20px;
+
   background: white;
   border: solid #ccc 1px;
   border-radius: 4px;
   bottom: auto;
   left: 50%;
   overflow: auto;
-  padding: 20px;
   position: absolute;
   right: auto;
+  text-align: center;
   top: 50%;
   transform: translate(-50%, -50%);
 
+  .body {
+    padding: $spacing;
+  }
+
+  .button-row {
+    margin-top: $spacing;
+    text-align: right;
+
+    .button {
+      font-size: 12px;
+      margin-left: 10px;
+      padding: 2px 4px;
+    }
+  }
+
   .close {
     cursor: pointer;
+    display: inline-block;
+    margin-left: $spacing;
+    float: right;
+  }
+
+  header {
+    background-color: lightyellow;
+    border-bottom: solid lightgray 1px;
+    padding: $spacing;
   }
 
   p, .title {
     cursor: default;
+  }
+
+  select {
+    font-size: 14px;
+  }
+
+  .title {
+    display: inline-block;
+    font-weight: bold;
   }
 }

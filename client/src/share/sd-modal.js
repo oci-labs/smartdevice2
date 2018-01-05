@@ -7,13 +7,26 @@ import {dispatch} from 'redux-easy';
 
 import './sd-modal.css';
 
-import type {StateType} from '../types';
+import type {ModalType, StateType} from '../types';
 
-type PropsType = {
-  message: string,
-  open: boolean,
-  title: string
-};
+type PropsType = ModalType & {render?: Function};
+
+let renderFn;
+
+export function hideModal(): void {
+  dispatch('setModal', {open: false});
+}
+
+export function showModal(title: string, message?: string): void {
+  // Using a setTimeout allows this to be called from a reducer.
+  setTimeout(() => {
+    dispatch('setModal', {open: true, message, title});
+  });
+}
+
+export function setRenderFn(fn: ?Function): void {
+  renderFn = fn;
+}
 
 class SdModal extends Component<PropsType> {
   modal: ?Object = null;
@@ -46,13 +59,16 @@ class SdModal extends Component<PropsType> {
           <div className="title">{title}</div>
           <div className="close" onClick={this.onCloseModal}>&#10005;</div>
         </header>
-        <p>{message}</p>
+        <section className="body">
+          {message ? <p>{message}</p> : null}
+          {renderFn ? renderFn() : null}
+        </section>
       </Modal>
     );
   }
 }
 
-const mapState = (state: StateType): PropsType => {
+const mapState = (state: StateType): ModalType => {
   const {ui: {modal}} = state;
   return modal;
 };
