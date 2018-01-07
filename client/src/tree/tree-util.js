@@ -6,7 +6,7 @@ import {dispatch, getState} from 'redux-easy';
 
 import {getUrlPrefix} from '../util/rest-util';
 import Button from '../share/button';
-import {hideModal, setRenderFn, showModal} from '../share/sd-modal';
+import {hideModal, showModal} from '../share/sd-modal';
 
 import type {
   AddNodePayloadType,
@@ -33,13 +33,11 @@ function handleTypeChange(event) {
 }
 
 function handleTypeSelectCancel() {
-  setRenderFn(null);
   hideModal();
 }
 
 function handleTypeSelectOk(name, parent) {
   reallyAddNode('instance', name, parent, typeId);
-  setRenderFn(null);
   hideModal();
 }
 
@@ -47,7 +45,7 @@ function promptForType(name, parent, childTypes: NodeType[]) {
   const sortedChildTypes = sortBy(childTypes, ['name']);
   typeId = sortedChildTypes[0].id;
 
-  setRenderFn(() => (
+  const renderFn = () => (
     <div>
       <select onChange={handleTypeChange}>
         {sortedChildTypes.map(childType => (
@@ -61,9 +59,9 @@ function promptForType(name, parent, childTypes: NodeType[]) {
         <Button label="Cancel" onClick={handleTypeSelectCancel} />
       </div>
     </div>
-  ));
+  );
 
-  showModal('Choose Child Type');
+  showModal('Choose Child Type', '', renderFn);
 }
 
 export function addNode(kind: TreeType, name: string, parent: NodeType) {

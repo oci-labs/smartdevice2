@@ -14,18 +14,20 @@ type PropsType = ModalType & {render?: Function};
 let renderFn;
 
 export function hideModal(): void {
+  renderFn = null;
   dispatch('setModal', {open: false});
 }
 
-export function showModal(title: string, message?: string): void {
+export function showModal(
+  title: string,
+  message?: string,
+  fn?: Function
+): void {
+  if (fn) renderFn = fn;
   // Using a setTimeout allows this to be called from a reducer.
   setTimeout(() => {
     dispatch('setModal', {open: true, message, title});
   });
-}
-
-export function setRenderFn(fn: ?Function): void {
-  renderFn = fn;
 }
 
 class SdModal extends Component<PropsType> {
