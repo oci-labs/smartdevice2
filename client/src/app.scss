@@ -53,13 +53,17 @@
   .parent-view {
     flex-grow: 1;
   }
+}
 
-  table {
-    border-collapse: collapse;
+table {
+  border-collapse: collapse;
 
-    td, th {
-      border: solid lightgray 1px;
-      padding: 5px;
-    }
+  td {
+    text-align: left;
+  }
+
+  td, th {
+    border: solid lightgray 1px;
+    padding: 5px;
   }
 }

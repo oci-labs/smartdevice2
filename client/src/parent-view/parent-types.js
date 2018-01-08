@@ -23,6 +23,7 @@ type MyStateType = {
 };
 
 class ParentTypes extends Component<PropsType, MyStateType> {
+
   state: MyStateType = {
     typeProps: []
   };

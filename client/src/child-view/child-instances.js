@@ -1,12 +1,13 @@
 // @flow
 
+import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
-import type {NodeType, StateType} from '../types';
+import type {NodeType, StateType, TypePropType} from '../types';
 import {getJson} from '../util/rest-util';
 
 import './child-instances.css';
@@ -14,6 +15,10 @@ import './child-instances.css';
 type PropsType = {
   node: NodeType,
   typeName: string
+};
+
+type MyStateType = {
+  typeProps: TypePropType[]
 };
 
 function getAlerts(node: NodeType) {
@@ -34,36 +39,82 @@ function getType(node: NodeType): Promise<NodeType> {
   return ((json: any): Promise<NodeType>);
 }
 
-class ChildInstances extends Component<PropsType> {
+function renderTableHead() {
+  return (
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+  );
+}
+
+function renderTableRow(node: NodeType, property: TypePropType) {
+  console.log('child-instances.js renderTableRow: node =', node);
+  const value = node[property.name];
+  console.log('child-instances.js renderTableRow: value =', value);
+  return (
+    <tr key={property.id}>
+      <td>
+        <label>{property.name}</label>
+      </td>
+      <td>
+        <input
+          type="text"
+          onChange={() => {}}
+          value={value}
+        />
+      </td>
+    </tr>
+  );
+}
+
+class ChildInstances extends Component<PropsType, MyStateType> {
+
+  state: MyStateType = {
+    typeProps: []
+  };
 
   async componentWillReceiveProps(nextProps: PropsType) {
     const {node} = nextProps;
     if (!node) return;
 
     const type = await getType(node);
-    console.log('child-instances.js componentWillReceiveProps: type =', type);
     dispatch('setTypeName', type.name);
+    this.loadTypeProps(type);
 
     const alerts = await getAlerts(node);
     dispatch('setInstanceAlerts', alerts);
-    console.log('child-view.js componentWillReceiveProps: alerts =', alerts);
 
     const data = await getData(node);
     dispatch('setInstanceData', data);
-    console.log('child-view.js componentWillReceiveProps: data =', data);
   }
 
   editProperties = () => {
+    const {typeProps} = this.state;
     const {node} = this.props;
 
     const renderFn = () => (
-      <div>
-        Editor goes here!
-      </div>
+      <table>
+        {renderTableHead()}
+        <tbody>
+          {typeProps.map(typeProp => renderTableRow(node, typeProp))}
+        </tbody>
+      </table>
     );
 
     showModal(node.name + ' Properties', '', renderFn);
   };
+
+  async loadTypeProps(typeNode: ?NodeType) {
+    if (!typeNode) return;
+
+    const json = await getJson(`types/${typeNode.id}/data`);
+    const typeProps = ((json: any): TypePropType[]);
+    const sortedTypeProps = sortBy(typeProps, ['name']);
+    this.setState({typeProps: sortedTypeProps});
+  }
 
   renderGuts = () => {
     const {node, typeName} = this.props;
