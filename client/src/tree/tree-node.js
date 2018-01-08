@@ -5,7 +5,7 @@ import {dispatch} from 'redux-easy';
 
 import {addNode} from './tree-util';
 import Button from '../share/button';
-import {getUrlPrefix} from '../util/rest-util';
+import {deleteResource, patchJson} from '../util/rest-util';
 
 import './tree-node.css';
 
@@ -23,8 +23,6 @@ type PropsType = {
   subscriptions: number[]
 };
 
-const URL_PREFIX = getUrlPrefix() + 'tree/';
-
 function getSortedChildren(node: NodeType, nodeMap: NodeMapType): NodeType[] {
   const children = node.children.map(id => nodeMap[id]);
   return children.sort(nodeCompare);
@@ -35,19 +33,12 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
-  deleteNode = async (node: NodeType) => {
-    try {
-      // Delete type from database.
-      const {kind} = this.props;
-      const url = `${URL_PREFIX}${kind}/${node.id}`;
-      const options = {method: 'DELETE'};
-      await fetch(url, options);
 
-      const payload: NodePayloadType = {kind, node};
-      dispatch('deleteNode', payload);
-    } catch (e) {
-      console.error('tree-builder.js deleteNode:', e.message);
-    }
+  deleteNode = async (node: NodeType) => {
+    const {kind} = this.props;
+    await deleteResource(`tree/${kind}/${node.id}`);
+    const payload: NodePayloadType = {kind, node};
+    dispatch('deleteNode', payload);
   };
 
   editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
@@ -73,21 +64,10 @@ class TreeNode extends Component<PropsType> {
     const {editedName: name, editingNode, kind, node} = this.props;
     if (!editingNode) return;
 
-    try {
-      // Update type name in database.
-      const url = `${URL_PREFIX}${kind}/${editingNode.id}`;
-      const options = {
-        method: 'PATCH',
-        body: JSON.stringify({name})
-      };
-      await fetch(url, options);
-
-      const newNode = {...node, name};
-      const payload: NodePayloadType = {kind, node: newNode};
-      dispatch('saveNode', payload);
-    } catch (e) {
-      console.error('tree-builder.js saveChange:', e.message);
-    }
+    await patchJson(`tree/${kind}/${editingNode.id}`, {name});
+    const newNode = {...node, name};
+    const payload: NodePayloadType = {kind, node: newNode};
+    dispatch('saveNode', payload);
   };
 
   selectNode = () => {

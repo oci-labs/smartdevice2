@@ -1,5 +1,6 @@
 // @flow
 
+const sortBy = require('lodash/sortBy');
 const MySqlConnection = require('mysql-easier');
 
 const {errorHandler} = require('./util/error-util');
@@ -13,7 +14,8 @@ async function getTypeDataHandler(
   const sql = 'select * from type_data where typeId = ?';
   try {
     const typeDatas = await mySql.query(sql, typeId);
-    res.send(typeDatas);
+    const sorted = sortBy(typeDatas, ['name']);
+    res.send(sorted);
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);

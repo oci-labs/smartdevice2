@@ -4,7 +4,7 @@ import sortBy from 'lodash/sortBy';
 import React from 'react';
 import {dispatch, getState} from 'redux-easy';
 
-import {getUrlPrefix} from '../util/rest-util';
+import {postJson} from '../util/rest-util';
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
 
@@ -14,8 +14,6 @@ import type {
   NodeType,
   TreeType
 } from '../types';
-
-const URL_PREFIX = getUrlPrefix() + 'tree/';
 
 let typeId;
 
@@ -120,12 +118,7 @@ async function reallyAddNode(
     // Add new node to database.
     const node: Object = {name, parentId};
     if (kind === 'instance') node.typeId = typeId;
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(node)
-    };
-    const url = URL_PREFIX + kind;
-    const res = await fetch(url, options);
+    const res = await postJson(kind, node);
     const id = Number(await res.text());
 
     // Add new node to Redux state.

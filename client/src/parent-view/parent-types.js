@@ -7,8 +7,7 @@ import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
-import {handleError} from '../util/error-util';
-import {getUrlPrefix} from '../util/rest-util';
+import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {NodeType, StateType, TypePropType, UiType} from '../types';
 
@@ -22,8 +21,6 @@ type PropsType = {
 type MyStateType = {
   typeProps: TypePropType[]
 };
-
-const URL_PREFIX = getUrlPrefix();
 
 class ParentTypes extends Component<PropsType, MyStateType> {
   state: MyStateType = {
@@ -39,20 +36,8 @@ class ParentTypes extends Component<PropsType, MyStateType> {
       name: newPropName,
       typeId: typeNode.id
     };
-    const url = `${URL_PREFIX}type_data`;
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(typeData),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    };
-    const res = await fetch(url, options);
-    if (res.ok) {
-      dispatch('setNewPropName', '');
-    } else {
-      handleError(`failed to create new property for type "${typeNode.name}"`);
-    }
+    await postJson('type_data', typeData);
+    dispatch('setNewPropName', '');
   };
 
   componentWillMount() {
@@ -70,29 +55,17 @@ class ParentTypes extends Component<PropsType, MyStateType> {
   async loadTypeProps(typeNode: ?NodeType) {
     if (!typeNode) return;
 
-    const url = `${URL_PREFIX}types/${typeNode.id}/data`;
-    const res = await fetch(url);
-    if (res.ok) {
-      const typeProps = await res.json();
-      // $FlowFixMe
-      const sortedTypeProps = sortBy(typeProps, ['name']);
-      this.setState({typeProps: sortedTypeProps});
-    } else {
-      handleError('failed to get properties for type ' + typeNode.name);
-    }
+    const json = await getJson(`types/${typeNode.id}/data`);
+    const typeProps = ((json: any): TypePropType[]);
+    const sortedTypeProps = sortBy(typeProps, ['name']);
+    this.setState({typeProps: sortedTypeProps});
   }
 
   deleteProp = async (typeProp: TypePropType) => {
-    const url = `${URL_PREFIX}type_data/${typeProp.id}`;
-    const options = {method: 'DELETE'};
-    const res = await fetch(url, options);
-    if (res.ok) {
-      let {typeProps} = this.state;
-      typeProps = without(typeProps, typeProp);
-      this.setState({typeProps});
-    } else {
-      handleError('failed to delete type property ' + typeProp.name);
-    }
+    await deleteResource(`type_data/${typeProp.id}`);
+    let {typeProps} = this.state;
+    typeProps = without(typeProps, typeProp);
+    this.setState({typeProps});
   };
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {

@@ -78,7 +78,7 @@ async function patchHandler(
   res: express$Response
 ): Promise<void> {
   const {id, kind} = req.params;
-  const changes = JSON.parse(req.body);
+  const changes = req.body;
   try {
     const type = await mySql.getById(kind, id);
     const newType = {...type, ...changes};

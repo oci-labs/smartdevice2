@@ -238,6 +238,10 @@ addReducer('setTreeType', (state: StateType, value: string): StateType =>
   setUiProp(state, 'treeType', value)
 );
 
+addReducer('setTypeName', (state: StateType, value: string): StateType =>
+  setUiProp(state, 'typeName', value)
+);
+
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
   const {kind, nodes} = payload;
 

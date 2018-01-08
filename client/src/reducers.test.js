@@ -201,4 +201,6 @@ describe('reducer', () => {
     newState = reducer(newState, action);
     expect(newState.ui.selectedTypeNodeId).toBe(0);
   });
+
+  test('setTypeName', () => testSetUiProp('typeName'));
 });

@@ -7,7 +7,7 @@ import {dispatch, getState} from 'redux-easy';
 import TreeNode from './tree-node';
 import {addNode} from './tree-util';
 import Button from '../share/button';
-import {getUrlPrefix} from '../util/rest-util';
+import {getJson} from '../util/rest-util';
 
 import './tree-builder.css';
 
@@ -30,7 +30,6 @@ type PropsType = {
 };
 
 const ROOT_ID = 1;
-const URL_PREFIX = getUrlPrefix() + 'tree/';
 
 function haveNodeMap(kind: TreeType): boolean {
   const prop = kind + 'NodeMap';
@@ -60,15 +59,10 @@ class TreeBuilder extends Component<PropsType> {
   load = async (kind: TreeType) => {
     if (haveNodeMap(kind)) return;
 
-    try {
-      const url = URL_PREFIX + kind;
-      const res = await fetch(url);
-      const nodes = await res.json();
-      const payload: SetNodesPayloadType = {kind, nodes};
-      dispatch('setNodes', payload);
-    } catch (e) {
-      console.error('tree-builder.js load:', e.message);
-    }
+    const json = await getJson(kind);
+    const nodes = ((json: any): NodeType[]);
+    const payload: SetNodesPayloadType = {kind, nodes};
+    dispatch('setNodes', payload);
   };
 
   render() {
