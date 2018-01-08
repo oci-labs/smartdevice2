@@ -6,12 +6,13 @@ const state: StateType = {
   allAlerts: [],
   errors: new Set(),
   instanceAlerts: [],
-  instanceData: [],
+  instanceData: {},
   instanceNodeMap: {},
   typeNodeMap: {},
   ui: {
     editedName: '',
     editingNode: null,
+    editingProperties: {},
     instanceName: '',
     modal: {
       message: '',

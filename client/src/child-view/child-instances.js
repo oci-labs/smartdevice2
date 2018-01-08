@@ -6,18 +6,21 @@ import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
-import {showModal} from '../share/sd-modal';
+import {getJson, postJson} from '../util/rest-util';
+import {hideModal, showModal} from '../share/sd-modal';
+
 import type {
+  InstanceDataType,
   NodeType,
-  PropertyKindType,
+  PrimitiveType,
   PropertyType,
   StateType
 } from '../types';
-import {getJson} from '../util/rest-util';
 
 import './child-instances.css';
 
 type PropsType = {
+  instanceData: Object,
   node: NodeType,
   typeName: string
 };
@@ -32,18 +35,6 @@ function getAlerts(node: NodeType) {
 
 function getData(node: NodeType) {
   return getJson(`instances/${node.id}/data`);
-}
-
-function getInput(type: PropertyKindType, value: string) {
-  return type === 'boolean' ? (
-    <input type="checkbox" onChange={() => {}} value={value} />
-  ) : type === 'number' ? (
-    <input type="number" onChange={() => {}} value={value} />
-  ) : type === 'text' ? (
-    <input type="text" onChange={() => {}} value={value} />
-  ) : (
-    <div>{`unsupported type ${type}`}</div>
-  );
 }
 
 function getType(node: NodeType): Promise<NodeType> {
@@ -67,21 +58,6 @@ function renderTableHead() {
   );
 }
 
-function renderTableRow(node: NodeType, property: PropertyType) {
-  console.log('child-instances.js renderTableRow: node =', node);
-  console.log('child-instances.js renderTableRow: property =', property);
-  const value = node[property.name];
-  console.log('child-instances.js renderTableRow: value =', value);
-  return (
-    <tr key={property.id}>
-      <td>
-        <label>{property.name}</label>
-      </td>
-      <td>{getInput(property.kind, value)}</td>
-    </tr>
-  );
-}
-
 class ChildInstances extends Component<PropsType, MyStateType> {
   state: MyStateType = {
     typeProps: []
@@ -91,6 +67,10 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     const {node} = nextProps;
     if (!node) return;
 
+    // If the same node has already been processed ...
+    const prevNode = this.props.node;
+    if (prevNode && node.id === prevNode.id) return;
+
     const type = await getType(node);
     dispatch('setTypeName', type.name);
     this.loadTypeProps(type);
@@ -98,7 +78,15 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     const alerts = await getAlerts(node);
     dispatch('setInstanceAlerts', alerts);
 
-    const data = await getData(node);
+    const json = await getData(node);
+    let data = ((json: any): InstanceDataType[]);
+    // Change the shape of this data
+    // from an array of InstanceDataType objects
+    // to an object with key/value pairs (map).
+    data = data.reduce((map, d) => {
+      map[d.dataKey] = d.dataValue;
+      return map;
+    }, {});
     dispatch('setInstanceData', data);
   }
 
@@ -107,15 +95,45 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     const {node} = this.props;
 
     const renderFn = () => (
-      <table>
-        {renderTableHead()}
-        <tbody>
-          {typeProps.map(typeProp => renderTableRow(node, typeProp))}
-        </tbody>
-      </table>
+      <div className="child-instances-modal">
+        <table>
+          {renderTableHead()}
+          <tbody>
+            {typeProps.map(typeProp => this.renderTableRow(node, typeProp))}
+          </tbody>
+        </table>
+        <Button
+          className="edit-properties"
+          label="Save"
+          onClick={() => this.saveProperties()}
+          tooltip="save properties"
+        />
+      </div>
     );
 
     showModal(node.name + ' Properties', '', renderFn);
+  };
+
+  getInput = (property: PropertyType, value: PrimitiveType) => {
+    const {kind, name} = property;
+
+    const onChange = event => {
+      const {instanceData} = this.props;
+      const {checked, value} = event.target;
+      const v = kind === 'boolean' ? checked : value;
+      const newInstanceData = {...instanceData, [name]: v};
+      dispatch('setInstanceData', newInstanceData);
+    };
+
+    return kind === 'boolean' ? (
+      <input type="checkbox" onChange={onChange} checked={value} />
+    ) : kind === 'number' ? (
+      <input type="number" onChange={onChange} value={value} />
+    ) : kind === 'text' ? (
+      <input type="text" onChange={onChange} value={value} />
+    ) : (
+      <div>{`unsupported type ${kind}`}</div>
+    );
   };
 
   async loadTypeProps(typeNode: ?NodeType) {
@@ -131,7 +149,6 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     const {node, typeName} = this.props;
     if (!node) return null;
 
-    console.log('child-instances.js renderGuts: node =', node);
     return (
       <div>
         <div className="node-name">
@@ -149,6 +166,34 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     );
   };
 
+  renderTableRow = (node: NodeType, property: PropertyType) => {
+    const {name} = property;
+    const {instanceData} = this.props;
+    const value = instanceData[name];
+
+    return (
+      <tr key={property.id}>
+        <td>
+          <label>{name}</label>
+        </td>
+        <td>{this.getInput(property, value)}</td>
+      </tr>
+    );
+  };
+
+  saveProperties = async () => {
+    const {instanceData, node} = this.props;
+    console.log(
+      'child-instances.js saveProperties: instanceData =',
+      instanceData
+    );
+    await postJson(`instances/${node.id}/data`, instanceData);
+    // Clear the instance data.  Is this needed?
+    dispatch('setInstanceData', {});
+
+    hideModal();
+  };
+
   render() {
     return (
       <section className="child-instances">
@@ -160,10 +205,10 @@ class ChildInstances extends Component<PropsType, MyStateType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {instanceNodeMap, ui} = state;
+  const {instanceData, instanceNodeMap, ui} = state;
   const {selectedChildNodeId, typeName} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
-  return {node, typeName};
+  return {instanceData, node, typeName};
 };
 
 export default connect(mapState)(ChildInstances);

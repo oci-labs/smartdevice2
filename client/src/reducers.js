@@ -8,7 +8,6 @@ import {showModal} from './share/sd-modal';
 import type {
   AddNodePayloadType,
   AlertType,
-  InstanceDataType,
   ModalType,
   NewNodeNamePayloadType,
   NodeMapType,
@@ -50,7 +49,8 @@ function validNewName(nodeMap: NodeMapType, parentId: number, name: string) {
     showModal(
       'Duplicate Child Name',
       `The name "${name}" is already in use ` +
-      `by a child of "${parentNode.name}".`);
+        `by a child of "${parentNode.name}".`
+    );
   }
 
   return !inUse;
@@ -168,7 +168,7 @@ addReducer('setInstanceAlerts', (state: StateType, alerts: AlertType[]) =>
   setTopProp(state, 'instanceAlerts', alerts)
 );
 
-addReducer('setInstanceData', (state: StateType, data: InstanceDataType[]) =>
+addReducer('setInstanceData', (state: StateType, data: Object) =>
   setTopProp(state, 'instanceData', data)
 );
 

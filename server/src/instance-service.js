@@ -28,9 +28,37 @@ function instanceService(
 ): void {
   const URL_PREFIX = '/instances/:instanceId/data';
   app.get(URL_PREFIX, getInstanceDataHandler.bind(null, mySql));
+  app.post(URL_PREFIX, postInstanceDataHandler.bind(null, mySql));
+}
+
+async function postInstanceDataHandler(
+  mySql: MySqlConnection,
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {instanceId} = req.params;
+  const data = req.body;
+
+  // Delete all the data for this instance.
+  const tableName = 'instance_data';
+  const sql = `delete from ${tableName} where instanceId = ?`;
+  await mySql.query(sql, instanceId);
+
+  // Save new data for this instance.
+  const promises = Object.keys(data).map(key => {
+    const obj = {
+      instanceId,
+      dataKey: key,
+      dataValue: data[key]
+    };
+    return mySql.insert(tableName, obj);
+  });
+  await Promise.all(promises);
+  res.send();
 }
 
 module.exports = {
   instanceService,
-  getInstanceDataHandler
+  getInstanceDataHandler,
+  postInstanceDataHandler
 };

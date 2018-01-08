@@ -78,14 +78,16 @@ export type ModalType = {
   title: string
 };
 
+export type PrimitiveType = boolean | number | string;
+
 export type RoleType = 'admin' | 'service' | 'spectator';
 
 // These strings must correspond to the name of a database table.
 export type TreeType = 'type' | 'instance';
 
 export type UiType = {
-  editedName: string,
-  editingNode: ?NodeType,
+  editedName: string, // within type or instance tree
+  editingNode: ?NodeType, // within type or instance tree
   instanceName: string,
   modal: ModalType,
   newPropName: string,
@@ -116,7 +118,7 @@ export type StateType = {
   allAlerts: AlertType[],
   errors: Set<string>,
   instanceAlerts: AlertType[],
-  instanceData: InstanceDataType[],
+  instanceData: Object,
   instanceNodeMap: NodeMapType,
   typeNodeMap: NodeMapType,
   ui: UiType,

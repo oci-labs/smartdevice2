@@ -7,7 +7,11 @@ import {reducer, reduxSetup} from 'redux-easy';
 import initialState from './initial-state';
 import './reducers';
 
-import type {AddNodePayloadType, NodePayloadType, NodeType} from './types';
+import type {
+  AddNodePayloadType,
+  NodePayloadType,
+  NodeType,
+} from './types';
 
 describe('reducer', () => {
   const ROOT_ID = 1;

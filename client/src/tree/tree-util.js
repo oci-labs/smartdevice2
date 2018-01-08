@@ -20,26 +20,26 @@ let typeId;
 /**
  * Gets the type name for an instance node.
  */
-export function getType(node: NodeType) {
+export function getType(node: NodeType): string {
   const {typeNodeMap} = getState();
   const typeNode = typeNodeMap[node.typeId];
-  return typeNode.name;
+  return typeNode ? typeNode.name : '';
 }
 
-function handleTypeChange(event) {
+function handleTypeChange(event): void {
   typeId = event.target.value;
 }
 
-function handleTypeSelectCancel() {
+function handleTypeSelectCancel(): void {
   hideModal();
 }
 
-function handleTypeSelectOk(name, parent) {
+function handleTypeSelectOk(name, parent): void {
   reallyAddNode('instance', name, parent, typeId);
   hideModal();
 }
 
-function promptForType(name, parent, childTypes: NodeType[]) {
+function promptForType(name, parent, childTypes: NodeType[]): void {
   const sortedChildTypes = sortBy(childTypes, ['name']);
   typeId = sortedChildTypes[0].id;
 
@@ -62,7 +62,7 @@ function promptForType(name, parent, childTypes: NodeType[]) {
   showModal('Choose Child Type', '', renderFn);
 }
 
-export function addNode(kind: TreeType, name: string, parent: NodeType) {
+export function addNode(kind: TreeType, name: string, parent: NodeType): void {
   if (!name) return;
 
   let typeId = 0;
@@ -111,7 +111,7 @@ async function reallyAddNode(
   name: string,
   parent: NodeType,
   typeId?: number
-) {
+): Promise<void> {
   const parentId = parent.id;
 
   try {

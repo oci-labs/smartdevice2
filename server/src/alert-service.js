@@ -13,7 +13,6 @@ async function getByInstanceHandler(
   const sql = 'select * from alert where instanceId = ?';
   try {
     const alerts = await mySql.query(sql, instanceId);
-    console.log('alert-service.js x: alerts =', alerts);
     res.send(alerts);
   } catch (e) {
     // istanbul ignore next
