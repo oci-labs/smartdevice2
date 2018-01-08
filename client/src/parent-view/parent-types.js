@@ -9,7 +9,7 @@ import {dispatch} from 'redux-easy';
 import Button from '../share/button';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
-import type {NodeType, StateType, TypePropType, UiType} from '../types';
+import type {NodeType, PropertyType, StateType, UiType} from '../types';
 
 import './parent-types.css';
 
@@ -19,7 +19,7 @@ type PropsType = {
 };
 
 type MyStateType = {
-  typeProps: TypePropType[]
+  typeProps: PropertyType[]
 };
 
 class ParentTypes extends Component<PropsType, MyStateType> {
@@ -57,12 +57,12 @@ class ParentTypes extends Component<PropsType, MyStateType> {
     if (!typeNode) return;
 
     const json = await getJson(`types/${typeNode.id}/data`);
-    const typeProps = ((json: any): TypePropType[]);
+    const typeProps = ((json: any): PropertyType[]);
     const sortedTypeProps = sortBy(typeProps, ['name']);
     this.setState({typeProps: sortedTypeProps});
   }
 
-  deleteProp = async (typeProp: TypePropType) => {
+  deleteProp = async (typeProp: PropertyType) => {
     await deleteResource(`type_data/${typeProp.id}`);
     let {typeProps} = this.state;
     typeProps = without(typeProps, typeProp);
@@ -139,7 +139,7 @@ class ParentTypes extends Component<PropsType, MyStateType> {
     );
   };
 
-  renderTableRow = (typeProp: TypePropType) => (
+  renderTableRow = (typeProp: PropertyType) => (
     <tr key={typeProp.name}>
       <td>{typeProp.name}</td>
       <td>{typeProp.kind}</td>

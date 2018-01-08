@@ -7,7 +7,12 @@ import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
-import type {NodeType, StateType, TypePropType} from '../types';
+import type {
+  NodeType,
+  PropertyKindType,
+  PropertyType,
+  StateType
+} from '../types';
 import {getJson} from '../util/rest-util';
 
 import './child-instances.css';
@@ -18,7 +23,7 @@ type PropsType = {
 };
 
 type MyStateType = {
-  typeProps: TypePropType[]
+  typeProps: PropertyType[]
 };
 
 function getAlerts(node: NodeType) {
@@ -27,6 +32,18 @@ function getAlerts(node: NodeType) {
 
 function getData(node: NodeType) {
   return getJson(`instances/${node.id}/data`);
+}
+
+function getInput(type: PropertyKindType, value: string) {
+  return type === 'boolean' ? (
+    <input type="checkbox" onChange={() => {}} value={value} />
+  ) : type === 'number' ? (
+    <input type="number" onChange={() => {}} value={value} />
+  ) : type === 'text' ? (
+    <input type="text" onChange={() => {}} value={value} />
+  ) : (
+    <div>{`unsupported type ${type}`}</div>
+  );
 }
 
 function getType(node: NodeType): Promise<NodeType> {
@@ -50,8 +67,9 @@ function renderTableHead() {
   );
 }
 
-function renderTableRow(node: NodeType, property: TypePropType) {
+function renderTableRow(node: NodeType, property: PropertyType) {
   console.log('child-instances.js renderTableRow: node =', node);
+  console.log('child-instances.js renderTableRow: property =', property);
   const value = node[property.name];
   console.log('child-instances.js renderTableRow: value =', value);
   return (
@@ -59,19 +77,12 @@ function renderTableRow(node: NodeType, property: TypePropType) {
       <td>
         <label>{property.name}</label>
       </td>
-      <td>
-        <input
-          type="text"
-          onChange={() => {}}
-          value={value}
-        />
-      </td>
+      <td>{getInput(property.kind, value)}</td>
     </tr>
   );
 }
 
 class ChildInstances extends Component<PropsType, MyStateType> {
-
   state: MyStateType = {
     typeProps: []
   };
@@ -111,9 +122,9 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     if (!typeNode) return;
 
     const json = await getJson(`types/${typeNode.id}/data`);
-    const typeProps = ((json: any): TypePropType[]);
-    const sortedTypeProps = sortBy(typeProps, ['name']);
-    this.setState({typeProps: sortedTypeProps});
+    const properties = ((json: any): PropertyType[]);
+    const sortedProperties = sortBy(properties, ['name']);
+    this.setState({typeProps: sortedProperties});
   }
 
   renderGuts = () => {

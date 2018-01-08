@@ -138,10 +138,12 @@ export type SystemType = {
   name: string
 };
 
-export type TypePropType = {
+export type PropertyType = {
   id: number,
   name: string,
-  kind: string
+  kind: PropertyKindType
 };
+
+export type PropertyKindType = 'boolean' | 'number' | 'text';
 
 export type ValidationFnType = (string) => string[];
