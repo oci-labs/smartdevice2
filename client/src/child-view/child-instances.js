@@ -142,10 +142,16 @@ class ChildInstances extends Component<PropsType> {
     const instanceAlerts = typeAlerts.filter(typeAlert =>
       isTriggered(typeAlert, instanceData)
     );
+    if (instanceAlerts.length === 0) {
+      return <div>none</div>;
+    }
+
     return (
       <div>
         {instanceAlerts.map(typeAlert => (
-          <div key={typeAlert.name}>{typeAlert.name}</div>
+          <div className="alert" key={typeAlert.name}>
+            {typeAlert.name}
+          </div>
         ))}
       </div>
     );
@@ -157,7 +163,7 @@ class ChildInstances extends Component<PropsType> {
 
     return (
       <div>
-        <div className="node-name">
+        <h3 className="node-name">
           {typeName} {node.name}
           <Button
             className="edit-properties"
@@ -165,7 +171,7 @@ class ChildInstances extends Component<PropsType> {
             onClick={() => this.editProperties()}
             tooltip="edit properties"
           />
-        </div>
+        </h3>
 
         <h4>Properties</h4>
         {this.renderProperties()}
@@ -214,7 +220,6 @@ class ChildInstances extends Component<PropsType> {
   render() {
     return (
       <section className="child-instances">
-        <h3>Child View</h3>
         {this.renderGuts()}
       </section>
     );

@@ -11,7 +11,7 @@ import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {AlertTypeType, NodeType, StateType, UiType} from '../types';
 
-//import './child-types.css';
+import './child-types.css';
 
 type PropsType = {
   typeNode: NodeType,
@@ -81,9 +81,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
 
   renderGuts() {
     const {typeNode} = this.props;
-    if (!typeNode) {
-      return <div key="no-selection">Select a type from the left nav.</div>;
-    }
+    if (!typeNode) return null;
 
     const {alertTypes} = this.state;
     return (
@@ -147,7 +145,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
       <td>{alertType.expression}</td>
       <td className="actions-column">
         <Button
-          className="delete-alert-type"
+          className="delete"
           icon="trash-o"
           onClick={() => this.deleteAlertType(alertType)}
           tooltip="delete alert type"

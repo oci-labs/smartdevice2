@@ -166,26 +166,4 @@ insert into type (id, name, parentId) values
 
 insert into instance (id, name, organizationId, typeId)
 values (1, 'Creve Coeur', 1, 1);
-
-insert into instance (id, name, organizationId, parentId, typeId) values
-  (2, 'IIOT', 1, 1, 2),
-  (3, 'demo-machine', 1, 2, 3),
-  (4, 'valve-a', 1, 3, 4),
-  (5, 'valve-b', 1, 3, 4);
-
-insert into instance_data (instanceId, dataKey, dataValue) values
-  (4, 'pressure', '300'),
-  (4, 'temperature', '90'),
-  (5, 'pressure', '310'),
-  (5, 'temperature', '30');
-
-insert into alert_type (id, name) values
-  (1, 'high pressure'),
-  (2, 'low pressure'),
-  (3, 'high temperature'),
-  (4, 'low temperature');
-
-insert into alert_condition (id, alertTypeId, expression, typeId) values
-  (1, 1, '> 300', 4), -- high pressure in a valve
-  (2, 4, '< 40', 4); -- low temperature in a valve
 */

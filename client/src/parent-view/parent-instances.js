@@ -26,7 +26,7 @@ class ParentInstances extends Component<PropsType> {
     const {instanceNode, instanceNodeMap} = this.props;
     if (!instanceNode) {
       return (
-        <div key="no-selection">Select an instance from the left nav.</div>
+        <div key="no-selection">Select an instance in the left nav.</div>
       );
     }
 
@@ -47,7 +47,6 @@ class ParentInstances extends Component<PropsType> {
   render() {
     return (
       <section className="parent-instances">
-        <h3 key="title">Parent View</h3>
         {this.renderSelection()}
       </section>
     );

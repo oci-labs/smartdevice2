@@ -80,7 +80,7 @@ class ParentTypes extends Component<PropsType, MyStateType> {
   renderGuts() {
     const {typeNode} = this.props;
     if (!typeNode) {
-      return <div key="no-selection">Select a type from the left nav.</div>;
+      return <div key="no-selection">Select a type in the left nav.</div>;
     }
 
     const {typeProps} = this.state;
@@ -145,7 +145,7 @@ class ParentTypes extends Component<PropsType, MyStateType> {
       <td>{typeProp.kind}</td>
       <td className="actions-column">
         <Button
-          className="delete-prop"
+          className="delete"
           icon="trash-o"
           onClick={() => this.deleteProp(typeProp)}
           tooltip="delete property"
