@@ -1,23 +1,21 @@
 // @flow
 
-import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
-import {getJson, postJson} from '../util/rest-util';
+import {postJson} from '../util/rest-util';
 import {hideModal} from '../share/sd-modal';
 
 import type {
-  InstanceDataType,
   NodeType,
   PrimitiveType,
   PropertyType,
   StateType
 } from '../types';
 
-//import './property-form.css';
+import './property-form.css';
 
 type PropsType = {
   instanceData: Object,
@@ -25,48 +23,7 @@ type PropsType = {
   typeProps: PropertyType[]
 };
 
-function getData(node: NodeType) {
-  return getJson(`instances/${node.id}/data`);
-}
-
-function getType(node: NodeType): Promise<NodeType> {
-  const {typeId} = node;
-  if (!typeId) {
-    throw new Error(`instance ${node.name} has no type id`);
-  }
-
-  const json = getJson(`type/${typeId}`);
-  return ((json: any): Promise<NodeType>);
-}
-
 class PropertyForm extends Component<PropsType> {
-  //async componentWillReceiveProps(nextProps: PropsType) {
-  async componentDidMount() {
-    //const {node} = nextProps;
-    const {node} = this.props;
-    if (!node) return;
-
-    /*
-    // If the same node has already been processed ...
-    const prevNode = this.props.node;
-    if (prevNode && node.id === prevNode.id) return;
-    */
-
-    const type = await getType(node);
-    dispatch('setTypeName', type.name);
-    this.loadTypeProps(type);
-
-    const json = await getData(node);
-    let data = ((json: any): InstanceDataType[]);
-    // Change the shape of this data
-    // from an array of InstanceDataType objects
-    // to an object with key/value pairs (map).
-    data = data.reduce((map, d) => {
-      map[d.dataKey] = d.dataValue;
-      return map;
-    }, {});
-    dispatch('setInstanceData', data);
-  }
 
   getInput = (property: PropertyType, value: PrimitiveType) => {
     const {kind, name} = property;
@@ -97,16 +54,6 @@ class PropertyForm extends Component<PropsType> {
     );
   };
 
-  async loadTypeProps(typeNode: ?NodeType) {
-    console.log('property-form.js loadTypeProps: typeNode =', typeNode);
-    if (!typeNode) return;
-
-    const json = await getJson(`types/${typeNode.id}/data`);
-    const properties = ((json: any): PropertyType[]);
-    const sortedProperties = sortBy(properties, ['name']);
-    dispatch('setTypeProps', sortedProperties);
-  }
-
   renderTableHead = () => (
     <thead>
       <tr>
@@ -135,7 +82,7 @@ class PropertyForm extends Component<PropsType> {
     const {instanceData, node} = this.props;
     await postJson(`instances/${node.id}/data`, instanceData);
     // Clear the instance data.  Is this needed?
-    dispatch('setInstanceData', {});
+    //dispatch('setInstanceData', {});
 
     hideModal();
   };
@@ -145,7 +92,7 @@ class PropertyForm extends Component<PropsType> {
     if (!typeProps) return null;
 
     return (
-      <div className="child-instances-modal">
+      <div className="property-form">
         <table>
           {this.renderTableHead()}
           <tbody>

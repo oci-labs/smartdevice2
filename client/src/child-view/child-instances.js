@@ -24,10 +24,6 @@ type PropsType = {
   typeName: string
 };
 
-type MyStateType = {
-  typeProps: PropertyType[]
-};
-
 function getAlerts(node: NodeType) {
   return getJson(`alerts/${node.id}`);
 }
@@ -46,12 +42,14 @@ function getType(node: NodeType): Promise<NodeType> {
   return ((json: any): Promise<NodeType>);
 }
 
-class ChildInstances extends Component<PropsType, MyStateType> {
-  state: MyStateType = {
-    typeProps: []
-  };
+class ChildInstances extends Component<PropsType> {
 
-  async componentWillReceiveProps(nextProps: PropsType) {
+  componentDidMount() {
+    const {node} = this.props;
+    this.loadData(node);
+  }
+
+  componentWillReceiveProps(nextProps: PropsType) {
     const {node} = nextProps;
     if (!node) return;
 
@@ -59,13 +57,28 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     const prevNode = this.props.node;
     if (prevNode && node.id === prevNode.id) return;
 
+    this.loadData(node);
+  }
+
+  editProperties = () => {
+    const {node} = this.props;
+    const renderFn = () => <PropertyForm />;
+    showModal(node.name + ' Properties', '', renderFn);
+  };
+
+  async loadData(node: NodeType) {
     const type = await getType(node);
-    dispatch('setTypeName', type.name);
-    this.loadTypeProps(type);
+    //dispatch('setTypeName', type.name);
 
     const alerts = await getAlerts(node);
     dispatch('setInstanceAlerts', alerts);
 
+    this.loadTypeProps(type);
+
+    this.loadInstanceData(node);
+  }
+
+  async loadInstanceData(node: NodeType) {
     const json = await getData(node);
     let data = ((json: any): InstanceDataType[]);
     // Change the shape of this data
@@ -78,19 +91,13 @@ class ChildInstances extends Component<PropsType, MyStateType> {
     dispatch('setInstanceData', data);
   }
 
-  editProperties = () => {
-    const {node} = this.props;
-    const renderFn = () => <PropertyForm />;
-    showModal(node.name + ' Properties', '', renderFn);
-  };
-
   async loadTypeProps(typeNode: ?NodeType) {
     if (!typeNode) return;
 
     const json = await getJson(`types/${typeNode.id}/data`);
     const properties = ((json: any): PropertyType[]);
     const sortedProperties = sortBy(properties, ['name']);
-    this.setState({typeProps: sortedProperties});
+    dispatch('setTypeProps', sortedProperties);
   }
 
   renderGuts = () => {
