@@ -207,4 +207,5 @@ describe('reducer', () => {
   });
 
   test('setTypeName', () => testSetUiProp('typeName'));
+  test('setTypeProps', () => testSetUiProp('typeProps'));
 });

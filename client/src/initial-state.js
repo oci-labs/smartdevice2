@@ -12,7 +12,7 @@ const state: StateType = {
   ui: {
     editedName: '',
     editingNode: null,
-    editingProperties: {},
+    typeProps: null,
     instanceName: '',
     modal: {
       message: '',

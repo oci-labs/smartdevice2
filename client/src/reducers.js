@@ -13,6 +13,7 @@ import type {
   NodeMapType,
   NodePayloadType,
   NodeType,
+  PropertyType,
   SetNodesPayloadType,
   StateType
 } from './types';
@@ -240,6 +241,10 @@ addReducer('setTreeType', (state: StateType, value: string): StateType =>
 
 addReducer('setTypeName', (state: StateType, value: string): StateType =>
   setUiProp(state, 'typeName', value)
+);
+
+addReducer('setTypeProps', (state: StateType, typeProps: PropertyType[]) =>
+  setUiProp(state, 'typeProps', typeProps)
 );
 
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {

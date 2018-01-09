@@ -96,7 +96,8 @@ export type UiType = {
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,
   treeType: TreeType,
-  typeName: string
+  typeName: string,
+  typeProps: PropertyType[]
 };
 
 export type UserType = {
