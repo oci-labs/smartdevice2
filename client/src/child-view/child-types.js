@@ -73,7 +73,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
   async loadAlertTypes(typeNode: ?NodeType) {
     if (!typeNode) return;
 
-    const json = await getJson(`types/${typeNode.id}/alert`);
+    const json = await getJson(`types/${typeNode.id}/alerts`);
     const alertTypes = ((json: any): AlertTypeType[]);
     const sortedAlertTypes = sortBy(alertTypes, ['name']);
     this.setState({alertTypes: sortedAlertTypes});
