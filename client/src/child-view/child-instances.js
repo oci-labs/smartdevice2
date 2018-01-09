@@ -133,7 +133,7 @@ class ChildInstances extends Component<PropsType> {
   };
 
   renderProperties = () => {
-    const {instanceData} = this.props;
+    const {instanceData, typeProps} = this.props;
     return (
       <table className="property-table">
         <thead>
@@ -143,22 +143,25 @@ class ChildInstances extends Component<PropsType> {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(instanceData).map(([key, value]) =>
-            this.renderProperty(key, value))}
+          {typeProps.map(typeProp =>
+            this.renderProperty(typeProp, instanceData)
+          )}
         </tbody>
       </table>
     );
   };
 
-  renderProperty = (key, value) => {
-    const {typeProps} = this.props;
-    const typeProp = typeProps.find(tp => tp.name === key);
-    const isBoolean = typeProp && typeProp.kind === 'boolean';
-    value = isBoolean ? Boolean(Number(value)) : value;
+  renderProperty = (typeProp: PropertyType, instanceData: Object) => {
+    const {name} = typeProp;
+    let value = instanceData[name];
+    const isBoolean = typeProp.kind === 'boolean';
+    value = isBoolean
+      ? Boolean(Number(value))
+      : value === undefined ? 'unset' : value;
 
     return (
-      <tr key={key}>
-        <td>{key}</td>
+      <tr key={name}>
+        <td>{name}</td>
         <td>{String(value)}</td>
       </tr>
     );
