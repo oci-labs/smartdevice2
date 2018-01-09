@@ -58,8 +58,16 @@ function isTriggered(alertType: AlertTypeType, instanceData: Object): boolean {
     ([key, value]) => `const ${key} = ${String(value)};`
   );
   const code = assignments.join(' ') + ' ' + alertType.expression;
-  // eslint-disable-next-line no-eval
-  return eval(code);
+  try {
+    // eslint-disable-next-line no-eval
+    return eval(code);
+  } catch (e) {
+    // If the expression references properties that are not set,
+    // a ReferenceError will thrown.
+    // For now we assume the alert is not triggered.
+    if (e instanceof ReferenceError) return false;
+    throw e;
+  }
 }
 
 class ChildInstances extends Component<PropsType> {
