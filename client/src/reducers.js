@@ -8,6 +8,7 @@ import {showModal} from './share/sd-modal';
 import type {
   AddNodePayloadType,
   AlertType,
+  AlertTypeType,
   ModalType,
   NewNodeNamePayloadType,
   NodeMapType,
@@ -245,6 +246,10 @@ addReducer('setNewPropType', (state: StateType, value: string) =>
 
 addReducer('setTreeType', (state: StateType, value: string): StateType =>
   setUiProp(state, 'treeType', value)
+);
+
+addReducer('setTypeAlerts', (state: StateType, typeAlerts: AlertTypeType[]) =>
+  setUiProp(state, 'typeAlerts', typeAlerts)
 );
 
 addReducer('setTypeName', (state: StateType, value: string): StateType =>

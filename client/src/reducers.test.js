@@ -208,6 +208,7 @@ describe('reducer', () => {
     expect(newState.ui.selectedTypeNodeId).toBe(0);
   });
 
+  test('setTypeAlerts', () => testSetUiProp('typeAlerts'));
   test('setTypeName', () => testSetUiProp('typeName'));
   test('setTypeProps', () => testSetUiProp('typeProps'));
 });

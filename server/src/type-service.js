@@ -42,7 +42,7 @@ async function getTypeDataHandler(
 function typeService(app: express$Application, mySql: MySqlConnection): void {
   const URL_PREFIX = '/types/:typeId/';
   app.get(URL_PREFIX + 'data', getTypeDataHandler.bind(null, mySql));
-  app.get(URL_PREFIX + 'alert', getTypeAlertsHandler.bind(null, mySql));
+  app.get(URL_PREFIX + 'alerts', getTypeAlertsHandler.bind(null, mySql));
 }
 
 module.exports = {

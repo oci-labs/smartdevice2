@@ -105,6 +105,7 @@ export type UiType = {
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,
   treeType: TreeType,
+  typeAlerts: AlertTypeType[],
   typeName: string,
   typeProps: PropertyType[]
 };

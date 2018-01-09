@@ -28,6 +28,7 @@ const state: StateType = {
     // Need to start with treeType set to "type"
     // to force loading of typeNodeMap in Redux.
     treeType: 'type',
+    typeAlerts: [],
     typeName: '',
     typeProps: []
   },

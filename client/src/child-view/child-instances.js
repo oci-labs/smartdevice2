@@ -11,6 +11,7 @@ import {getJson} from '../util/rest-util';
 import {showModal} from '../share/sd-modal';
 
 import type {
+  AlertTypeType,
   InstanceDataType,
   NodeType,
   PropertyType,
@@ -22,6 +23,7 @@ import './child-instances.css';
 type PropsType = {
   instanceData: Object,
   node: NodeType,
+  typeAlerts: AlertTypeType[],
   typeName: string,
   typeProps: PropertyType[]
 };
@@ -49,6 +51,15 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
 
   const json = await getJson(`type/${typeId}`);
   return ((json: any): Promise<NodeType>);
+}
+
+function isTriggered(alertType: AlertTypeType, instanceData: Object): boolean {
+  const assignments = Object.entries(instanceData).map(
+    ([key, value]) => `const ${key} = ${String(value)};`
+  );
+  const code = assignments.join(' ') + ' ' + alertType.expression;
+  // eslint-disable-next-line no-eval
+  return eval(code);
 }
 
 class ChildInstances extends Component<PropsType> {
@@ -81,6 +92,8 @@ class ChildInstances extends Component<PropsType> {
     const alerts = await getAlerts(instanceNode);
     dispatch('setInstanceAlerts', alerts);
 
+    this.loadTypeAlerts(typeNode);
+
     this.loadTypeProps(typeNode);
 
     this.loadInstanceData(instanceNode);
@@ -98,6 +111,15 @@ class ChildInstances extends Component<PropsType> {
     dispatch('setInstanceData', data);
   }
 
+  async loadTypeAlerts(typeNode: ?NodeType) {
+    if (!typeNode) return;
+
+    const json = await getJson(`types/${typeNode.id}/alerts`);
+    const alerts = ((json: any): AlertTypeType[]);
+    const sortedAlerts = sortBy(alerts, ['name']);
+    dispatch('setTypeAlerts', sortedAlerts);
+  }
+
   async loadTypeProps(typeNode: ?NodeType) {
     if (!typeNode) return;
 
@@ -106,6 +128,20 @@ class ChildInstances extends Component<PropsType> {
     const sortedProperties = sortBy(properties, ['name']);
     dispatch('setTypeProps', sortedProperties);
   }
+
+  renderAlerts = () => {
+    const {instanceData, typeAlerts} = this.props;
+    const instanceAlerts = typeAlerts.filter(typeAlert =>
+      isTriggered(typeAlert, instanceData)
+    );
+    return (
+      <div>
+        {instanceAlerts.map(typeAlert => (
+          <div key={typeAlert.name}>{typeAlert.name}</div>
+        ))}
+      </div>
+    );
+  };
 
   renderGuts = () => {
     const {node, typeName} = this.props;
@@ -127,7 +163,7 @@ class ChildInstances extends Component<PropsType> {
         {this.renderProperties()}
 
         <h4>Alerts</h4>
-        {/* Iterate over alerts in Redux. */}
+        {this.renderAlerts()}
       </div>
     );
   };
@@ -179,9 +215,9 @@ class ChildInstances extends Component<PropsType> {
 
 const mapState = (state: StateType): PropsType => {
   const {instanceData, instanceNodeMap, ui} = state;
-  const {selectedChildNodeId, typeName, typeProps} = ui;
+  const {selectedChildNodeId, typeAlerts, typeName, typeProps} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
-  return {instanceData, node, typeName, typeProps};
+  return {instanceData, node, typeAlerts, typeName, typeProps};
 };
 
 export default connect(mapState)(ChildInstances);
