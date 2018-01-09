@@ -12,7 +12,6 @@ const state: StateType = {
   ui: {
     editedName: '',
     editingNode: null,
-    typeProps: null,
     instanceName: '',
     modal: {
       message: '',
@@ -24,8 +23,11 @@ const state: StateType = {
     selectedChildNodeId: 0,
     selectedInstanceNodeId: 0,
     selectedTypeNodeId: 0,
-    treeType: 'instance',
-    typeName: ''
+    // Need to start with treeType set to "type"
+    // to force loading of typeNodeMap in Redux.
+    treeType: 'type',
+    typeName: '',
+    typeProps: []
   },
   user: {
     confirmEmail: '',

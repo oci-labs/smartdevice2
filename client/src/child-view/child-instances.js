@@ -20,30 +20,38 @@ import type {
 import './child-instances.css';
 
 type PropsType = {
+  instanceData: Object,
   node: NodeType,
-  typeName: string
+  typeName: string,
+  typeProps: PropertyType[]
 };
 
 function getAlerts(node: NodeType) {
+  if (!node) return;
+
   return getJson(`alerts/${node.id}`);
 }
 
-function getData(node: NodeType) {
-  return getJson(`instances/${node.id}/data`);
+function getData(node: NodeType): InstanceDataType[] {
+  if (!node) return [];
+
+  const json = getJson(`instances/${node.id}/data`);
+  return ((json: any): InstanceDataType[]);
 }
 
-function getType(node: NodeType): Promise<NodeType> {
+async function getTypeNode(node: NodeType): Promise<?NodeType> {
+  if (!node) return null;
+
   const {typeId} = node;
   if (!typeId) {
     throw new Error(`instance ${node.name} has no type id`);
   }
 
-  const json = getJson(`type/${typeId}`);
+  const json = await getJson(`type/${typeId}`);
   return ((json: any): Promise<NodeType>);
 }
 
 class ChildInstances extends Component<PropsType> {
-
   componentDidMount() {
     const {node} = this.props;
     this.loadData(node);
@@ -66,21 +74,20 @@ class ChildInstances extends Component<PropsType> {
     showModal(node.name + ' Properties', '', renderFn);
   };
 
-  async loadData(node: NodeType) {
-    const type = await getType(node);
-    //dispatch('setTypeName', type.name);
+  async loadData(instanceNode: NodeType) {
+    const typeNode = await getTypeNode(instanceNode);
+    dispatch('setTypeName', typeNode ? typeNode.name : '');
 
-    const alerts = await getAlerts(node);
+    const alerts = await getAlerts(instanceNode);
     dispatch('setInstanceAlerts', alerts);
 
-    this.loadTypeProps(type);
+    this.loadTypeProps(typeNode);
 
-    this.loadInstanceData(node);
+    this.loadInstanceData(instanceNode);
   }
 
-  async loadInstanceData(node: NodeType) {
-    const json = await getData(node);
-    let data = ((json: any): InstanceDataType[]);
+  async loadInstanceData(instanceNode: NodeType) {
+    let data = await getData(instanceNode);
     // Change the shape of this data
     // from an array of InstanceDataType objects
     // to an object with key/value pairs (map).
@@ -115,9 +122,45 @@ class ChildInstances extends Component<PropsType> {
             tooltip="edit properties"
           />
         </div>
-        <h3>Alerts</h3>
+
+        <h4>Properties</h4>
+        {this.renderProperties()}
+
+        <h4>Alerts</h4>
         {/* Iterate over alerts in Redux. */}
       </div>
+    );
+  };
+
+  renderProperties = () => {
+    const {instanceData} = this.props;
+    return (
+      <table className="property-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(instanceData).map(([key, value]) =>
+            this.renderProperty(key, value))}
+        </tbody>
+      </table>
+    );
+  };
+
+  renderProperty = (key, value) => {
+    const {typeProps} = this.props;
+    const typeProp = typeProps.find(tp => tp.name === key);
+    const isBoolean = typeProp && typeProp.kind === 'boolean';
+    value = isBoolean ? Boolean(Number(value)) : value;
+
+    return (
+      <tr key={key}>
+        <td>{key}</td>
+        <td>{String(value)}</td>
+      </tr>
     );
   };
 
@@ -132,10 +175,10 @@ class ChildInstances extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {instanceNodeMap, ui} = state;
-  const {selectedChildNodeId, typeName} = ui;
+  const {instanceData, instanceNodeMap, ui} = state;
+  const {selectedChildNodeId, typeName, typeProps} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
-  return {node, typeName};
+  return {instanceData, node, typeName, typeProps};
 };
 
 export default connect(mapState)(ChildInstances);
