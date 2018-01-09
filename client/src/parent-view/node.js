@@ -9,6 +9,7 @@ import type {NodeType} from '../types';
 import './node.css';
 
 type PropsType = {
+  isSelected: boolean,
   node: NodeType
 };
 
@@ -19,9 +20,12 @@ class Node extends Component<PropsType> {
   };
 
   render() {
-    const {node} = this.props;
+    const {isSelected, node} = this.props;
+    let className = 'node';
+    if (isSelected) className += ' selected';
+
     return (
-      <div className="node" onClick={this.select}>
+      <div className={className} onClick={this.select}>
         <div className="circle">{node.name}</div>
         {getType(node)}
       </div>

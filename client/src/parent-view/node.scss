@@ -15,4 +15,10 @@ $size: $radius * 2 - $borderSize * 2;
     margin-bottom: 10px;
     width: $size;
   }
+
+  &.selected {
+    .circle {
+      border-color: green;
+    }
+  }
 }

@@ -12,11 +12,15 @@ import './parent-instances.css';
 
 type PropsType = {
   instanceNodeMap: NodeMapType,
-  instanceNode: ?NodeType
+  instanceNode: ?NodeType,
+  selectedChildNodeId: number
 };
 
 class ParentInstances extends Component<PropsType> {
-  renderChild = (child: NodeType) => <Node key={child.id} node={child} />;
+  renderChild = (child: NodeType) => {
+    const isSelected = child.id === this.props.selectedChildNodeId;
+    return <Node key={child.id} isSelected={isSelected} node={child} />;
+  }
 
   renderSelection = () => {
     const {instanceNode, instanceNodeMap} = this.props;
@@ -52,9 +56,9 @@ class ParentInstances extends Component<PropsType> {
 
 const mapState = (state: StateType): PropsType => {
   const {instanceNodeMap, ui} = state;
-  const {selectedInstanceNodeId} = ui;
+  const {selectedChildNodeId, selectedInstanceNodeId} = ui;
   const instanceNode = instanceNodeMap[selectedInstanceNodeId];
-  return {instanceNode, instanceNodeMap};
+  return {instanceNode, instanceNodeMap, selectedChildNodeId};
 };
 
 export default connect(mapState)(ParentInstances);
