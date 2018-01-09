@@ -18,6 +18,8 @@ const state: StateType = {
       open: false,
       title: ''
     },
+    newAlertExpression: '',
+    newAlertName: '',
     newPropName: '',
     newPropType: 'number',
     selectedChildNodeId: 0,

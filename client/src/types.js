@@ -13,6 +13,13 @@ export type AddNodePayloadType = {
   typeId?: number
 };
 
+export type AlertTypeType = {
+  name: string,
+  expression: string,
+  id: number,
+  typeId: number
+};
+
 export type NewNodeNamePayloadType = {
   kind: TreeType,
   name: string
@@ -90,6 +97,8 @@ export type UiType = {
   editingNode: ?NodeType, // within type or instance tree
   instanceName: string,
   modal: ModalType,
+  newAlertExpression: string,
+  newAlertName: string,
   newPropName: string,
   newPropType: string,
   selectedChildNodeId: number,

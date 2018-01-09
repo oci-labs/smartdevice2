@@ -219,6 +219,14 @@ addReducer('setModal', (state: StateType, modal: ModalType) =>
   setUiProp(state, 'modal', modal)
 );
 
+addReducer('setNewAlertExpression', (state: StateType, value: string) =>
+  setUiProp(state, 'newAlertExpression', value)
+);
+
+addReducer('setNewAlertName', (state: StateType, value: string) =>
+  setUiProp(state, 'newAlertName', value)
+);
+
 addReducer(
   'setNewNodeName',
   (state: StateType, payload: NewNodeNamePayloadType): StateType => {

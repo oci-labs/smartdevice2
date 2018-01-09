@@ -5,6 +5,23 @@ const MySqlConnection = require('mysql-easier');
 
 const {errorHandler} = require('./util/error-util');
 
+async function getTypeAlertsHandler(
+  mySql: MySqlConnection,
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {typeId} = req.params;
+  const sql = 'select * from alert_type where typeId = ?';
+  try {
+    const conditions = await mySql.query(sql, typeId);
+    const sorted = sortBy(conditions, ['name']);
+    res.send(sorted);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
 async function getTypeDataHandler(
   mySql: MySqlConnection,
   req: express$Request,
@@ -23,8 +40,9 @@ async function getTypeDataHandler(
 }
 
 function typeService(app: express$Application, mySql: MySqlConnection): void {
-  const URL_PREFIX = '/types/:typeId/data';
-  app.get(URL_PREFIX, getTypeDataHandler.bind(null, mySql));
+  const URL_PREFIX = '/types/:typeId/';
+  app.get(URL_PREFIX + 'data', getTypeDataHandler.bind(null, mySql));
+  app.get(URL_PREFIX + 'alert', getTypeAlertsHandler.bind(null, mySql));
 }
 
 module.exports = {

@@ -53,6 +53,13 @@ class ParentTypes extends Component<PropsType, MyStateType> {
     if (newPropName === '') this.loadTypeProps(typeNode);
   }
 
+  deleteProp = async (typeProp: PropertyType) => {
+    await deleteResource(`type_data/${typeProp.id}`);
+    let {typeProps} = this.state;
+    typeProps = without(typeProps, typeProp);
+    this.setState({typeProps});
+  };
+
   async loadTypeProps(typeNode: ?NodeType) {
     if (!typeNode) return;
 
@@ -61,13 +68,6 @@ class ParentTypes extends Component<PropsType, MyStateType> {
     const sortedTypeProps = sortBy(typeProps, ['name']);
     this.setState({typeProps: sortedTypeProps});
   }
-
-  deleteProp = async (typeProp: PropertyType) => {
-    await deleteResource(`type_data/${typeProp.id}`);
-    let {typeProps} = this.state;
-    typeProps = without(typeProps, typeProp);
-    this.setState({typeProps});
-  };
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewPropName', e.target.value);

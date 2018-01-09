@@ -48,7 +48,6 @@ treeService(app, mySql);
 typeService(app, mySql);
 crudService(app, mySql, 'alert');
 crudService(app, mySql, 'alert_type');
-crudService(app, mySql, 'alert_condition');
 crudService(app, mySql, 'instance');
 crudService(app, mySql, 'instance_data');
 crudService(app, mySql, 'snooze');
@@ -63,5 +62,6 @@ crudService(app, mySql, 'user');
 app.use(morgan('dev'));
 app.use(/^\/$/, healthCheck());
 
+const HOST = 'localhost';
 const PORT = 3001; //process.argv.pop();
-app.listen(PORT, () => console.info('listening on', PORT));
+app.listen(PORT, HOST, () => console.info('listening on', PORT));

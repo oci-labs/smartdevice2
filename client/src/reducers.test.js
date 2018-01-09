@@ -168,6 +168,8 @@ describe('reducer', () => {
   test('setPhone', () => testSetUserProp('phone'));
 
   test('setModal', () => testSetUiProp('modal'));
+  test('setNewAlertExpression', () => testSetUiProp('newAlertExpression'));
+  test('setNewAlertName', () => testSetUiProp('newAlertName'));
   test('setNewPropName', () => testSetUiProp('newPropName'));
   test('setNewPropType', () => testSetUiProp('newPropType'));
 
