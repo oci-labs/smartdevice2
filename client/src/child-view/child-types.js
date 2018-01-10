@@ -34,7 +34,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
     if (!typeNode) return;
 
     const alertType = {
-      name: newAlertName,
+      name: newAlertName.trim(),
       expression: newAlertExpression,
       typeId: typeNode.id
     };
