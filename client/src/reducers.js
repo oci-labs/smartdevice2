@@ -230,6 +230,10 @@ addReducer('setNewAlertName', (state: StateType, value: string) =>
   setUiProp(state, 'newAlertName', value)
 );
 
+addReducer('setNewAlertSticky', (state: StateType, value: boolean) =>
+  setUiProp(state, 'newAlertSticky', value)
+);
+
 addReducer(
   'setNewNodeName',
   (state: StateType, payload: NewNodeNamePayloadType): StateType => {

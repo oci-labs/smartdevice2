@@ -19,6 +19,7 @@ const state: StateType = {
     },
     newAlertExpression: '',
     newAlertName: '',
+    newAlertSticky: false,
     newPropName: '',
     newPropType: 'number',
     selectedChildNodeId: 0,

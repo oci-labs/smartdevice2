@@ -38,7 +38,6 @@ function haveNodeMap(kind: TreeType): boolean {
 }
 
 class TreeBuilder extends Component<PropsType> {
-
   componentDidMount() {
     this.load(this.props.kind);
   }

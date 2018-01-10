@@ -5,9 +5,7 @@
  * of an HTML input to prevent entry of
  * values that are not valid JavaScript names.
  */
-export function spaceHandler(
-  e: SyntheticKeyboardEvent<HTMLInputElement>
-) {
+export function spaceHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   // $FlowFixMe - doesn't think target.value exists
   const {keyCode, target: {value}} = e;
   if (keyCode !== 32) return;
@@ -26,9 +24,7 @@ export function spaceHandler(
  * of an HTML input to prevent entry of
  * values that are not valid JavaScript names.
  */
-export function validNameHandler(
-  e: SyntheticKeyboardEvent<HTMLInputElement>
-) {
+export function validNameHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   // $FlowFixMe - doesn't think target.value exists
   const {keyCode, target: {value}} = e;
 

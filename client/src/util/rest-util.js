@@ -2,9 +2,7 @@
 
 import {OK, handleError} from '../util/error-util';
 
-export async function deleteResource(
-  urlSuffix: string
-): Promise<void> {
+export async function deleteResource(urlSuffix: string): Promise<void> {
   const url = getUrlPrefix() + urlSuffix;
   const options = {method: 'DELETE'};
   const res = await fetch(url, options);

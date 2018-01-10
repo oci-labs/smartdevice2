@@ -33,7 +33,6 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
-
   deleteNode = async (node: NodeType) => {
     const {kind} = this.props;
     await deleteResource(`tree/${kind}/${node.id}`);

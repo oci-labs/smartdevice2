@@ -32,7 +32,6 @@ function pad2(n: number) {
 }
 
 class Alert extends Component<PropsType> {
-
   deleteAlert = () => {
     const {alert} = this.props;
     if (!alert) return;

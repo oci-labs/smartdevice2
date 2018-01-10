@@ -24,24 +24,28 @@ type MyStateType = {
 };
 
 class ChildTypes extends Component<PropsType, MyStateType> {
-
   state: MyStateType = {
     alertTypes: []
   };
 
   addAlertType = async () => {
-    const {typeNode, ui: {newAlertExpression, newAlertName}} = this.props;
+    const {
+      typeNode,
+      ui: {newAlertExpression, newAlertName, newAlertSticky}
+    } = this.props;
     if (!typeNode) return;
 
     const alertType = {
       name: newAlertName.trim(),
       expression: newAlertExpression,
+      sticky: newAlertSticky,
       typeId: typeNode.id
     };
     await postJson('alert_type', alertType);
 
     dispatch('setNewAlertName', '');
     dispatch('setNewAlertExpression', '');
+    dispatch('setNewAlertSticky', false);
   };
 
   alertExpressionChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -50,6 +54,10 @@ class ChildTypes extends Component<PropsType, MyStateType> {
 
   alertNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewAlertName', e.target.value);
+  };
+
+  alertStickyChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
+    dispatch('setNewAlertSticky', e.target.checked);
   };
 
   componentWillMount() {
@@ -76,6 +84,13 @@ class ChildTypes extends Component<PropsType, MyStateType> {
 
     const json = await getJson(`types/${typeNode.id}/alerts`);
     const alertTypes = ((json: any): AlertTypeType[]);
+
+    // Convert sticky properties from number to boolean.
+    alertTypes.forEach(
+      alertType => (alertType.sticky = Boolean(alertType.sticky))
+    );
+    console.log('child-types.js loadAlertTypes: alertTypes =', alertTypes);
+
     const sortedAlertTypes = sortBy(alertTypes, ['name']);
     this.setState({alertTypes: sortedAlertTypes});
   }
@@ -85,6 +100,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
     if (!typeNode) return null;
 
     const {alertTypes} = this.state;
+    console.log('child-types.js renderGuts: alertTypes =', alertTypes);
     return (
       <div>
         <h3>Alerts for type &quot;{typeNode.name}&quot;</h3>
@@ -104,13 +120,14 @@ class ChildTypes extends Component<PropsType, MyStateType> {
       <tr>
         <th>Alert</th>
         <th>Condition</th>
+        <th>Sticky</th>
         <th>Actions</th>
       </tr>
     </thead>
   );
 
   renderTableInputRow = () => {
-    const {ui: {newAlertExpression, newAlertName}} = this.props;
+    const {ui: {newAlertExpression, newAlertName, newAlertSticky}} = this.props;
     return (
       <tr>
         <td>
@@ -126,6 +143,13 @@ class ChildTypes extends Component<PropsType, MyStateType> {
             type="text"
             onChange={this.alertExpressionChange}
             value={newAlertExpression}
+          />
+        </td>
+        <td>
+          <input
+            type="checkbox"
+            onChange={this.alertStickyChange}
+            checked={newAlertSticky}
           />
         </td>
         <td className="actions-column">
@@ -145,6 +169,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
     <tr key={alertType.name}>
       <td>{alertType.name}</td>
       <td>{alertType.expression}</td>
+      <td>{String(alertType.sticky)}</td>
       <td className="actions-column">
         <Button
           className="delete"
@@ -157,11 +182,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
   );
 
   render() {
-    return (
-      <section className="child-types">
-        {this.renderGuts()}
-      </section>
-    );
+    return <section className="child-types">{this.renderGuts()}</section>;
   }
 }
 

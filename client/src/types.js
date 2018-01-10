@@ -31,6 +31,7 @@ export type AlertTypeType = {
   name: string,
   expression: string,
   id: number,
+  sticky: boolean,
   typeId: number
 };
 
@@ -133,6 +134,7 @@ export type UiType = {
   modal: ModalType,
   newAlertExpression: string,
   newAlertName: string,
+  newAlertSticky: boolean,
   newPropName: string,
   newPropType: string,
   selectedChildNodeId: number,

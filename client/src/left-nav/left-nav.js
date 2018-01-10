@@ -21,7 +21,6 @@ type PropsType = {
 };
 
 class LeftNav extends Component<PropsType> {
-
   getTree = () => {
     const {instanceNodeMap, subscriptions, typeNodeMap, ui} = this.props;
     const {editedName, editingNode, instanceName, typeName, treeType} = ui;

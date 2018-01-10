@@ -120,9 +120,7 @@ class ChildInstances extends Component<PropsType> {
     }
 
     return (
-      <div>
-        {alerts.map(alert => <Alert key={alert.name} alert={alert} />)}
-      </div>
+      <div>{alerts.map(alert => <Alert key={alert.name} alert={alert} />)}</div>
     );
   };
 

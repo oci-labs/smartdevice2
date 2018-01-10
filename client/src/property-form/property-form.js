@@ -8,12 +8,7 @@ import Button from '../share/button';
 import {postJson} from '../util/rest-util';
 import {hideModal} from '../share/sd-modal';
 
-import type {
-  NodeType,
-  PrimitiveType,
-  PropertyType,
-  StateType
-} from '../types';
+import type {NodeType, PrimitiveType, PropertyType, StateType} from '../types';
 
 import './property-form.css';
 
@@ -24,7 +19,6 @@ type PropsType = {
 };
 
 class PropertyForm extends Component<PropsType> {
-
   getInput = (property: PropertyType, value: PrimitiveType) => {
     const {kind, name} = property;
 

@@ -21,7 +21,7 @@ class ParentInstances extends Component<PropsType> {
   renderChild = (child: NodeType) => {
     const isSelected = child.id === this.props.selectedChildNodeId;
     return <Node key={child.id} isSelected={isSelected} node={child} />;
-  }
+  };
 
   renderChildren = () => {
     const {instanceNode, instanceNodeMap} = this.props;
@@ -47,14 +47,12 @@ class ParentInstances extends Component<PropsType> {
 
     const isSelected = parent.id === selectedChildNodeId;
     return <Node isSelected={isSelected} node={parent} />;
-  }
+  };
 
   renderSelection = () => {
     const {instanceNode} = this.props;
     if (!instanceNode) {
-      return (
-        <div key="no-selection">Select an instance in the left nav.</div>
-      );
+      return <div key="no-selection">Select an instance in the left nav.</div>;
     }
 
     const type = getType(instanceNode);
@@ -74,9 +72,7 @@ class ParentInstances extends Component<PropsType> {
 
   render() {
     return (
-      <section className="parent-instances">
-        {this.renderSelection()}
-      </section>
+      <section className="parent-instances">{this.renderSelection()}</section>
     );
   }
 }
