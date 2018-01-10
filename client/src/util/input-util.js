@@ -1,6 +1,20 @@
 // @flow
 
 /**
+ * This returns a boolean indicating whether
+ * a string of JavaScript code is "safe".
+ * It determines this by looking for function calls.
+ */
+export function isSafeCode(jsCode: string) {
+  // A function call is ...
+  // one or more word characters,
+  // followed by zero or more whitespace characters,
+  // followed by a left paren.
+  const re = /\w+\s*\(/;
+  return !re.test(jsCode);
+}
+
+/**
  * This can be used for the onKeyDown handler
  * of an HTML input to prevent entry of
  * values that are not valid JavaScript names.

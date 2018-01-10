@@ -76,7 +76,7 @@ class ChildInstances extends Component<PropsType> {
   editProperties = () => {
     const {node} = this.props;
     const renderFn = () => <PropertyForm />;
-    showModal(node.name + ' Properties', '', renderFn);
+    showModal({title: node.name + ' Properties', renderFn});
   };
 
   async loadData(instanceNode: NodeType) {

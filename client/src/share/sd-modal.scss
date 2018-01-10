@@ -13,6 +13,19 @@
   top: 50%;
   transform: translate(-50%, -50%);
 
+  &:focus {
+    outline: none;
+  }
+
+  &.error {
+    border: solid red 2px;
+
+    header {
+      background-color: red;
+      color: white;
+    }
+  }
+
   .body {
     padding: $spacing;
   }

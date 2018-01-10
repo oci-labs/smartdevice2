@@ -59,7 +59,7 @@ function promptForType(name, parent, childTypes: NodeType[]): void {
     </div>
   );
 
-  showModal('Choose Child Type', '', renderFn);
+  showModal({title: 'Choose Child Type', renderFn});
 }
 
 export function addNode(kind: TreeType, name: string, parent: NodeType): void {

@@ -48,11 +48,12 @@ function validNewName(nodeMap: NodeMapType, parentId: number, name: string) {
   const {children} = parentNode;
   const inUse = children.find(id => nodeMap[id].name === name);
   if (inUse) {
-    showModal(
-      'Duplicate Child Name',
-      `The name "${name}" is already in use ` +
+    showModal({
+      title: 'Duplicate Child Name',
+      message:
+        `The name "${name}" is already in use ` +
         `by a child of "${parentNode.name}".`
-    );
+    });
   }
 
   return !inUse;
@@ -169,7 +170,8 @@ addReducer(
 );
 
 addReducer('setAlerts', (state: StateType, alerts: AlertType[]) =>
-  setTopProp(state, 'alerts', alerts));
+  setTopProp(state, 'alerts', alerts)
+);
 
 addReducer('setInstanceData', (state: StateType, data: Object) =>
   setTopProp(state, 'instanceData', data)

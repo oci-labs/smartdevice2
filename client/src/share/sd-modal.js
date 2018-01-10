@@ -9,24 +9,22 @@ import './sd-modal.css';
 
 import type {ModalType, StateType} from '../types';
 
-type PropsType = ModalType & {render?: Function};
+type PropsType = ModalType;
 
-let renderFn;
+let renderFn: ?Function;
 
 export function hideModal(): void {
   renderFn = null;
   dispatch('setModal', {open: false});
 }
 
-export function showModal(
-  title: string,
-  message?: string,
-  fn?: Function
-): void {
+export function showModal(options: ModalType): void {
+  const {error, message, renderFn: fn, title} = options;
   if (fn) renderFn = fn;
+
   // Using a setTimeout allows this to be called from a reducer.
   setTimeout(() => {
-    dispatch('setModal', {open: true, message, title});
+    dispatch('setModal', {error, open: true, message, title});
   });
 }
 
@@ -46,16 +44,17 @@ class SdModal extends Component<PropsType> {
   onCloseModal = () => dispatch('setModal', {open: false});
 
   render() {
-    const {message, open, title} = this.props;
+    const {error, message, open, title} = this.props;
+    let className = 'sd-modal';
+    if (error) className += ' error';
     return (
       <Modal
         ariaHideApp={false}
-        className="sd-modal"
+        className={className}
         isOpen={open}
         onRequestClose={this.onCloseModal}
         ref={modal => (this.modal = modal)}
         shouldCloseOnOverlayClick={false}
-        shouldFocusAfterRender={false}
       >
         <header>
           <div className="title">{title}</div>

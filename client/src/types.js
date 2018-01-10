@@ -77,8 +77,10 @@ export type NodeType = {
 };
 
 export type ModalType = {
-  message: string,
-  open: boolean,
+  error?: boolean,
+  message?: string,
+  open?: boolean,
+  renderFn?: Function,
   title: string
 };
 
