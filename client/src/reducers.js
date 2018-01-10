@@ -98,6 +98,12 @@ addReducer(
   }
 );
 
+addReducer('deleteAlert', (state: StateType, alertId: number) => {
+  const {alerts} = state;
+  const newAlerts = alerts.filter(alert => alert.id !== alertId);
+  return setTopProp(state, 'alerts', newAlerts);
+});
+
 addReducer(
   'deleteNode',
   (state: StateType, payload: NodePayloadType): StateType => {
@@ -162,12 +168,8 @@ addReducer(
   }
 );
 
-addReducer('setAllAlerts', (state: StateType, alerts: AlertType[]) =>
-  setTopProp(state, 'allAlerts', alerts)
-);
-
-addReducer('setInstanceAlerts', (state: StateType, alerts: AlertType[]) =>
-  setTopProp(state, 'instanceAlerts', alerts));
+addReducer('setAlerts', (state: StateType, alerts: AlertType[]) =>
+  setTopProp(state, 'alerts', alerts));
 
 addReducer('setInstanceData', (state: StateType, data: Object) =>
   setTopProp(state, 'instanceData', data)

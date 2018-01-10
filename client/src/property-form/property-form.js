@@ -82,7 +82,7 @@ class PropertyForm extends Component<PropsType> {
     const {instanceData, node} = this.props;
     const res = await postJson(`instances/${node.id}/data`, instanceData);
     const alerts = await res.json();
-    dispatch('setInstanceAlerts', alerts);
+    dispatch('setAlerts', alerts);
     hideModal();
   };
 

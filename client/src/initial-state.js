@@ -3,9 +3,8 @@
 import type {StateType} from './types';
 
 const state: StateType = {
-  allAlerts: [],
+  alerts: [],
   errors: new Set(),
-  instanceAlerts: [],
   instanceData: {},
   instanceNodeMap: {},
   typeNodeMap: {},

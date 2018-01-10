@@ -23,7 +23,7 @@ import type {
 import './child-instances.css';
 
 type PropsType = {
-  instanceAlerts: AlertType[],
+  alerts: AlertType[],
   instanceData: Object,
   node: NodeType,
   typeName: string,
@@ -84,7 +84,7 @@ class ChildInstances extends Component<PropsType> {
     dispatch('setTypeName', typeNode ? typeNode.name : '');
 
     const alerts = await getAlerts(instanceNode);
-    dispatch('setInstanceAlerts', alerts);
+    dispatch('setAlerts', alerts);
 
     this.loadTypeProps(typeNode);
 
@@ -113,15 +113,15 @@ class ChildInstances extends Component<PropsType> {
   }
 
   renderAlerts = () => {
-    const {instanceAlerts} = this.props;
+    const {alerts} = this.props;
 
-    if (instanceAlerts.length === 0) {
+    if (alerts.length === 0) {
       return <div>none</div>;
     }
 
     return (
       <div>
-        {instanceAlerts.map(alert => <Alert key={alert.name} alert={alert} />)}
+        {alerts.map(alert => <Alert key={alert.name} alert={alert} />)}
       </div>
     );
   };
@@ -197,10 +197,10 @@ class ChildInstances extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {instanceAlerts, instanceData, instanceNodeMap, ui} = state;
+  const {alerts, instanceData, instanceNodeMap, ui} = state;
   const {selectedChildNodeId, typeName, typeProps} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
-  return {instanceAlerts, instanceData, node, typeName, typeProps};
+  return {alerts, instanceData, node, typeName, typeProps};
 };
 
 export default connect(mapState)(ChildInstances);

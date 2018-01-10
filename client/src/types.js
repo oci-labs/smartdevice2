@@ -99,9 +99,8 @@ export type SetNodesPayloadType = {
 };
 
 export type StateType = {
-  allAlerts: AlertType[],
+  alerts: AlertType[],
   errors: Set<string>,
-  instanceAlerts: AlertType[],
   instanceData: Object,
   instanceNodeMap: NodeMapType,
   typeNodeMap: NodeMapType,

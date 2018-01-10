@@ -155,8 +155,7 @@ describe('reducer', () => {
     expect(newState.typeNodeMap[childId]).not.toBeDefined();
   });
 
-  test('setAllAlerts', () => testSetTopProp('allAlerts'));
-  test('setInstanceAlerts', () => testSetTopProp('instanceAlerts'));
+  test('setAlerts', () => testSetTopProp('alerts'));
   test('setInstanceData', () => testSetTopProp('instanceData'));
 
   test('setConfirmEmail', () => testSetUserProp('confirmEmail'));

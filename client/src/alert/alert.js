@@ -4,6 +4,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
+import {deleteResource} from '../util/rest-util';
+
 import type {AlertType, NodeMapType, StateType} from '../types';
 
 import './alert.css';
@@ -30,6 +32,15 @@ function pad2(n: number) {
 }
 
 class Alert extends Component<PropsType> {
+
+  deleteAlert = () => {
+    const {alert} = this.props;
+    if (!alert) return;
+
+    deleteResource('alert/' + alert.id);
+    dispatch('deleteAlert', alert.id);
+  };
+
   handleDoubleClick = () => {
     const {alert} = this.props;
     if (!alert) return;
@@ -53,6 +64,9 @@ class Alert extends Component<PropsType> {
       >
         <div className="line1">
           {typeName} {instance.name} ({instanceId})
+          <div className="delete" onClick={this.deleteAlert}>
+            &#10005;
+          </div>
         </div>
         <div className="line2">
           {alert.name}: {formatTimestamp(alert.timestamp)}
