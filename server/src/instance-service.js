@@ -52,7 +52,6 @@ function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
 }
 
 async function getInstanceDataHandler(
-  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -77,11 +76,13 @@ async function getInstanceTypeId(instanceId: number): Promise<number> {
 
 function instanceService(
   app: express$Application,
-  mySql: MySqlConnection
+  connection: MySqlConnection
 ): void {
+  mySql = connection;
+
   const URL_PREFIX = '/instances/:instanceId/data';
-  app.get(URL_PREFIX, getInstanceDataHandler.bind(null, mySql));
-  app.post(URL_PREFIX, postInstanceDataHandler.bind(null, mySql));
+  app.get(URL_PREFIX, getInstanceDataHandler);
+  app.post(URL_PREFIX, postInstanceDataHandler);
 }
 
 function isTriggered(expression: string, instanceData: Object): boolean {
@@ -90,8 +91,13 @@ function isTriggered(expression: string, instanceData: Object): boolean {
   );
   const code = assignments.join(' ') + ' ' + expression;
   try {
+    //TODO: Check for dangerous code.
     // eslint-disable-next-line no-eval
-    return eval(code);
+    const triggered = eval(code);
+    if (triggered) {
+      console.log('instance-service.js isTriggered: code =', code);
+    }
+    return triggered;
   } catch (e) {
     // If the expression references properties that are not set,
     // a ReferenceError will thrown.
@@ -102,12 +108,9 @@ function isTriggered(expression: string, instanceData: Object): boolean {
 }
 
 async function postInstanceDataHandler(
-  connection: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  mySql = connection;
-
   const instanceId = Number(req.params.instanceId);
   const data = req.body;
 

@@ -1,13 +1,16 @@
 // @flow
 
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 
-import type {AlertType} from '../types';
+import type {AlertType, NodeMapType, StateType} from '../types';
 
 import './alert.css';
 
 type PropsType = {
-  alert: AlertType
+  alert?: AlertType,
+  instanceNodeMap: NodeMapType,
+  typeNodeMap: NodeMapType
 };
 
 function formatTimestamp(timestamp: number) {
@@ -28,14 +31,31 @@ function pad2(n: number) {
 class Alert extends Component<PropsType> {
 
   render() {
-    const {alert} = this.props;
+    const {alert, instanceNodeMap, typeNodeMap} = this.props;
+    if (!alert) return null;
+
+    const {instanceId} = alert;
+    const instance = instanceNodeMap[instanceId];
+    const {typeId} = instance;
+    const typeName = typeId ? typeNodeMap[typeId].name : 'unknown';
+
     return (
       <div className="alert" key={alert.name}>
-        {alert.name}:{' '}
-        {formatTimestamp(alert.timestamp)}
+        <div className="line1">
+          {typeName} {instance.name} ({instanceId})
+        </div>
+        <div className="line2">
+          {alert.name}:{' '}
+          {formatTimestamp(alert.timestamp)}
+        </div>
       </div>
     );
   }
 }
 
-export default Alert;
+const mapState = (state: StateType): PropsType => {
+  const {instanceNodeMap, typeNodeMap} = state;
+  return {instanceNodeMap, typeNodeMap};
+};
+
+export default connect(mapState)(Alert);

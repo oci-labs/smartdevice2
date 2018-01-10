@@ -1,7 +1,9 @@
 .alert {
-  background-color: red;
+  $red: #BA2316;
+  background-color: $red;
   border-radius: 5px;
   color: white;
   font-size: 10px;
+  margin-bottom: 5px;
   padding: 5px;
 }
