@@ -21,6 +21,7 @@ export type AddressType = {
 };
 
 export type AlertType = {
+  id: number,
   instanceId: number,
   name: string,
   timestamp: Date

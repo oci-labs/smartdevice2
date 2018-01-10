@@ -5,7 +5,7 @@ import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
-import Node from './node';
+import Node from '../node/node';
 import {getType} from '../tree/tree-util';
 import type {NodeMapType, NodeType, StateType} from '../types';
 
