@@ -3,6 +3,7 @@
 import upperFirst from 'lodash/upperFirst';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
 import {dispatch} from 'redux-easy';
 
 import TreeBuilder from '../tree/tree-builder';
@@ -10,6 +11,7 @@ import TreeBuilder from '../tree/tree-builder';
 import type {NodeMapType, StateType, UiType} from '../types';
 
 import './left-nav.css';
+import 'react-tabs/style/react-tabs.css';
 
 type PropsType = {
   instanceNodeMap: NodeMapType,
@@ -43,32 +45,24 @@ class LeftNav extends Component<PropsType> {
     );
   };
 
-  treeTypeChange = (e: SyntheticInputEvent<HTMLInputElement>) =>
-    dispatch('setTreeType', e.target.value);
+  handleTabSelect = (index: number, lastIndex: number) => {
+    if (index === lastIndex) return;
+    const treeType = index === 0 ? 'type' : 'instance';
+    dispatch('setTreeType', treeType);
+  };
 
   render() {
-    const {treeType} = this.props.ui;
-
+    //const {treeType} = this.props.ui;
     return (
       <section className="left-nav">
-        <div className="tree-radio">
-          <input
-            type="radio"
-            value="type"
-            name="treeType"
-            checked={treeType === 'type'}
-            onChange={this.treeTypeChange}
-          />
-          Type
-          <input
-            type="radio"
-            value="instance"
-            name="treeType"
-            checked={treeType === 'instance'}
-            onChange={this.treeTypeChange}
-          />
-          Instance
-        </div>
+        <Tabs onSelect={this.handleTabSelect}>
+          <TabList>
+            <Tab>Type</Tab>
+            <Tab>Instance</Tab>
+          </TabList>
+          <TabPanel />
+          <TabPanel />
+        </Tabs>
         {this.getTree()}
       </section>
     );
