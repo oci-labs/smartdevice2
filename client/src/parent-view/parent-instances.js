@@ -50,7 +50,7 @@ class ParentInstances extends Component<PropsType> {
   }
 
   renderSelection = () => {
-    const {instanceNode, instanceNodeMap} = this.props;
+    const {instanceNode} = this.props;
     if (!instanceNode) {
       return (
         <div key="no-selection">Select an instance in the left nav.</div>

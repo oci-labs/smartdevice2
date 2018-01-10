@@ -179,7 +179,8 @@ addReducer(
     const prop = 'selectedChildNodeId';
     const oldSelectedId = state.ui[prop];
     const newSelectedId = nodeId !== oldSelectedId ? nodeId : 0;
-    return setUiProp(state, prop, newSelectedId);
+    const newState = setUiProp(state, 'selectedInstanceNodeId', newSelectedId);
+    return setUiProp(newState, prop, newSelectedId);
   }
 );
 
