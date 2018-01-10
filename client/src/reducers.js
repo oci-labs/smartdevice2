@@ -174,11 +174,11 @@ addReducer('setInstanceData', (state: StateType, data: Object) =>
 );
 
 addReducer(
-  'setSelectedChildNode',
-  (state: StateType, node: NodeType): StateType => {
+  'setSelectedChildNodeId',
+  (state: StateType, nodeId: number): StateType => {
     const prop = 'selectedChildNodeId';
     const oldSelectedId = state.ui[prop];
-    const newSelectedId = node && node.id !== oldSelectedId ? node.id : 0;
+    const newSelectedId = nodeId !== oldSelectedId ? nodeId : 0;
     return setUiProp(state, prop, newSelectedId);
   }
 );

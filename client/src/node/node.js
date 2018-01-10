@@ -17,7 +17,7 @@ type PropsType = {
 class Node extends Component<PropsType> {
   select = () => {
     const {node} = this.props;
-    dispatch('setSelectedChildNode', node);
+    dispatch('setSelectedChildNodeId', node.id);
   };
 
   render() {

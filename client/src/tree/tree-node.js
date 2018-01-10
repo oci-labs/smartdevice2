@@ -74,7 +74,7 @@ class TreeNode extends Component<PropsType> {
     const {kind, node} = this.props;
     const payload: NodePayloadType = {kind, node};
     dispatch('setSelectedNode', payload);
-    dispatch('setSelectedChildNode', node);
+    dispatch('setSelectedChildNodeId', node.id);
   };
 
   toggleEdit = () => dispatch('toggleEditNode', this.props.node);

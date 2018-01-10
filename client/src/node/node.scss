@@ -4,14 +4,16 @@ $size: $radius * 2 - $borderSize * 2;
 
 .node {
   display: inline-block;
-  margin: 20px;
+  margin: 0 20px;
   text-align: center;
 
   .circle {
+    align-items: center;
     border: solid lightgray $borderSize;
     border-radius: $radius;
+    display: flex;
     height: $size;
-    line-height: $size;
+    justify-content: center;
     margin-bottom: 10px;
     width: $size;
   }

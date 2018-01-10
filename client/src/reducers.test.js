@@ -173,17 +173,11 @@ describe('reducer', () => {
   test('setNewPropName', () => testSetUiProp('newPropName'));
   test('setNewPropType', () => testSetUiProp('newPropType'));
 
-  test('setSelectedChildNode', () => {
-    const id = 999;
-    const node: NodeType = {
-      id,
-      children: [],
-      name: 'some node',
-      parentId: 0
-    };
-    const action = {type: 'setSelectedChildNode', payload: node};
+  test('setSelectedChildNodeId', () => {
+    const nodeId = 999;
+    const action = {type: 'setSelectedChildNodeId', payload: nodeId};
     let newState = reducer(state, action);
-    expect(newState.ui.selectedChildNodeId).toBe(id);
+    expect(newState.ui.selectedChildNodeId).toBe(nodeId);
 
     // Toggle off.
     newState = reducer(newState, action);

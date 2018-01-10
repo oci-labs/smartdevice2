@@ -2,6 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {dispatch} from 'redux-easy';
 
 import type {AlertType, NodeMapType, StateType} from '../types';
 
@@ -29,6 +30,11 @@ function pad2(n: number) {
 }
 
 class Alert extends Component<PropsType> {
+  handleDoubleClick = () => {
+    const {alert} = this.props;
+    if (!alert) return;
+    dispatch('setSelectedChildNodeId', alert.instanceId);
+  };
 
   render() {
     const {alert, instanceNodeMap, typeNodeMap} = this.props;
@@ -40,13 +46,16 @@ class Alert extends Component<PropsType> {
     const typeName = typeId ? typeNodeMap[typeId].name : 'unknown';
 
     return (
-      <div className="alert" key={alert.id}>
+      <div
+        className="alert"
+        key={alert.id}
+        onDoubleClick={this.handleDoubleClick}
+      >
         <div className="line1">
           {typeName} {instance.name} ({instanceId})
         </div>
         <div className="line2">
-          {alert.name}:{' '}
-          {formatTimestamp(alert.timestamp)}
+          {alert.name}: {formatTimestamp(alert.timestamp)}
         </div>
       </div>
     );

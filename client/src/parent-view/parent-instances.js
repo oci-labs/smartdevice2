@@ -23,6 +23,32 @@ class ParentInstances extends Component<PropsType> {
     return <Node key={child.id} isSelected={isSelected} node={child} />;
   }
 
+  renderChildren = () => {
+    const {instanceNode, instanceNodeMap} = this.props;
+    if (!instanceNode) return;
+
+    const {children} = instanceNode;
+    if (children.length === 0) return <div>none</div>;
+
+    const childNodes = children.map(id => instanceNodeMap[id]);
+    const sortedChildren = sortBy(childNodes, ['name']);
+    return sortedChildren.map(child => this.renderChild(child));
+  };
+
+  renderParent = () => {
+    const {instanceNode, instanceNodeMap, selectedChildNodeId} = this.props;
+    if (!instanceNode) return;
+
+    const {parentId} = instanceNode;
+    if (!parentId) return <div>none</div>;
+
+    const parent = instanceNodeMap[parentId];
+    if (parent.name === 'root') return <div>none</div>;
+
+    const isSelected = parent.id === selectedChildNodeId;
+    return <Node isSelected={isSelected} node={parent} />;
+  }
+
   renderSelection = () => {
     const {instanceNode, instanceNodeMap} = this.props;
     if (!instanceNode) {
@@ -31,16 +57,17 @@ class ParentInstances extends Component<PropsType> {
       );
     }
 
-    const {children} = instanceNode;
-    const childNodes = children.map(id => instanceNodeMap[id]);
-    const sortedChildren = sortBy(childNodes, ['name']);
     const type = getType(instanceNode);
+
     return (
       <div key={instanceNode.id}>
         <h3>
-          {capitalize(type)} &quot;{instanceNode.name}&quot; Children
+          {capitalize(type)} &quot;{instanceNode.name}&quot;
         </h3>
-        {sortedChildren.map(child => this.renderChild(child))}
+        <h4>Children</h4>
+        {this.renderChildren()}
+        <h4>Parent</h4>
+        {this.renderParent()}
       </div>
     );
   };
