@@ -12,7 +12,6 @@ import {showModal} from '../share/sd-modal';
 
 import type {
   AlertType,
-  AlertTypeType,
   InstanceDataType,
   NodeType,
   PropertyType,
@@ -29,10 +28,11 @@ type PropsType = {
   typeProps: PropertyType[]
 };
 
-function getAlerts(node: NodeType) {
-  if (!node) return;
+async function getAlerts(node: NodeType): Promise<AlertType[]> {
+  if (!node) return Promise.resolve([]);
 
-  return getJson(`alerts/${node.id}`);
+  const json = await getJson(`alerts/${node.id}`);
+  return ((json: any): AlertType[]);
 }
 
 function getData(node: NodeType): InstanceDataType[] {
@@ -55,6 +55,7 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
 }
 
 class ChildInstances extends Component<PropsType> {
+
   componentDidMount() {
     const {node} = this.props;
     this.loadData(node);
@@ -84,8 +85,6 @@ class ChildInstances extends Component<PropsType> {
     const alerts = await getAlerts(instanceNode);
     dispatch('setInstanceAlerts', alerts);
 
-    this.loadTypeAlerts(typeNode);
-
     this.loadTypeProps(typeNode);
 
     this.loadInstanceData(instanceNode);
@@ -103,15 +102,6 @@ class ChildInstances extends Component<PropsType> {
     dispatch('setInstanceData', data);
   }
 
-  async loadTypeAlerts(typeNode: ?NodeType) {
-    if (!typeNode) return;
-
-    const json = await getJson(`types/${typeNode.id}/alerts`);
-    const alerts = ((json: any): AlertTypeType[]);
-    const sortedAlerts = sortBy(alerts, ['name']);
-    dispatch('setTypeAlerts', sortedAlerts);
-  }
-
   async loadTypeProps(typeNode: ?NodeType) {
     if (!typeNode) return;
 
@@ -123,6 +113,7 @@ class ChildInstances extends Component<PropsType> {
 
   renderAlerts = () => {
     const {instanceAlerts} = this.props;
+
     if (instanceAlerts.length === 0) {
       return <div>none</div>;
     }

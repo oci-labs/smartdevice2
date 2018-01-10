@@ -80,10 +80,9 @@ class PropertyForm extends Component<PropsType> {
 
   saveProperties = async () => {
     const {instanceData, node} = this.props;
-    await postJson(`instances/${node.id}/data`, instanceData);
-    // Clear the instance data.  Is this needed?
-    //dispatch('setInstanceData', {});
-
+    const res = await postJson(`instances/${node.id}/data`, instanceData);
+    const alerts = await res.json();
+    dispatch('setInstanceAlerts', alerts);
     hideModal();
   };
 

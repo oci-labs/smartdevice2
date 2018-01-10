@@ -167,8 +167,7 @@ addReducer('setAllAlerts', (state: StateType, alerts: AlertType[]) =>
 );
 
 addReducer('setInstanceAlerts', (state: StateType, alerts: AlertType[]) =>
-  setTopProp(state, 'instanceAlerts', alerts)
-);
+  setTopProp(state, 'instanceAlerts', alerts));
 
 addReducer('setInstanceData', (state: StateType, data: Object) =>
   setTopProp(state, 'instanceData', data)

@@ -10,7 +10,10 @@ async function getByInstanceHandler(
   res: express$Response
 ): Promise<void> {
   const {instanceId} = req.params;
-  const sql = 'select * from alert where instanceId = ?';
+  const sql =
+    'select a.instanceId, t.name, a.timestamp ' +
+    'from alert a, alert_type t ' +
+    'where instanceId = ?';
   try {
     const alerts = await mySql.query(sql, instanceId);
     res.send(alerts);
