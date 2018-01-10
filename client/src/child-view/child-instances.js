@@ -11,6 +11,7 @@ import {getJson} from '../util/rest-util';
 import {showModal} from '../share/sd-modal';
 
 import type {
+  AlertType,
   AlertTypeType,
   InstanceDataType,
   NodeType,
@@ -21,9 +22,9 @@ import type {
 import './child-instances.css';
 
 type PropsType = {
+  instanceAlerts: AlertType[],
   instanceData: Object,
   node: NodeType,
-  typeAlerts: AlertTypeType[],
   typeName: string,
   typeProps: PropertyType[]
 };
@@ -51,23 +52,6 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
 
   const json = await getJson(`type/${typeId}`);
   return ((json: any): Promise<NodeType>);
-}
-
-function isTriggered(alertType: AlertTypeType, instanceData: Object): boolean {
-  const assignments = Object.entries(instanceData).map(
-    ([key, value]) => `const ${key} = ${String(value)};`
-  );
-  const code = assignments.join(' ') + ' ' + alertType.expression;
-  try {
-    // eslint-disable-next-line no-eval
-    return eval(code);
-  } catch (e) {
-    // If the expression references properties that are not set,
-    // a ReferenceError will thrown.
-    // For now we assume the alert is not triggered.
-    if (e instanceof ReferenceError) return false;
-    throw e;
-  }
 }
 
 class ChildInstances extends Component<PropsType> {
@@ -138,19 +122,16 @@ class ChildInstances extends Component<PropsType> {
   }
 
   renderAlerts = () => {
-    const {instanceData, typeAlerts} = this.props;
-    const instanceAlerts = typeAlerts.filter(typeAlert =>
-      isTriggered(typeAlert, instanceData)
-    );
+    const {instanceAlerts} = this.props;
     if (instanceAlerts.length === 0) {
       return <div>none</div>;
     }
 
     return (
       <div>
-        {instanceAlerts.map(typeAlert => (
-          <div className="alert" key={typeAlert.name}>
-            {typeAlert.name}
+        {instanceAlerts.map(alert => (
+          <div className="alert" key={alert.name}>
+            {alert.name}
           </div>
         ))}
       </div>
@@ -227,10 +208,10 @@ class ChildInstances extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {instanceData, instanceNodeMap, ui} = state;
-  const {selectedChildNodeId, typeAlerts, typeName, typeProps} = ui;
+  const {instanceAlerts, instanceData, instanceNodeMap, ui} = state;
+  const {selectedChildNodeId, typeName, typeProps} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
-  return {instanceData, node, typeAlerts, typeName, typeProps};
+  return {instanceAlerts, instanceData, node, typeName, typeProps};
 };
 
 export default connect(mapState)(ChildInstances);

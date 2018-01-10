@@ -13,28 +13,6 @@ export type AddNodePayloadType = {
   typeId?: number
 };
 
-export type AlertTypeType = {
-  name: string,
-  expression: string,
-  id: number,
-  typeId: number
-};
-
-export type NewNodeNamePayloadType = {
-  kind: TreeType,
-  name: string
-};
-
-export type NodePayloadType = {
-  kind: TreeType,
-  node: NodeType
-};
-
-export type SetNodesPayloadType = {
-  kind: TreeType,
-  nodes: NodeType[]
-};
-
 export type AddressType = {
   street: string,
   city: string,
@@ -44,8 +22,15 @@ export type AddressType = {
 
 export type AlertType = {
   instanceId: number,
-  message: string,
-  severity?: number
+  name: string,
+  timestamp: Date
+};
+
+export type AlertTypeType = {
+  name: string,
+  expression: string,
+  id: number,
+  typeId: number
 };
 
 export type HistoryType = {
@@ -54,18 +39,6 @@ export type HistoryType = {
   },
   push: Function
 };
-
-export type NodeType = {
-  id: number,
-  children: number[],
-  expanded?: boolean,
-  name: string,
-  parentId: number,
-  selected?: boolean,
-  typeId?: number // for instance nodes
-};
-
-export type NodeMapType = {[id: number]: NodeType};
 
 export type InstanceDataType = {
   dataKey: string,
@@ -79,6 +52,28 @@ export type InstanceType = {
   type: NodeType
 };
 
+export type NewNodeNamePayloadType = {
+  kind: TreeType,
+  name: string
+};
+
+export type NodeMapType = {[id: number]: NodeType};
+
+export type NodePayloadType = {
+  kind: TreeType,
+  node: NodeType
+};
+
+export type NodeType = {
+  id: number,
+  children: number[],
+  expanded?: boolean,
+  name: string,
+  parentId: number,
+  selected?: boolean,
+  typeId?: number // for instance nodes
+};
+
 export type ModalType = {
   message: string,
   open: boolean,
@@ -87,7 +82,46 @@ export type ModalType = {
 
 export type PrimitiveType = boolean | number | string;
 
+export type PropertyKindType = 'boolean' | 'number' | 'text';
+
+export type PropertyType = {
+  id: number,
+  name: string,
+  kind: PropertyKindType
+};
+
 export type RoleType = 'admin' | 'service' | 'spectator';
+
+export type SetNodesPayloadType = {
+  kind: TreeType,
+  nodes: NodeType[]
+};
+
+export type StateType = {
+  allAlerts: AlertType[],
+  errors: Set<string>,
+  instanceAlerts: AlertType[],
+  instanceData: Object,
+  instanceNodeMap: NodeMapType,
+  typeNodeMap: NodeMapType,
+  ui: UiType,
+  user: UserType
+};
+
+export type StoreType = {
+  getActions(): ActionType[],
+  getState(): StateType,
+  subscribe: Function
+};
+
+export type SystemType = {
+  alerts: AlertType[],
+  id: string,
+  internalIp?: string,
+  location: string,
+  model: string,
+  name: string
+};
 
 // These strings must correspond to the name of a database table.
 export type TreeType = 'type' | 'instance';
@@ -124,39 +158,5 @@ export type UserType = {
   role: RoleType,
   version: number
 };
-
-export type StateType = {
-  allAlerts: AlertType[],
-  errors: Set<string>,
-  instanceAlerts: AlertType[],
-  instanceData: Object,
-  instanceNodeMap: NodeMapType,
-  typeNodeMap: NodeMapType,
-  ui: UiType,
-  user: UserType
-};
-
-export type StoreType = {
-  getActions(): ActionType[],
-  getState(): StateType,
-  subscribe: Function
-};
-
-export type SystemType = {
-  alerts: AlertType[],
-  id: string,
-  internalIp?: string,
-  location: string,
-  model: string,
-  name: string
-};
-
-export type PropertyType = {
-  id: number,
-  name: string,
-  kind: PropertyKindType
-};
-
-export type PropertyKindType = 'boolean' | 'number' | 'text';
 
 export type ValidationFnType = (string) => string[];
