@@ -1,5 +1,6 @@
 // @flow
 
+import capitalize from 'lodash/capitalize';
 import React, {Component} from 'react';
 import {dispatch} from 'redux-easy';
 import {getType} from '../tree/tree-util';
@@ -27,7 +28,7 @@ class Node extends Component<PropsType> {
     return (
       <div className={className} onClick={this.select}>
         <div className="circle">{node.name}</div>
-        {getType(node)}
+        {capitalize(getType(node))}
       </div>
     );
   }

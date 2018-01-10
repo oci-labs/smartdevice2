@@ -1,5 +1,6 @@
 // @flow
 
+import capitalize from 'lodash/capitalize';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
@@ -36,9 +37,9 @@ class ParentInstances extends Component<PropsType> {
     const type = getType(instanceNode);
     return (
       <div key={instanceNode.id}>
-        <div>
-          You selected {type} {instanceNode.name}.
-        </div>
+        <h3>
+          {capitalize(type)} &quot;{instanceNode.name}&quot; Children
+        </h3>
         {sortedChildren.map(child => this.renderChild(child))}
       </div>
     );

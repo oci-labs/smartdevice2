@@ -40,7 +40,7 @@ class Alert extends Component<PropsType> {
     const typeName = typeId ? typeNodeMap[typeId].name : 'unknown';
 
     return (
-      <div className="alert" key={alert.name}>
+      <div className="alert" key={alert.id}>
         <div className="line1">
           {typeName} {instance.name} ({instanceId})
         </div>

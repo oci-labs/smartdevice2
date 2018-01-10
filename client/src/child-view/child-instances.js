@@ -1,5 +1,6 @@
 // @flow
 
+import capitalize from 'lodash/capitalize';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
@@ -132,7 +133,7 @@ class ChildInstances extends Component<PropsType> {
     return (
       <div>
         <h3 className="node-name">
-          {typeName} {node.name}
+          {capitalize(typeName)} &quot;{node.name}&quot; Detail
           <Button
             className="edit-properties"
             icon="cog"
@@ -152,6 +153,11 @@ class ChildInstances extends Component<PropsType> {
 
   renderProperties = () => {
     const {instanceData, typeProps} = this.props;
+
+    if (typeProps.length === 0) {
+      return <div>none</div>;
+    }
+
     return (
       <table className="property-table">
         <thead>

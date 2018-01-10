@@ -25,9 +25,10 @@ async function createAlerts(
     };
     return mySql.insert('alert', data);
   });
-  await Promise.all(promises);
+  const alertIds = await Promise.all(promises);
 
-  const alerts = alertTypes.map(alertType => ({
+  const alerts = alertTypes.map((alertType, index) => ({
+    id: alertIds[index],
     instanceId,
     name: alertType.name,
     timestamp

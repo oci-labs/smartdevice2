@@ -24,7 +24,7 @@ async function getInstanceAlerts(
   includeDescendants: boolean
 ): Promise<AlertType[]> {
   const sql =
-    'select a.instanceId, t.name, a.timestamp ' +
+    'select a.id, a.instanceId, t.name, a.timestamp ' +
     'from alert a, alert_type t ' +
     'where instanceId = ?';
   const alerts = await mySql.query(sql, instanceId);

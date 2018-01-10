@@ -1,6 +1,7 @@
 // @flow
 
 export type AlertType = {
+  id: number,
   instanceId: number,
   name: string,
   timestamp: number
