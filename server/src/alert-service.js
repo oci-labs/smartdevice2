@@ -23,17 +23,14 @@ async function getInstanceAlerts(
   instanceId: number,
   includeDescendants: boolean
 ): Promise<AlertType[]> {
-  console.log('alert-service.js getInstanceAlerts: instanceId =', instanceId);
   const sql =
     'select a.instanceId, t.name, a.timestamp ' +
     'from alert a, alert_type t ' +
     'where instanceId = ?';
   const alerts = await mySql.query(sql, instanceId);
-  console.log('alert-service.js getInstanceAlerts: alerts =', alerts);
 
   if (includeDescendants) {
     const childIds = await getChildInstanceIds(instanceId);
-    console.log('alert-service.js getByInstanceHandler: childIds =', childIds);
 
     const promises = childIds.map(childId =>
       getInstanceAlerts(childId, true));
