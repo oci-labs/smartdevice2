@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
+import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {NodeType, PropertyType, StateType, UiType} from '../types';
@@ -115,6 +116,7 @@ class ParentTypes extends Component<PropsType, MyStateType> {
         <td>
           <input
             type="text"
+            onKeyDown={validNameHandler}
             onChange={this.propNameChange}
             value={newPropName}
           />

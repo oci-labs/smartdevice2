@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
+import {spaceHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {AlertTypeType, NodeType, StateType, UiType} from '../types';
@@ -116,6 +117,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
           <input
             type="text"
             onChange={this.alertNameChange}
+            onKeyDown={spaceHandler}
             value={newAlertName}
           />
         </td>

@@ -6,7 +6,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
-import PropertyForm from './property-form';
+import PropertyForm from '../property-form/property-form';
 import Alert from '../alert/alert';
 import Button from '../share/button';
 import {getJson} from '../util/rest-util';
