@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
 import PropertyForm from './property-form';
+import Alert from '../alert/alert';
 import Button from '../share/button';
 import {getJson} from '../util/rest-util';
 import {showModal} from '../share/sd-modal';
@@ -55,7 +56,6 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
 }
 
 class ChildInstances extends Component<PropsType> {
-
   componentDidMount() {
     const {node} = this.props;
     this.loadData(node);
@@ -120,11 +120,7 @@ class ChildInstances extends Component<PropsType> {
 
     return (
       <div>
-        {instanceAlerts.map(alert => (
-          <div className="alert" key={alert.name}>
-            {alert.name}
-          </div>
-        ))}
+        {instanceAlerts.map(alert => <Alert key={alert.name} alert={alert} />)}
       </div>
     );
   };
@@ -190,11 +186,7 @@ class ChildInstances extends Component<PropsType> {
   };
 
   render() {
-    return (
-      <section className="child-instances">
-        {this.renderGuts()}
-      </section>
-    );
+    return <section className="child-instances">{this.renderGuts()}</section>;
   }
 }
 
