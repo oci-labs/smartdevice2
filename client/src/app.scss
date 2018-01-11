@@ -9,7 +9,7 @@
   .app-header {
     background-color: #222;
     height: 60px;
-    padding: 10px;
+    padding: $padding;
     color: white;
   }
 
@@ -22,7 +22,7 @@
     flex-grow: 1;
 
     & > section {
-      padding: 10px;
+      padding: $padding;
 
       h3 {
         margin-top: 0;
@@ -30,17 +30,28 @@
     }
   }
 
-  .instance-detail, .type-alerts {
-    background-color: $bg-color3;
-    text-align: left;
-    width: 400px;
-  }
-
   input {
     border: solid lightgray 1px;
     border-radius: 4px;
     box-shadow: none;
     padding: 4px;
+  }
+
+  // Right side
+  .instance-detail, .type-alerts {
+    background-color: $bg-color3;
+    text-align: left;
+  }
+
+  .instance-detail {
+    width: 300px;
+  }
+
+  // Center
+  .instance-hierarchy, .type-properties {
+    background-color: $bg-color2;
+    flex-grow: 1;
+    text-align: left;
   }
 
   label {
@@ -53,15 +64,14 @@
     width: 300px;
   }
 
-  .instance-hierarchy, .type-properties {
-    background-color: $bg-color2;
-    flex-grow: 1;
-    text-align: left;
+  .type-alerts {
+    width: 500px;
   }
 }
 
 table {
   background-color: white;
+  border: solid gray 5px;
   border-collapse: collapse;
 
   .button {
@@ -74,10 +84,15 @@ table {
 
   td {
     text-align: left;
+
+    input[type=text] {
+      box-sizing: border-box;
+      width: 100%
+    }
   }
 
   td, th {
     border: solid lightgray 1px;
-    padding: 5px;
+    padding: $padding / 2;
   }
 }

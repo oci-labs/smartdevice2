@@ -52,7 +52,11 @@ class ParentInstances extends Component<PropsType> {
   render() {
     const {instanceNode} = this.props;
     if (!instanceNode) {
-      return <div key="no-selection">Select an instance in the left nav.</div>;
+      return (
+        <section className="instance-hierarchy">
+          Select an instance in the left nav.
+        </section>
+      );
     }
 
     const type = getType(instanceNode);

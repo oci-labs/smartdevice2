@@ -137,7 +137,11 @@ class TypeProperties extends Component<PropsType, MyStateType> {
   render() {
     const {typeNode} = this.props;
     if (!typeNode) {
-      return <div key="no-selection">Select a type in the left nav.</div>;
+      return (
+        <section className="type-properties">
+          Select a type in the left nav.
+        </section>
+      );
     }
 
     const {typeProps} = this.state;

@@ -1,4 +1,4 @@
-.parent-types {
+.type-properties {
   text-align: left;
 
   .actions-column {
@@ -11,5 +11,9 @@
 
   .button {
     border: none;
+  }
+
+  table {
+    width: 100%;
   }
 }
