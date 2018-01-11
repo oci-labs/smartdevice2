@@ -9,7 +9,7 @@ import Node from '../node/node';
 import {getType} from '../tree/tree-util';
 import type {NodeMapType, NodeType, StateType} from '../types';
 
-import './parent-instances.css';
+import './instance-hierarchy.css';
 
 type PropsType = {
   instanceNodeMap: NodeMapType,
@@ -49,7 +49,7 @@ class ParentInstances extends Component<PropsType> {
     return <Node isSelected={isSelected} node={parent} />;
   };
 
-  renderSelection = () => {
+  render() {
     const {instanceNode} = this.props;
     if (!instanceNode) {
       return <div key="no-selection">Select an instance in the left nav.</div>;
@@ -58,7 +58,7 @@ class ParentInstances extends Component<PropsType> {
     const type = getType(instanceNode);
 
     return (
-      <div key={instanceNode.id}>
+      <section key={instanceNode.id} className="instance-hierarchy">
         <h3>
           {capitalize(type)} &quot;{instanceNode.name}&quot;
         </h3>
@@ -66,13 +66,7 @@ class ParentInstances extends Component<PropsType> {
         {this.renderChildren()}
         <h4>Parent</h4>
         {this.renderParent()}
-      </div>
-    );
-  };
-
-  render() {
-    return (
-      <section className="parent-instances">{this.renderSelection()}</section>
+      </section>
     );
   }
 }

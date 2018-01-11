@@ -20,7 +20,7 @@ import type {
   StateType
 } from '../types';
 
-import './child-instances.css';
+import './instance-detail.css';
 
 type PropsType = {
   alerts: AlertType[],
@@ -56,7 +56,7 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
   return ((json: any): Promise<NodeType>);
 }
 
-class ChildInstances extends Component<PropsType> {
+class InstanceDetail extends Component<PropsType> {
   componentDidMount() {
     const {node} = this.props;
     this.loadData(node);
@@ -125,31 +125,6 @@ class ChildInstances extends Component<PropsType> {
     );
   };
 
-  renderGuts = () => {
-    const {node, typeName} = this.props;
-    if (!node) return null;
-
-    return (
-      <div>
-        <h3 className="node-name">
-          {capitalize(typeName)} &quot;{node.name}&quot; Detail
-          <Button
-            className="edit-properties"
-            icon="cog"
-            onClick={() => this.editProperties()}
-            tooltip="edit properties"
-          />
-        </h3>
-
-        <h4>Properties</h4>
-        {this.renderProperties()}
-
-        <h4>Alerts</h4>
-        {this.renderAlerts()}
-      </div>
-    );
-  };
-
   renderProperties = () => {
     const {instanceData, typeProps} = this.props;
 
@@ -191,7 +166,28 @@ class ChildInstances extends Component<PropsType> {
   };
 
   render() {
-    return <section className="child-instances">{this.renderGuts()}</section>;
+    const {node, typeName} = this.props;
+    if (!node) return null;
+
+    return (
+      <section className="instance-detail">
+        <h3 className="node-name">
+          {capitalize(typeName)} &quot;{node.name}&quot; Detail
+          <Button
+            className="edit-properties"
+            icon="cog"
+            onClick={() => this.editProperties()}
+            tooltip="edit properties"
+          />
+        </h3>
+
+        <h4>Properties</h4>
+        {this.renderProperties()}
+
+        <h4>Alerts</h4>
+        {this.renderAlerts()}
+      </section>
+    );
   }
 }
 
@@ -202,4 +198,4 @@ const mapState = (state: StateType): PropsType => {
   return {alerts, instanceData, node, typeName, typeProps};
 };
 
-export default connect(mapState)(ChildInstances);
+export default connect(mapState)(InstanceDetail);

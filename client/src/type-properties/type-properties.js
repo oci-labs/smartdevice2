@@ -12,7 +12,7 @@ import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {NodeType, PropertyType, StateType, UiType} from '../types';
 
-import './parent-types.css';
+import './type-properties.css';
 
 type PropsType = {
   typeNode: ?NodeType,
@@ -23,7 +23,7 @@ type MyStateType = {
   typeProps: PropertyType[]
 };
 
-class ParentTypes extends Component<PropsType, MyStateType> {
+class TypeProperties extends Component<PropsType, MyStateType> {
   state: MyStateType = {
     typeProps: []
   };
@@ -76,27 +76,6 @@ class ParentTypes extends Component<PropsType, MyStateType> {
   propTypeChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewPropType', e.target.value);
   };
-
-  renderGuts() {
-    const {typeNode} = this.props;
-    if (!typeNode) {
-      return <div key="no-selection">Select a type in the left nav.</div>;
-    }
-
-    const {typeProps} = this.state;
-    return (
-      <div>
-        <h3>Properties for type &quot;{typeNode.name}&quot;</h3>
-        <table>
-          {this.renderTableHead()}
-          <tbody>
-            {this.renderTableInputRow()}
-            {typeProps.map(typeProp => this.renderTableRow(typeProp))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
 
   renderTableHead = () => (
     <thead>
@@ -156,7 +135,24 @@ class ParentTypes extends Component<PropsType, MyStateType> {
   );
 
   render() {
-    return <div className="parent-types">{this.renderGuts()}</div>;
+    const {typeNode} = this.props;
+    if (!typeNode) {
+      return <div key="no-selection">Select a type in the left nav.</div>;
+    }
+
+    const {typeProps} = this.state;
+    return (
+      <section className="type-properties">
+        <h3>Properties for type &quot;{typeNode.name}&quot;</h3>
+        <table>
+          {this.renderTableHead()}
+          <tbody>
+            {this.renderTableInputRow()}
+            {typeProps.map(typeProp => this.renderTableRow(typeProp))}
+          </tbody>
+        </table>
+      </section>
+    );
   }
 }
 
@@ -167,4 +163,4 @@ const mapState = (state: StateType): PropsType => {
   return {typeNode, ui};
 };
 
-export default connect(mapState)(ParentTypes);
+export default connect(mapState)(TypeProperties);

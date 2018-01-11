@@ -13,7 +13,7 @@ import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {AlertTypeType, NodeType, StateType, UiType} from '../types';
 
-import './child-types.css';
+import './type-alerts.css';
 
 type PropsType = {
   typeNode: NodeType,
@@ -24,7 +24,7 @@ type MyStateType = {
   alertTypes: AlertTypeType[]
 };
 
-class ChildTypes extends Component<PropsType, MyStateType> {
+class TypeAlerts extends Component<PropsType, MyStateType> {
   state: MyStateType = {
     alertTypes: []
   };
@@ -77,7 +77,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
       title: 'Invalid Alert Condition',
       message: 'Function calls are not allowed.'
     });
-  }
+  };
 
   componentWillMount() {
     this.loadAlertTypes(this.props.typeNode);
@@ -111,25 +111,6 @@ class ChildTypes extends Component<PropsType, MyStateType> {
 
     const sortedAlertTypes = sortBy(alertTypes, ['name']);
     this.setState({alertTypes: sortedAlertTypes});
-  }
-
-  renderGuts() {
-    const {typeNode} = this.props;
-    if (!typeNode) return null;
-
-    const {alertTypes} = this.state;
-    return (
-      <div>
-        <h3>Alerts for type &quot;{typeNode.name}&quot;</h3>
-        <table>
-          {this.renderTableHead()}
-          <tbody>
-            {this.renderTableInputRow()}
-            {alertTypes.map(alertType => this.renderTableRow(alertType))}
-          </tbody>
-        </table>
-      </div>
-    );
   }
 
   renderTableHead = () => (
@@ -199,7 +180,22 @@ class ChildTypes extends Component<PropsType, MyStateType> {
   );
 
   render() {
-    return <section className="child-types">{this.renderGuts()}</section>;
+    const {typeNode} = this.props;
+    if (!typeNode) return null;
+
+    const {alertTypes} = this.state;
+    return (
+      <section className="type-alerts">
+        <h3>Alerts for type &quot;{typeNode.name}&quot;</h3>
+        <table>
+          {this.renderTableHead()}
+          <tbody>
+            {this.renderTableInputRow()}
+            {alertTypes.map(alertType => this.renderTableRow(alertType))}
+          </tbody>
+        </table>
+      </section>
+    );
   }
 }
 
@@ -210,4 +206,4 @@ const mapState = (state: StateType): PropsType => {
   return {typeNode, ui};
 };
 
-export default connect(mapState)(ChildTypes);
+export default connect(mapState)(TypeAlerts);

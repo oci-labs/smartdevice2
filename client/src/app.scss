@@ -30,8 +30,9 @@
     }
   }
 
-  .child-view {
+  .instance-detail, .type-alerts {
     background-color: $bg-color3;
+    text-align: left;
     width: 400px;
   }
 
@@ -52,9 +53,10 @@
     width: 300px;
   }
 
-  .parent-view {
+  .instance-hierarchy, .type-properties {
     background-color: $bg-color2;
     flex-grow: 1;
+    text-align: left;
   }
 }
 
