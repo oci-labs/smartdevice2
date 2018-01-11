@@ -5,8 +5,15 @@
 
   .tree-builder {
     display: block;
-    margin-right: 20px;
     vertical-align: top;
+
+    .new-div {
+      display: flex;
+
+      input {
+        flex-grow: 1;
+      }
+    }
   }
 
   .tree-radio {

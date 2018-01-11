@@ -12,7 +12,7 @@ let mySql;
 async function createAlerts(
   instanceId: number,
   alertTypes: AlertTypeType[]
-): Promise<AlertType[]> {
+): Promise<void> {
   const timestamp = Date.now();
 
   const promises = alertTypes.map(alertType => {
@@ -25,25 +25,28 @@ async function createAlerts(
     };
     return mySql.insert('alert', data);
   });
-  const alertIds = await Promise.all(promises);
-
-  const alerts = alertTypes.map((alertType, index) => ({
-    id: alertIds[index],
-    instanceId,
-    name: alertType.name,
-    timestamp
-  }));
-
-  return alerts;
+  await Promise.all(promises);
 }
 
 function deleteDynamicAlerts(instanceId: number): Promise<void> {
-  const sql = 'delete from alert where instanceId=? and dynamic=true';
+  const sql =
+    'delete a.* from alert as a ' +
+    'left join alert_type as t ' +
+    'on a.alertTypeId = t.id ' +
+    'where a.instanceId=? and a.dynamic=true and t.sticky=false';
   return mySql.query(sql, instanceId);
 }
 
 function deleteInstanceData(instanceId: number): Promise<void> {
   const sql = 'delete from instance_data where instanceId=?';
+  return mySql.query(sql, instanceId);
+}
+
+function getAlerts(instanceId: number): Promise<AlertType[]> {
+  const sql =
+    'select a.id, a.instanceId, t.name, a.timestamp ' +
+    'from alert a, alert_type t ' +
+    'where a.alertTypeId = t.id and a.instanceId=?';
   return mySql.query(sql, instanceId);
 }
 
@@ -108,6 +111,10 @@ function isTriggered(expression: string, instanceData: Object): boolean {
   }
 }
 
+/**
+ * Changes the property values for a given instance
+ * and returns the current alerts for that instance.
+ */
 async function postInstanceDataHandler(
   req: express$Request,
   res: express$Response
@@ -133,7 +140,11 @@ async function postInstanceDataHandler(
   );
 
   // Create new alerts that were triggered.
-  const alerts = await createAlerts(instanceId, triggered);
+  await createAlerts(instanceId, triggered);
+
+  // Return all the alerts for this instance,
+  // including sticky ones that were not deleted above.
+  const alerts = await getAlerts(instanceId);
 
   res.send(alerts);
 }

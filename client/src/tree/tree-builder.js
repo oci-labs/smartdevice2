@@ -72,7 +72,7 @@ class TreeBuilder extends Component<PropsType> {
 
     return (
       <div className="tree-builder">
-        <div>
+        <div className="new-div">
           <label>New {capitalize(kind)}</label>
           <input
             type="text"

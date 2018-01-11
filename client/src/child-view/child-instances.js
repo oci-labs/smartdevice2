@@ -83,6 +83,7 @@ class ChildInstances extends Component<PropsType> {
     const typeNode = await getTypeNode(instanceNode);
     dispatch('setTypeName', typeNode ? typeNode.name : '');
 
+    //TODO: May only need this on Mount, not ReceiveProps.
     const alerts = await getAlerts(instanceNode);
     dispatch('setAlerts', alerts);
 
