@@ -15,6 +15,7 @@ import {showModal} from '../share/sd-modal';
 import type {
   AlertType,
   InstanceDataType,
+  NodeMapType,
   NodeType,
   PropertyType,
   StateType
@@ -25,15 +26,23 @@ import './instance-detail.css';
 type PropsType = {
   alerts: AlertType[],
   instanceData: Object,
+  instanceNodeMap: NodeMapType,
   node: NodeType,
   typeName: string,
   typeProps: PropertyType[]
 };
 
+/*
 async function getAlerts(node: NodeType): Promise<AlertType[]> {
   if (!node) return Promise.resolve([]);
 
   const json = await getJson(`alerts/${node.id}`);
+  return ((json: any): AlertType[]);
+}
+*/
+
+async function getAllAlerts(): Promise<AlertType[]> {
+  const json = await getJson('alerts');
   return ((json: any): AlertType[]);
 }
 
@@ -57,6 +66,15 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
 }
 
 class InstanceDetail extends Component<PropsType> {
+  alertIsFor(instanceId: number, alertInstanceId: number) {
+    if (alertInstanceId === instanceId) return true;
+
+    const {instanceNodeMap} = this.props;
+    const node = instanceNodeMap[instanceId];
+    const {children} = node;
+    return children.some(childId => this.alertIsFor(childId, alertInstanceId));
+  }
+
   componentDidMount() {
     const {node} = this.props;
     this.loadData(node);
@@ -84,7 +102,8 @@ class InstanceDetail extends Component<PropsType> {
     dispatch('setTypeName', typeNode ? typeNode.name : '');
 
     //TODO: May only need this on Mount, not ReceiveProps.
-    const alerts = await getAlerts(instanceNode);
+    //const alerts = await getAlerts(instanceNode);
+    const alerts = await getAllAlerts();
     dispatch('setAlerts', alerts);
 
     this.loadTypeProps(typeNode);
@@ -114,14 +133,21 @@ class InstanceDetail extends Component<PropsType> {
   }
 
   renderAlerts = () => {
-    const {alerts} = this.props;
+    const {alerts, node} = this.props;
 
-    if (alerts.length === 0) {
+    if (!alerts || alerts.length === 0) {
       return <div>none</div>;
     }
 
+    const {id} = node;
+    const myAlerts = alerts.filter(alert =>
+      this.alertIsFor(id, alert.instanceId)
+    );
+
     return (
-      <div>{alerts.map(alert => <Alert key={alert.name} alert={alert} />)}</div>
+      <div>
+        {myAlerts.map(alert => <Alert key={alert.name} alert={alert} />)}
+      </div>
     );
   };
 
@@ -195,7 +221,7 @@ const mapState = (state: StateType): PropsType => {
   const {alerts, instanceData, instanceNodeMap, ui} = state;
   const {selectedChildNodeId, typeName, typeProps} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
-  return {alerts, instanceData, node, typeName, typeProps};
+  return {alerts, instanceData, instanceNodeMap, node, typeName, typeProps};
 };
 
 export default connect(mapState)(InstanceDetail);

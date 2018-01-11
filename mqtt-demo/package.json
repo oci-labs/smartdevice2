@@ -1,0 +1,14 @@
+{
+  "name": "mqtt-demo",
+  "version": "1.0.0",
+  "description": "demo of using MQTT pub/sub",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "R. Mark Volkmann <r.mark.volkmann@gmail.com> (https://mvolkmann.github.io/)",
+  "license": "MIT",
+  "dependencies": {
+    "mqtt": "^2.15.1"
+  }
+}
