@@ -26,13 +26,13 @@ $size: $radius * 2 - $borderSize * 2;
       align-items: center;
       color: white;
       background-color: $error-color;
-      bottom: 0;
+      bottom: -$borderSize;
       border-radius: $badgeSize / 2;
       box-sizing: border-box;
       display: flex;
       height: $badgeSize;
       justify-content: center;
-      right: 0;
+      right: -$borderSize;
       position: absolute;
       width: $badgeSize;
     }
