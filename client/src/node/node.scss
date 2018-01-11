@@ -1,3 +1,5 @@
+@import '../share.scss';
+
 $borderSize: 5px;
 $radius: 50px;
 $size: $radius * 2 - $borderSize * 2;
@@ -9,7 +11,8 @@ $size: $radius * 2 - $borderSize * 2;
 
   .circle {
     align-items: center;
-    border: solid lightgray $borderSize;
+    background-color: white;
+    border: solid $bg-color3 $borderSize;
     border-radius: $radius;
     display: flex;
     height: $size;

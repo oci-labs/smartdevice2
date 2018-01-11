@@ -1,3 +1,5 @@
+@import './share.scss';
+
 .app {
   display: flex;
   flex-direction: column;
@@ -7,12 +9,12 @@
   .app-header {
     background-color: #222;
     height: 60px;
-    padding: 20px;
+    padding: 10px;
     color: white;
   }
 
   .app-title {
-    font-size: 1.5em;
+    font-size: 24px;
   }
 
   #body {
@@ -29,7 +31,7 @@
   }
 
   .child-view {
-    border-left: solid blue 3px;
+    background-color: $bg-color3;
     width: 400px;
   }
 
@@ -46,16 +48,18 @@
   }
 
   .left-nav {
-    border-right: solid blue 3px;
+    background-color: $bg-color1;
     width: 300px;
   }
 
   .parent-view {
+    background-color: $bg-color2;
     flex-grow: 1;
   }
 }
 
 table {
+  background-color: white;
   border-collapse: collapse;
 
   .button {
