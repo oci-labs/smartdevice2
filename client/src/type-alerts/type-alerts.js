@@ -37,7 +37,11 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     if (!typeNode) return;
 
     if (!isSafeCode(newAlertExpression)) {
-      this.badExpression();
+      showModal({
+        error: true,
+        title: 'Invalid Alert Condition',
+        message: 'Function calls are not allowed.'
+      });
       return;
     }
 
@@ -56,11 +60,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
   alertExpressionChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     const {value} = e.target;
-    if (isSafeCode(value)) {
-      dispatch('setNewAlertExpression', value);
-    } else {
-      this.badExpression();
-    }
+    dispatch('setNewAlertExpression', value);
   };
 
   alertNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -69,14 +69,6 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
   alertStickyChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewAlertSticky', e.target.checked);
-  };
-
-  badExpression = () => {
-    showModal({
-      error: true,
-      title: 'Invalid Alert Condition',
-      message: 'Function calls are not allowed.'
-    });
   };
 
   componentWillMount() {
