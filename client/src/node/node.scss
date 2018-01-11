@@ -1,5 +1,6 @@
 @import '../share.scss';
 
+$badgeSize: 30px;
 $borderSize: 5px;
 $radius: 50px;
 $size: $radius * 2 - $borderSize * 2;
@@ -18,7 +19,23 @@ $size: $radius * 2 - $borderSize * 2;
     height: $size;
     justify-content: center;
     margin-bottom: 10px;
+    position: relative;
     width: $size;
+
+    .badge {
+      align-items: center;
+      color: white;
+      background-color: $error-color;
+      bottom: 0;
+      border-radius: $badgeSize / 2;
+      box-sizing: border-box;
+      display: flex;
+      height: $badgeSize;
+      justify-content: center;
+      right: 0;
+      position: absolute;
+      width: $badgeSize;
+    }
   }
 
   &.selected {

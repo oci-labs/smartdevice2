@@ -27,7 +27,10 @@ class Node extends Component<PropsType> {
 
     return (
       <div className={className} onClick={this.select}>
-        <div className="circle">{node.name}</div>
+        <div className="circle">
+          {node.name}
+          <div className="badge">19</div>
+        </div>
         {capitalize(getType(node))}
       </div>
     );
