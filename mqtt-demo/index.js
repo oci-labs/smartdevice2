@@ -1,5 +1,10 @@
 // @flow
 
+// Before running this,
+// 1) start Mosquitto broker (or verify that it is running)
+// 2) optionally enter "java -jar TheJoveExpress.jar"
+//    to get lots of messages
+
 const TRAIN_NAME = 'thejoveexpress';
 
 //const mqttHost = TRAIN_NAME + '.local';
@@ -16,7 +21,11 @@ function getTopic(name) {
 }
 
 const feedbackTopic = getTopic('');
+
+// To get a zero, kill train app.
+// To get a one, restart train app.
 const lifecycleTopic = getTopic('lifecycle');
+
 const lightsOverrideTopic = getTopic('lights/override');
 const lightsPowerTopic = getTopic('lights/power');
 /*
