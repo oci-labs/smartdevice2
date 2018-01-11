@@ -36,6 +36,11 @@ class ChildTypes extends Component<PropsType, MyStateType> {
     } = this.props;
     if (!typeNode) return;
 
+    if (!isSafeCode(newAlertExpression)) {
+      this.badExpression();
+      return;
+    }
+
     const alertType = {
       name: newAlertName.trim(),
       expression: newAlertExpression,
@@ -54,11 +59,7 @@ class ChildTypes extends Component<PropsType, MyStateType> {
     if (isSafeCode(value)) {
       dispatch('setNewAlertExpression', value);
     } else {
-      showModal({
-        error: true,
-        title: 'Invalid Alert Condition',
-        message: 'Function calls are not allowed.'
-      });
+      this.badExpression();
     }
   };
 
@@ -69,6 +70,14 @@ class ChildTypes extends Component<PropsType, MyStateType> {
   alertStickyChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatch('setNewAlertSticky', e.target.checked);
   };
+
+  badExpression = () => {
+    showModal({
+      error: true,
+      title: 'Invalid Alert Condition',
+      message: 'Function calls are not allowed.'
+    });
+  }
 
   componentWillMount() {
     this.loadAlertTypes(this.props.typeNode);

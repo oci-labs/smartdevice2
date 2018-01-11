@@ -51,7 +51,6 @@ class LeftNav extends Component<PropsType> {
   };
 
   render() {
-    //const {treeType} = this.props.ui;
     return (
       <section className="left-nav">
         <Tabs onSelect={this.handleTabSelect}>
