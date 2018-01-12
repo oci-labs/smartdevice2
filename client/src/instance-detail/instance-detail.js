@@ -65,6 +65,11 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
   return ((json: any): Promise<NodeType>);
 }
 
+export async function reloadAlerts() {
+  const alerts = await getAllAlerts();
+  dispatch('setAlerts', alerts);
+}
+
 class InstanceDetail extends Component<PropsType> {
   alertIsFor(instanceId: number, alertInstanceId: number) {
     if (alertInstanceId === instanceId) return true;
@@ -101,10 +106,7 @@ class InstanceDetail extends Component<PropsType> {
     const typeNode = await getTypeNode(instanceNode);
     dispatch('setTypeName', typeNode ? typeNode.name : '');
 
-    //TODO: May only need this on Mount, not ReceiveProps.
-    //const alerts = await getAlerts(instanceNode);
-    const alerts = await getAllAlerts();
-    dispatch('setAlerts', alerts);
+    reloadAlerts();
 
     this.loadTypeProps(typeNode);
 

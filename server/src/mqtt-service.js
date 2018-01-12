@@ -17,6 +17,8 @@ thejoveexpress/lights/calibration/feedback - rational
 */
 
 const mqtt = require('mqtt');
+const WebSocket = require('ws');
+
 const {getChildId, getParentId, updateProperty} = require('./instance-service');
 
 const MSG_DELIM = '/';
@@ -38,6 +40,25 @@ const engineCalibrationTopic = getTopic('engine', 'calibration');
 const lightsAmbientTopic = getTopic('lights', 'ambient');
 const lightsCalibrationTopic = getTopic('lights', 'calibration');
 
+let ws;
+
+function websocketSetup() {
+  const wsServer = new WebSocket.Server({port: 1337});
+  console.log('waiting for WebSocket connection');
+  wsServer.on('connection', webSocket => {
+    console.log('got WebSocket connection');
+    ws = webSocket;
+
+    ws.on('error', error => {
+      if (error.code !== 'ECONNRESET') {
+        console.error('websocket error:', error.code);
+      }
+    });
+  });
+}
+
+websocketSetup();
+
 function getTopic(...parts) {
   const middle = parts.length ? parts.join(MSG_DELIM) + MSG_DELIM : '';
   return TRAIN_NAME + MSG_DELIM + middle + 'feedback';
@@ -53,7 +74,14 @@ async function saveProperty(parentName, childName, property, value) {
     );
   }
 
-  await updateProperty(instanceId, property, value);
+  const alertsChanged =
+    await updateProperty(instanceId, property, value);
+
+  // Notify web client that new alerts may be available.
+  if (alertsChanged && ws) {
+    console.log('mqtt-service.js saveProperty: reload alerts');
+    ws.send('reload alerts');
+  }
 }
 
 // message is a Buffer

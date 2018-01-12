@@ -1,5 +1,6 @@
 // @flow
 
+const isEqual = require('lodash/isEqual');
 const sortBy = require('lodash/sortBy');
 const MySqlConnection = require('mysql-easier');
 
@@ -50,6 +51,12 @@ function getAlerts(instanceId: number): Promise<AlertType[]> {
     'from alert a, alert_type t ' +
     'where a.alertTypeId = t.id and a.instanceId=?';
   return mySql.query(sql, instanceId);
+}
+
+async function getAlertTypeIds(instanceId: number): Promise<number[]> {
+  const sql = 'select alertTypeId from alert where instanceId=?';
+  const rows = await mySql.query(sql, instanceId);
+  return rows.map(row => row.alertTypeId);
 }
 
 function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
@@ -208,8 +215,15 @@ async function saveProperty(
   mySql.upsert('instance_data', obj);
 }
 
-async function updateAlerts(instanceId: number, data: Object): Promise<void> {
-  await deleteDynamicAlerts(instanceId);
+/**
+ * Updates the alerts for an instance and returns a
+ * boolean indicating whether any of its alerts changed.
+ */
+async function updateAlerts(
+  instanceId: number,
+  data: Object
+): Promise<boolean> {
+  const oldAlertTypeIds = await getAlertTypeIds(instanceId);
 
   // Get all the alert types defined for the type of this instance.
   const typeId = await getInstanceTypeId(instanceId);
@@ -220,18 +234,31 @@ async function updateAlerts(instanceId: number, data: Object): Promise<void> {
     isTriggered(alertType.expression, data)
   );
 
-  // Create new alerts that were triggered.
-  await createAlerts(instanceId, triggered);
+  const newAlertTypeIds = triggered.map(t => t.id);
+
+  const haveNew = !isEqual(newAlertTypeIds, oldAlertTypeIds);
+  if (haveNew) {
+    await deleteDynamicAlerts(instanceId);
+
+    // Create all the new alerts that were triggered.
+    await createAlerts(instanceId, triggered);
+  }
+
+  return haveNew;
 }
 
+/**
+ * Updates and instance property and returns a boolean
+ * indicating whether any alerts changed.
+ */
 async function updateProperty(
   instanceId: number,
   property: string,
   value: PrimitiveType
-) {
+): Promise<boolean> {
   await saveProperty(instanceId, property, value);
   const data = await getData(instanceId);
-  await updateAlerts(instanceId, data);
+  return updateAlerts(instanceId, data);
 }
 
 module.exports = {

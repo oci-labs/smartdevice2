@@ -20,15 +20,12 @@ type PropsType = {
 class Node extends Component<PropsType> {
   getAlertCount = (node: NodeType): number => {
     const {children, id} = node;
-    console.log('getAlertCount: node.name =', node.name);
-    console.log('getAlertCount: id =', id);
     const {alerts, instanceNodeMap} = this.props;
 
     // Get the number of alerts for this node.
     const alertCount = alerts
       ? alerts.filter(alert => alert.instanceId === id).length
       : 0;
-    console.log('getAlertCount: alertCount =', alertCount);
 
     // Get the number of alerts for
     // all the children of this node.
@@ -36,7 +33,6 @@ class Node extends Component<PropsType> {
       const child = instanceNodeMap[id];
       return sum + this.getAlertCount(child);
     }, 0);
-    console.log('getAlertCount: childrenAlertCount =', childrenAlertCount);
 
     return alertCount + childrenAlertCount;
   };
@@ -49,7 +45,6 @@ class Node extends Component<PropsType> {
   render() {
     const {isSelected, node} = this.props;
     if (!node) return null;
-    console.log('render: node.name =', node.name);
 
     let className = 'node';
     if (isSelected) className += ' selected';

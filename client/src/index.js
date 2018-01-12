@@ -7,6 +7,7 @@ import {reduxSetup} from 'redux-easy';
 
 import App from './app';
 import initialState from './initial-state';
+import {websocketSetup} from './websocket';
 import './reducers';
 
 import './index.css';
@@ -27,4 +28,5 @@ function render() {
   );
 }
 
+websocketSetup();
 render();
