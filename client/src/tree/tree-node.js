@@ -135,10 +135,7 @@ class TreeNode extends Component<PropsType> {
             value={editedName}
           />
         ) : (
-          <div
-            className="tree-node-name"
-            onClick={this.selectNode}
-          >
+          <div className="tree-node-name" onClick={this.selectNode}>
             {/*onDoubleClick={this.toggleEdit}*/}
             {node.name}
           </div>
