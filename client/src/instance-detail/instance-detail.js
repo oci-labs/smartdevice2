@@ -178,9 +178,9 @@ class InstanceDetail extends Component<PropsType> {
   };
 
   renderProperty = (typeProp: PropertyType, instanceData: Object) => {
-    const {name} = typeProp;
+    const {kind, name} = typeProp;
     let value = instanceData[name];
-    const isBoolean = typeProp.kind === 'boolean';
+    const isBoolean = kind === 'boolean';
     value = isBoolean
       ? Boolean(Number(value))
       : value === undefined ? 'unset' : value;
@@ -188,7 +188,7 @@ class InstanceDetail extends Component<PropsType> {
     return (
       <tr key={name}>
         <td>{name}</td>
-        <td>{String(value)}</td>
+        <td className={kind}>{String(value)}</td>
       </tr>
     );
   };

@@ -15,7 +15,10 @@ export function websocketSetup() {
 
   connection.onmessage = message => {
     const {data} = message;
-    if (data === 'reload alerts') reloadAlerts();
+    if (data === 'reload alerts') {
+      reloadAlerts();
+      return;
+    }
 
     try {
       // $FlowFixMe - doesn't think data is a string
