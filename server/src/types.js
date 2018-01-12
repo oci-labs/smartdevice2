@@ -13,3 +13,5 @@ export type AlertTypeType = {
   id: number,
   typeId: number
 };
+
+export type PrimitiveType = boolean | number | string;

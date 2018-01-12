@@ -5,7 +5,7 @@ const MySqlConnection = require('mysql-easier');
 
 const {errorHandler} = require('./util/error-util');
 
-import type {AlertType, AlertTypeType} from './types';
+import type {AlertType, AlertTypeType, PrimitiveType} from './types';
 
 let mySql;
 
@@ -53,6 +53,14 @@ function getAlerts(instanceId: number): Promise<AlertType[]> {
 function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
   const sql = 'select * from alert_type where typeId=?';
   return mySql.query(sql, typeId);
+}
+
+async function getData(instanceId: number): Promise<Object> {
+  const rows = await mySql.getById('instance_data', instanceId);
+  return rows.reduce((data, row) => {
+    data[row.dataKey] = row.dataValue;
+    return data;
+  }, {});
 }
 
 async function getInstanceDataHandler(
@@ -128,19 +136,7 @@ async function postInstanceDataHandler(
   // Save the new data for this instance.
   await saveInstanceData(instanceId, data);
 
-  await deleteDynamicAlerts(instanceId);
-
-  // Get all the alert types defined for the type of this instance.
-  const typeId = await getInstanceTypeId(instanceId);
-  const alertTypes = await getAlertTypes(typeId);
-
-  // Determine which alerts are triggered by the new data.
-  const triggered = alertTypes.filter(alertType =>
-    isTriggered(alertType.expression, data)
-  );
-
-  // Create new alerts that were triggered.
-  await createAlerts(instanceId, triggered);
+  await updateAlerts(instanceId, data);
 
   // Return all the alerts for this instance,
   // including sticky ones that were not deleted above.
@@ -164,8 +160,54 @@ async function saveInstanceData(
   await Promise.all(promises);
 }
 
+async function saveProperty(
+  instanceId: number,
+  property: string,
+  value: PrimitiveType
+): Promise<void> {
+  // Get the id of the existing instance_data row if any.
+  const sql = 'select id from instance_data where instanceId=?';
+  const rows = await mySql.query(sql, instanceId);
+  const id = rows.length ? rows[0].id : undefined;
+
+  const obj = {
+    id,
+    instanceId,
+    dataKey: property,
+    dataValue: value
+  };
+  mySql.upsert('instance_data', obj);
+}
+
+async function updateAlerts(instanceId: number, data: Object): Promise<void> {
+  await deleteDynamicAlerts(instanceId);
+
+  // Get all the alert types defined for the type of this instance.
+  const typeId = await getInstanceTypeId(instanceId);
+  const alertTypes = await getAlertTypes(typeId);
+
+  // Determine which alerts are triggered by the new data.
+  const triggered = alertTypes.filter(alertType =>
+    isTriggered(alertType.expression, data)
+  );
+
+  // Create new alerts that were triggered.
+  await createAlerts(instanceId, triggered);
+}
+
+async function updateProperty(
+  instanceId: number,
+  property: string,
+  value: PrimitiveType
+) {
+  await saveProperty(instanceId, property, value);
+  const data = await getData(instanceId);
+  await updateAlerts(instanceId, data);
+}
+
 module.exports = {
   instanceService,
   getInstanceDataHandler,
-  postInstanceDataHandler
+  postInstanceDataHandler,
+  updateProperty
 };

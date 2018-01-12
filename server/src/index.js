@@ -10,6 +10,7 @@ const MySqlConnection = require('mysql-easier');
 const {alertService} = require('./alert-service');
 const crudService = require('./crud-service');
 const {instanceService} = require('./instance-service');
+const {mqttService} = require('./mqtt-service');
 const {treeService} = require('./tree-service');
 const {typeService} = require('./type-service');
 
@@ -23,7 +24,7 @@ const mySql = new MySqlConnection(dbConfig);
 
 const app = express();
 
-// Parse JSON request bodies to JavaScript objects.
+// Parse JSON request bodGies to JavaScript objects.
 app.use(bodyParser.json());
 
 // Parse text request bodies to JavaScript strings.
@@ -44,6 +45,7 @@ app.set('etag', 'strong');
 
 alertService(app, mySql);
 instanceService(app, mySql);
+mqttService(mySql);
 treeService(app, mySql);
 typeService(app, mySql);
 crudService(app, mySql, 'alert');
