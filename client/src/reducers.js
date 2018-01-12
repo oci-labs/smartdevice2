@@ -9,6 +9,7 @@ import type {
   AddNodePayloadType,
   AlertType,
   AlertTypeType,
+  ChangeType,
   ModalType,
   NewNodeNamePayloadType,
   NodeMapType,
@@ -176,6 +177,17 @@ addReducer('setAlerts', (state: StateType, alerts: AlertType[]) =>
 addReducer('setInstanceData', (state: StateType, data: Object) =>
   setTopProp(state, 'instanceData', data)
 );
+
+addReducer('setInstanceProperty', (state: StateType, change: ChangeType) => {
+  const {instanceData, ui} = state;
+  const {selectedInstanceNodeId} = ui;
+  const {instanceId, property, value} = change;
+
+  if (instanceId !== selectedInstanceNodeId) return state;
+
+  const newInstanceData = {...instanceData, [property]: value};
+  return setTopProp(state, 'instanceData', newInstanceData);
+});
 
 addReducer(
   'setSelectedChildNodeId',

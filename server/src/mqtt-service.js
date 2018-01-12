@@ -16,6 +16,7 @@ thejoveexpress/lights/power/feedback - boolean, 1 byte
 thejoveexpress/lights/calibration/feedback - rational
 */
 
+const isEqual = require('lodash/isEqual');
 const mqtt = require('mqtt');
 const WebSocket = require('ws');
 
@@ -40,7 +41,7 @@ const engineCalibrationTopic = getTopic('engine', 'calibration');
 const lightsAmbientTopic = getTopic('lights', 'ambient');
 const lightsCalibrationTopic = getTopic('lights', 'calibration');
 
-let ws;
+let lastChange, ws;
 
 function websocketSetup() {
   const wsServer = new WebSocket.Server({port: 1337});
@@ -77,10 +78,16 @@ async function saveProperty(parentName, childName, property, value) {
   const alertsChanged =
     await updateProperty(instanceId, property, value);
 
-  // Notify web client that new alerts may be available.
-  if (alertsChanged && ws) {
-    console.log('mqtt-service.js saveProperty: reload alerts');
-    ws.send('reload alerts');
+  if (ws) {
+    // Notify web client about property change.
+    const change = {instanceId, property, value};
+    if (!isEqual(change, lastChange)) {
+      lastChange = change;
+      ws.send(JSON.stringify(change));
+    }
+
+    // Notify web client that new alerts may be available.
+    if (alertsChanged) ws.send('reload alerts');
   }
 }
 

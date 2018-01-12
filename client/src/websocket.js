@@ -1,5 +1,7 @@
 // @flow
 
+import {dispatch} from 'redux-easy';
+
 import {reloadAlerts} from './instance-detail/instance-detail';
 
 export function websocketSetup() {
@@ -13,7 +15,14 @@ export function websocketSetup() {
 
   connection.onmessage = message => {
     const {data} = message;
-    //console.log('WebSocket message:', data);
     if (data === 'reload alerts') reloadAlerts();
+
+    try {
+      // $FlowFixMe - doesn't think data is a string
+      const change = JSON.parse(data);
+      dispatch('setInstanceProperty', change);
+    } catch (e) {
+      console.log('unsupported WebSocket message:', data);
+    }
   };
 }

@@ -35,6 +35,12 @@ export type AlertTypeType = {
   typeId: number
 };
 
+export type ChangeType = {
+  instanceId: number,
+  property: string,
+  value: PrimitiveType
+};
+
 export type HistoryType = {
   location: {
     pathname: string
