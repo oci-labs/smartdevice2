@@ -17,7 +17,8 @@ import type {
   NodeType,
   PropertyType,
   SetNodesPayloadType,
-  StateType
+  StateType,
+  TreeType
 } from './types';
 
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
@@ -311,16 +312,35 @@ addReducer(
   'toggleExpandNode',
   (state: StateType, payload: NodePayloadType): StateType => {
     const {kind, node} = payload;
-    const nodeMap = state[kind + 'NodeMap'];
+    const key = kind + 'NodeMap';
+    const nodeMap = state[key];
 
     // nodeMap is immutable, so make a copy that can be modified.
     const newNodeMap = {...nodeMap};
     const newNode = {...node, expanded: !node.expanded};
     newNodeMap[node.id] = newNode;
 
-    return {...state, [kind + 'NodeMap']: newNodeMap};
+    return {...state, [key]: newNodeMap};
   }
 );
+
+addReducer('toggleExpandAll', (state: StateType, kind: TreeType): StateType => {
+  const key = kind + 'NodeMap';
+  const nodeMap = state[key];
+
+  const [firstNode] = ((Object.values(nodeMap): any): NodeType);
+  const expanded = !firstNode.expanded;
+
+  const newNodeMap = {};
+
+  Object.values(nodeMap).forEach(node => {
+    const copy = {...node};
+    copy.expanded = expanded;
+    newNodeMap[copy.id] = copy;
+  });
+
+  return {...state, [key]: newNodeMap};
+});
 
 addReducer(
   'toggleSubscribeNode',

@@ -65,10 +65,17 @@ class TreeBuilder extends Component<PropsType> {
     dispatch('setNodes', payload);
   };
 
+  toggleExpandAll = () => {
+    const {kind} = this.props;
+    dispatch('toggleExpandAll', kind);
+  };
+
   render() {
     const {kind, newNodeName, nodeMap} = this.props;
     const rootNode = nodeMap[ROOT_ID];
     if (!rootNode) return null;
+
+    const isExpanded = rootNode.expanded;
 
     return (
       <div className="tree-builder">
@@ -81,6 +88,11 @@ class TreeBuilder extends Component<PropsType> {
             value={newNodeName}
           />
         </div>
+        <Button
+          icon={isExpanded ? 'compress' : 'expand'}
+          onClick={() => this.toggleExpandAll()}
+          tooltip={isExpanded ? 'collapse all' : 'expand all'}
+        />
         <Button
           className="add-node"
           disabled={newNodeName === ''}
