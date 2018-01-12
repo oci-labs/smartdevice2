@@ -17,7 +17,7 @@ thejoveexpress/lights/calibration/feedback - rational
 */
 
 const mqtt = require('mqtt');
-const MySqlConnection = require('mysql-easier');
+const {getChildId, getParentId, updateProperty} = require('./instance-service');
 
 const MSG_DELIM = '/';
 const TRAIN_NAME = 'thejoveexpress';
@@ -38,37 +38,6 @@ const engineCalibrationTopic = getTopic('engine', 'calibration');
 const lightsAmbientTopic = getTopic('lights', 'ambient');
 const lightsCalibrationTopic = getTopic('lights', 'calibration');
 
-const childMap = {};
-const parentMap = {};
-let mySql;
-
-async function getChildId(parentName, childName) {
-  const key = parentName + MSG_DELIM + childName;
-  let id = childMap[key];
-  if (id) return id;
-
-  const parentId = await getParentId(parentName);
-  if (parentId === 0) return 0; // not found
-  const sql = 'select id from instance where parentId=? and name=?';
-  const rows = await mySql.query(sql, parentId, childName);
-  if (rows.length === 0) return 0; // not found
-  [{id}] = rows;
-  childMap[key] = id;
-  return id;
-}
-
-async function getParentId(parentName) {
-  let id = parentMap[parentName];
-  if (id) return id;
-
-  const sql = 'select id from instance where name=?';
-  const rows = await mySql.query(sql, parentName);
-  if (rows.length === 0) return 0; // not found
-  [{id}] = rows;
-  parentMap[parentName] = id;
-  return id;
-}
-
 function getTopic(...parts) {
   const middle = parts.length ? parts.join(MSG_DELIM) + MSG_DELIM : '';
   return TRAIN_NAME + MSG_DELIM + middle + 'feedback';
@@ -84,18 +53,7 @@ async function saveProperty(parentName, childName, property, value) {
     );
   }
 
-  // Get the id of the existing instance_data row if any.
-  const sql = 'select id from instance_data where instanceId=?';
-  const rows = await mySql.query(sql, instanceId);
-  const id = rows.length ? rows[0].id : undefined;
-
-  const obj = {
-    id,
-    instanceId,
-    dataKey: property,
-    dataValue: value
-  };
-  mySql.upsert('instance_data', obj);
+  await updateProperty(instanceId, property, value);
 }
 
 // message is a Buffer
@@ -137,9 +95,7 @@ function handleMessage(topic, message) {
   }
 }
 
-function mqttService(connection: MySqlConnection) {
-  mySql = connection;
-
+function mqttService() {
   const client = mqtt.connect('mqtt://' + MQTT_HOST + ':' + MQTT_PORT);
   // Listen for messages on all topics.
   client.on('connect', () => client.subscribe('#'));

@@ -7,6 +7,8 @@ const {errorHandler} = require('./util/error-util');
 
 import type {AlertType, AlertTypeType, PrimitiveType} from './types';
 
+const childMap = {};
+const parentMap = {};
 let mySql;
 
 async function createAlerts(
@@ -55,8 +57,27 @@ function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
   return mySql.query(sql, typeId);
 }
 
+async function getChildId(
+  parentName: string,
+  childName: string
+): Promise<number> {
+  const key = parentName + '/' + childName;
+  let id = childMap[key];
+  if (id) return id;
+
+  const parentId = await getParentId(parentName);
+  if (parentId === 0) return 0; // not found
+  const sql = 'select id from instance where parentId=? and name=?';
+  const rows = await mySql.query(sql, parentId, childName);
+  if (rows.length === 0) return 0; // not found
+  [{id}] = rows;
+  childMap[key] = id;
+  return id;
+}
+
 async function getData(instanceId: number): Promise<Object> {
-  const rows = await mySql.getById('instance_data', instanceId);
+  const sql = 'select dataKey, dataValue from instance_data where instanceId=?';
+  const rows = await mySql.query(sql, instanceId);
   return rows.reduce((data, row) => {
     data[row.dataKey] = row.dataValue;
     return data;
@@ -86,6 +107,18 @@ async function getInstanceTypeId(instanceId: number): Promise<number> {
   return Number(typeId);
 }
 
+async function getParentId(parentName: string): Promise<number> {
+  let id = parentMap[parentName];
+  if (id) return id;
+
+  const sql = 'select id from instance where name=?';
+  const rows = await mySql.query(sql, parentName);
+  if (rows.length === 0) return 0; // not found
+  [{id}] = rows;
+  parentMap[parentName] = id;
+  return id;
+}
+
 function instanceService(
   app: express$Application,
   connection: MySqlConnection
@@ -103,12 +136,8 @@ function isTriggered(expression: string, instanceData: Object): boolean {
   );
   const code = assignments.join(' ') + ' ' + expression;
   try {
-    //TODO: Check for dangerous code.
     // eslint-disable-next-line no-eval
     const triggered = eval(code);
-    if (triggered) {
-      console.log('instance-service.js isTriggered: code =', code);
-    }
     return triggered;
   } catch (e) {
     // If the expression references properties that are not set,
@@ -206,8 +235,10 @@ async function updateProperty(
 }
 
 module.exports = {
-  instanceService,
+  getChildId,
   getInstanceDataHandler,
+  getParentId,
+  instanceService,
   postInstanceDataHandler,
   updateProperty
 };
