@@ -2,7 +2,7 @@
 
 $badgeSize: 30px;
 $borderSize: 5px;
-$radius: 50px;
+$radius: 30px;
 $size: $radius * 2 - $borderSize * 2;
 
 .node {
@@ -18,9 +18,8 @@ $size: $radius * 2 - $borderSize * 2;
     display: flex;
     height: $size;
     justify-content: center;
-    margin-bottom: 10px;
     position: relative;
-    width: $size;
+    width: $size * 3;
 
     .badge {
       align-items: center;
