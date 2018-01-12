@@ -9,6 +9,7 @@
   "author": "R. Mark Volkmann <r.mark.volkmann@gmail.com> (https://mvolkmann.github.io/)",
   "license": "MIT",
   "dependencies": {
-    "mqtt": "^2.15.1"
+    "mqtt": "^2.15.1",
+    "mysql-easier": "^1.3.5"
   }
 }
