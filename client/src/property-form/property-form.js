@@ -22,16 +22,12 @@ type PropsType = {
 class PropertyForm extends Component<PropsType> {
   getInput = (property: PropertyType) => {
     const {kind, name} = property;
-
-    const path = 'instanceData/' + name;
-
     const type =
       kind === 'boolean'
         ? 'checkbox'
         : kind === 'number' ? kind : kind === 'text' ? kind : undefined;
-
     return type ? (
-      <Input type={type} path={path} />
+      <Input type={type} path={'instanceData/' + name} />
     ) : (
       <div>{`unsupported type ${kind}`}</div>
     );

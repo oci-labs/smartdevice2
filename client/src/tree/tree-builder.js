@@ -7,6 +7,7 @@ import {dispatch, getState} from 'redux-easy';
 import TreeNode from './tree-node';
 import {addNode} from './tree-util';
 import Button from '../share/button';
+import Input from '../share/input';
 import {getJson} from '../util/rest-util';
 
 import './tree-builder.css';
@@ -47,13 +48,6 @@ class TreeBuilder extends Component<PropsType> {
     if (newKind !== currentKind) this.load(newKind);
   }
 
-  handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    const {kind} = this.props;
-    const {value} = event.target;
-    const path = `ui/${kind}Name`;
-    dispatch('@setPath', {path, value});
-  };
-
   // Loads nodes from database.
   load = async (kind: TreeType) => {
     if (haveNodeMap(kind)) return;
@@ -80,11 +74,10 @@ class TreeBuilder extends Component<PropsType> {
       <div className="tree-builder">
         <div className="new-div">
           <label>New {capitalize(kind)}</label>
-          <input
+          <Input
+            path={`ui/${kind}Name`}
             type="text"
             autoFocus
-            onChange={this.handleChange}
-            value={newNodeName}
           />
         </div>
         <Button
