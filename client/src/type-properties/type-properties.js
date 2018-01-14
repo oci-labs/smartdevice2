@@ -4,7 +4,7 @@ import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatchSet} from 'redux-easy';
 
 import Button from '../share/button';
 import {validNameHandler} from '../util/input-util';
@@ -38,7 +38,7 @@ class TypeProperties extends Component<PropsType, MyStateType> {
       typeId: typeNode.id
     };
     await postJson('type_data', typeData);
-    dispatch('setNewPropName', '');
+    dispatchSet('ui/newPropName', '');
   };
 
   componentWillMount() {
@@ -70,11 +70,11 @@ class TypeProperties extends Component<PropsType, MyStateType> {
   }
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewPropName', e.target.value);
+    dispatchSet('ui/newPropName', e.target.value);
   };
 
   propTypeChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewPropType', e.target.value);
+    dispatchSet('ui/newPropType', e.target.value);
   };
 
   renderTableHead = () => (

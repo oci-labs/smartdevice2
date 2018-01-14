@@ -4,7 +4,7 @@ import capitalize from 'lodash/capitalize';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatchSet} from 'redux-easy';
 
 import PropertyForm from '../property-form/property-form';
 import Alert from '../alert/alert';
@@ -67,7 +67,7 @@ async function getTypeNode(node: NodeType): Promise<?NodeType> {
 
 export async function reloadAlerts() {
   const alerts = await getAllAlerts();
-  dispatch('setAlerts', alerts);
+  dispatchSet('alerts', alerts);
 }
 
 class InstanceDetail extends Component<PropsType> {
@@ -104,7 +104,7 @@ class InstanceDetail extends Component<PropsType> {
 
   async loadData(instanceNode: NodeType) {
     const typeNode = await getTypeNode(instanceNode);
-    dispatch('setTypeName', typeNode ? typeNode.name : '');
+    dispatchSet('ui/typeName', typeNode ? typeNode.name : '');
 
     reloadAlerts();
 
@@ -122,7 +122,7 @@ class InstanceDetail extends Component<PropsType> {
       map[d.dataKey] = d.dataValue;
       return map;
     }, {});
-    dispatch('setInstanceData', data);
+    dispatchSet('instanceData', data);
   }
 
   async loadTypeProps(typeNode: ?NodeType) {
@@ -131,7 +131,7 @@ class InstanceDetail extends Component<PropsType> {
     const json = await getJson(`types/${typeNode.id}/data`);
     const properties = ((json: any): PropertyType[]);
     const sortedProperties = sortBy(properties, ['name']);
-    dispatch('setTypeProps', sortedProperties);
+    dispatchSet('ui/typeProps', sortedProperties);
   }
 
   renderAlerts = () => {

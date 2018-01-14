@@ -2,13 +2,14 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatchSet} from 'redux-easy';
 
 import Button from '../share/button';
+import Input from '../share/input';
 import {postJson} from '../util/rest-util';
 import {hideModal} from '../share/sd-modal';
 
-import type {NodeType, PrimitiveType, PropertyType, StateType} from '../types';
+import type {NodeType, PropertyType, StateType} from '../types';
 
 import './property-form.css';
 
@@ -19,30 +20,18 @@ type PropsType = {
 };
 
 class PropertyForm extends Component<PropsType> {
-  getInput = (property: PropertyType, value: PrimitiveType) => {
+  getInput = (property: PropertyType) => {
     const {kind, name} = property;
 
-    const onChange = event => {
-      const {instanceData} = this.props;
-      const {checked, value} = event.target;
-      const v = kind === 'boolean' ? checked : value;
-      const newInstanceData = {...instanceData, [name]: v};
-      dispatch('setInstanceData', newInstanceData);
-    };
+    const path = 'instanceData/' + name;
 
-    const v =
+    const type =
       kind === 'boolean'
-        ? Boolean(Number(value))
-        : kind === 'number'
-          ? Number(value) || 0
-          : kind === 'text' ? value || '' : undefined;
+        ? 'checkbox'
+        : kind === 'number' ? kind : kind === 'text' ? kind : undefined;
 
-    return kind === 'boolean' ? (
-      <input type="checkbox" onChange={onChange} checked={v} />
-    ) : kind === 'number' ? (
-      <input type="number" onChange={onChange} value={v} />
-    ) : kind === 'text' ? (
-      <input type="text" onChange={onChange} value={v} />
+    return type ? (
+      <Input type={type} path={path} />
     ) : (
       <div>{`unsupported type ${kind}`}</div>
     );
@@ -59,15 +48,12 @@ class PropertyForm extends Component<PropsType> {
 
   renderTableRow = (node: NodeType, property: PropertyType) => {
     const {name} = property;
-    const {instanceData} = this.props;
-    const value = instanceData[name];
-
     return (
       <tr key={property.id}>
         <td>
           <label>{name}</label>
         </td>
-        <td>{this.getInput(property, value)}</td>
+        <td>{this.getInput(property)}</td>
       </tr>
     );
   };
@@ -76,7 +62,7 @@ class PropertyForm extends Component<PropsType> {
     const {instanceData, node} = this.props;
     const res = await postJson(`instances/${node.id}/data`, instanceData);
     const alerts = await res.json();
-    dispatch('setAlerts', alerts);
+    dispatchSet('alerts', alerts);
 
     hideModal();
   };

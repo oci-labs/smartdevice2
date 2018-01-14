@@ -1,7 +1,7 @@
 // @flow
 
 import React, {Component} from 'react';
-import {dispatch} from 'redux-easy';
+import {dispatch, dispatchSet} from 'redux-easy';
 
 import {addNode} from './tree-util';
 import Button from '../share/button';
@@ -41,11 +41,7 @@ class TreeNode extends Component<PropsType> {
   };
 
   editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
-    dispatch('editNode', event.target.value);
-
-  handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewNodeName', event.target.value);
-  };
+    dispatchSet('ui/editedName', event.target.value);
 
   handleEscape = (event: SyntheticInputEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') this.toggleEdit();

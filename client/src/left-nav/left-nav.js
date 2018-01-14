@@ -4,7 +4,7 @@ import upperFirst from 'lodash/upperFirst';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
-import {dispatch} from 'redux-easy';
+import {dispatchSet} from 'redux-easy';
 
 import TreeBuilder from '../tree/tree-builder';
 
@@ -47,7 +47,7 @@ class LeftNav extends Component<PropsType> {
   handleTabSelect = (index: number, lastIndex: number) => {
     if (index === lastIndex) return;
     const treeType = index === 0 ? 'type' : 'instance';
-    dispatch('setTreeType', treeType);
+    dispatchSet('ui/treeType', treeType);
   };
 
   render() {

@@ -12,7 +12,6 @@ import {getJson} from '../util/rest-util';
 import './tree-builder.css';
 
 import type {
-  NewNodeNamePayloadType,
   NodeMapType,
   NodeType,
   SetNodesPayloadType,
@@ -50,9 +49,9 @@ class TreeBuilder extends Component<PropsType> {
 
   handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
     const {kind} = this.props;
-    const name = event.target.value;
-    const payload: NewNodeNamePayloadType = {kind, name};
-    dispatch('setNewNodeName', payload);
+    const {value} = event.target;
+    const path = `ui/${kind}Name`;
+    dispatch('@setPath', {path, value});
   };
 
   // Loads nodes from database.

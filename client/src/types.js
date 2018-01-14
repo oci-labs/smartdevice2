@@ -60,11 +60,6 @@ export type InstanceType = {
   type: NodeType
 };
 
-export type NewNodeNamePayloadType = {
-  kind: TreeType,
-  name: string
-};
-
 export type NodeMapType = {[id: number]: NodeType};
 
 export type NodePayloadType = {

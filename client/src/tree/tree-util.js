@@ -2,18 +2,13 @@
 
 import sortBy from 'lodash/sortBy';
 import React from 'react';
-import {dispatch, getState} from 'redux-easy';
+import {dispatch, dispatchSet, getState} from 'redux-easy';
 
 import {postJson} from '../util/rest-util';
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
 
-import type {
-  AddNodePayloadType,
-  NewNodeNamePayloadType,
-  NodeType,
-  TreeType
-} from '../types';
+import type {AddNodePayloadType, NodeType, TreeType} from '../types';
 
 let typeId;
 
@@ -122,11 +117,11 @@ async function reallyAddNode(
     const id = Number(await res.text());
 
     // Add new node to Redux state.
-    const payload1: AddNodePayloadType = {id, kind, name, parentId, typeId};
-    dispatch('addNode', payload1);
+    const payload: AddNodePayloadType = {id, kind, name, parentId, typeId};
+    dispatch('addNode', payload);
 
-    const payload2: NewNodeNamePayloadType = {kind, name: ''};
-    dispatch('setNewNodeName', payload2);
+    // Clear the node name input.
+    dispatchSet(`ui/${kind}Name`, '');
   } catch (e) {
     console.error('tree-builder.js addNode:', e.message);
   }

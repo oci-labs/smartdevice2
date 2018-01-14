@@ -7,15 +7,10 @@ import {showModal} from './share/sd-modal';
 
 import type {
   AddNodePayloadType,
-  AlertType,
-  AlertTypeType,
   ChangeType,
-  ModalType,
-  NewNodeNamePayloadType,
   NodeMapType,
   NodePayloadType,
   NodeType,
-  PropertyType,
   SetNodesPayloadType,
   StateType,
   TreeType
@@ -132,10 +127,6 @@ addReducer(
   }
 );
 
-addReducer('editNode', (state: StateType, value: string): StateType =>
-  setUiProp(state, 'editedName', value)
-);
-
 addReducer(
   'saveNode',
   (state: StateType, payload: NodePayloadType): StateType => {
@@ -169,14 +160,6 @@ addReducer(
       }
     };
   }
-);
-
-addReducer('setAlerts', (state: StateType, alerts: AlertType[]) =>
-  setTopProp(state, 'alerts', alerts)
-);
-
-addReducer('setInstanceData', (state: StateType, data: Object) =>
-  setTopProp(state, 'instanceData', data)
 );
 
 addReducer('setInstanceProperty', (state: StateType, change: ChangeType) => {
@@ -213,74 +196,6 @@ addReducer(
   }
 );
 
-addReducer('setConfirmEmail', (state: StateType, value: string): StateType =>
-  setUserProp(state, 'confirmEmail', value)
-);
-
-addReducer('setConfirmPassword', (state: StateType, value: string): StateType =>
-  setUserProp(state, 'confirmPassword', value)
-);
-
-addReducer('setEmail', (state: StateType, value: string): StateType =>
-  setUserProp(state, 'email', value)
-);
-
-addReducer('setFirstName', (state: StateType, value: string): StateType =>
-  setUserProp(state, 'firstName', value)
-);
-
-addReducer('setLastName', (state: StateType, value: string): StateType =>
-  setUserProp(state, 'lastName', value)
-);
-
-addReducer('setModal', (state: StateType, modal: ModalType) =>
-  setUiProp(state, 'modal', modal)
-);
-
-addReducer('setNewAlertExpression', (state: StateType, value: string) =>
-  setUiProp(state, 'newAlertExpression', value)
-);
-
-addReducer('setNewAlertName', (state: StateType, value: string) =>
-  setUiProp(state, 'newAlertName', value)
-);
-
-addReducer('setNewAlertSticky', (state: StateType, value: boolean) =>
-  setUiProp(state, 'newAlertSticky', value)
-);
-
-addReducer(
-  'setNewNodeName',
-  (state: StateType, payload: NewNodeNamePayloadType): StateType => {
-    const {kind, name} = payload;
-    return setUiProp(state, kind + 'Name', name);
-  }
-);
-
-addReducer('setNewPropName', (state: StateType, value: string) =>
-  setUiProp(state, 'newPropName', value)
-);
-
-addReducer('setNewPropType', (state: StateType, value: string) =>
-  setUiProp(state, 'newPropType', value)
-);
-
-addReducer('setTreeType', (state: StateType, value: string): StateType =>
-  setUiProp(state, 'treeType', value)
-);
-
-addReducer('setTypeAlerts', (state: StateType, typeAlerts: AlertTypeType[]) =>
-  setUiProp(state, 'typeAlerts', typeAlerts)
-);
-
-addReducer('setTypeName', (state: StateType, value: string): StateType =>
-  setUiProp(state, 'typeName', value)
-);
-
-addReducer('setTypeProps', (state: StateType, typeProps: PropertyType[]) =>
-  setUiProp(state, 'typeProps', typeProps)
-);
-
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
   const {kind, nodes} = payload;
 
@@ -293,14 +208,6 @@ addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
 
   return {...state, [kind + 'NodeMap']: nodeMap};
 });
-
-addReducer('setPassword', (state: StateType, value: string): StateType =>
-  setUserProp(state, 'password', value)
-);
-
-addReducer('setPhone', (state: StateType, value: string): StateType =>
-  setUserProp(state, 'phone', value)
-);
 
 addReducer('toggleEditNode', (state: StateType, node: NodeType): StateType => {
   const value = node === state.ui.editingNode ? 0 : node;

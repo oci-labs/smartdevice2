@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import Modal from 'react-modal'; // See https://reactcommunity.org/react-modal/.
 import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatchSet} from 'redux-easy';
 
 import './sd-modal.css';
 
@@ -15,7 +15,7 @@ let renderFn: ?Function;
 
 export function hideModal(): void {
   renderFn = null;
-  dispatch('setModal', {open: false});
+  dispatchSet('ui/modal', {open: false});
 }
 
 export function showModal(options: ModalType): void {
@@ -24,7 +24,7 @@ export function showModal(options: ModalType): void {
 
   // Using a setTimeout allows this to be called from a reducer.
   setTimeout(() => {
-    dispatch('setModal', {error, open: true, message, title});
+    dispatchSet('ui/modal', {error, open: true, message, title});
   });
 }
 
@@ -41,7 +41,7 @@ class SdModal extends Component<PropsType> {
     node.onclick = () => node.firstChild.firstChild.blur();
   }
 
-  onCloseModal = () => dispatch('setModal', {open: false});
+  onCloseModal = hideModal;
 
   render() {
     const {error, message, open, title} = this.props;

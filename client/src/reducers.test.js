@@ -23,27 +23,12 @@ describe('reducer', () => {
     reduxSetup({initialState: state});
   });
 
-  function testSetTopProp(prop: string) {
-    const payload = ['foo', 'bar'];
-    const action = {type: 'set' + upperFirst(prop), payload};
-    state = reducer(state, action);
-    expect(state[prop]).toEqual(payload);
-  }
-
   function testSetUiProp(prop: string) {
     const type = 'set' + upperFirst(prop);
     const payload = true;
     const action = {type, payload};
     state = reducer(state, action);
     expect(state.ui[prop]).toBe(payload);
-  }
-
-  function testSetUserProp(prop: string) {
-    const type = 'set' + upperFirst(prop);
-    const payload = 'some value';
-    const action = {type, payload};
-    state = reducer(state, action);
-    expect(state.user[prop]).toBe(payload);
   }
 
   function addRootNode() {
@@ -155,22 +140,8 @@ describe('reducer', () => {
     expect(newState.typeNodeMap[childId]).not.toBeDefined();
   });
 
-  test('setAlerts', () => testSetTopProp('alerts'));
-  test('setInstanceData', () => testSetTopProp('instanceData'));
-
-  test('setConfirmEmail', () => testSetUserProp('confirmEmail'));
-  test('setConfirmPassword', () => testSetUserProp('confirmPassword'));
-  test('setEmail', () => testSetUserProp('email'));
-  test('setFirstName', () => testSetUserProp('firstName'));
-  test('setLastName', () => testSetUserProp('lastName'));
-  test('setPassword', () => testSetUserProp('password'));
-  test('setPhone', () => testSetUserProp('phone'));
-
-  test('setModal', () => testSetUiProp('modal'));
   test('setNewAlertExpression', () => testSetUiProp('newAlertExpression'));
   test('setNewAlertName', () => testSetUiProp('newAlertName'));
-  test('setNewPropName', () => testSetUiProp('newPropName'));
-  test('setNewPropType', () => testSetUiProp('newPropType'));
 
   test('setSelectedChildNodeId', () => {
     const nodeId = 999;
@@ -200,8 +171,4 @@ describe('reducer', () => {
     newState = reducer(newState, action);
     expect(newState.ui.selectedTypeNodeId).toBe(0);
   });
-
-  test('setTypeAlerts', () => testSetUiProp('typeAlerts'));
-  test('setTypeName', () => testSetUiProp('typeName'));
-  test('setTypeProps', () => testSetUiProp('typeProps'));
 });

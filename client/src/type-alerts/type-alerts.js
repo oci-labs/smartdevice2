@@ -4,7 +4,7 @@ import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatchSet} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
@@ -53,22 +53,22 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     };
     await postJson('alert_type', alertType);
 
-    dispatch('setNewAlertName', '');
-    dispatch('setNewAlertExpression', '');
-    dispatch('setNewAlertSticky', false);
+    dispatchSet('ui/newAlertName', '');
+    dispatchSet('ui/newAlertExpression', '');
+    dispatchSet('ui/newAlertSticky', false);
   };
 
   alertExpressionChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     const {value} = e.target;
-    dispatch('setNewAlertExpression', value);
+    dispatchSet('ui/newAlertExpression', value);
   };
 
   alertNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewAlertName', e.target.value);
+    dispatchSet('ui/newAlertName', e.target.value);
   };
 
   alertStickyChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatch('setNewAlertSticky', e.target.checked);
+    dispatchSet('ui/newAlertSticky', e.target.checked);
   };
 
   componentWillMount() {
