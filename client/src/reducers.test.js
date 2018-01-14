@@ -140,9 +140,6 @@ describe('reducer', () => {
     expect(newState.typeNodeMap[childId]).not.toBeDefined();
   });
 
-  test('setNewAlertExpression', () => testSetUiProp('newAlertExpression'));
-  test('setNewAlertName', () => testSetUiProp('newAlertName'));
-
   test('setSelectedChildNodeId', () => {
     const nodeId = 999;
     const action = {type: 'setSelectedChildNodeId', payload: nodeId};
