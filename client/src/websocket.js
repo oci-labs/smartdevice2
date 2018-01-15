@@ -8,7 +8,7 @@ export function websocketSetup() {
   const connection = new WebSocket('ws://127.0.0.1:1337');
 
   connection.onopen = () =>
-    console.log('got WebSocket connection');
+    console.info('got WebSocket connection');
 
   connection.onerror = error =>
     console.error('WebSocket error:', error);
@@ -25,7 +25,7 @@ export function websocketSetup() {
       const change = JSON.parse(data);
       dispatch('setInstanceProperty', change);
     } catch (e) {
-      console.log('unsupported WebSocket message:', data);
+      console.info('unsupported WebSocket message:', data);
     }
   };
 }

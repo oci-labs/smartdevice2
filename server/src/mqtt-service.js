@@ -20,13 +20,20 @@ const isEqual = require('lodash/isEqual');
 const mqtt = require('mqtt');
 const WebSocket = require('ws');
 
-const {getChildId, getParentId, updateProperty} = require('./instance-service');
+const {
+  PATH_DELIMITER,
+  getInstanceId,
+  updateProperty
+} = require('./instance-service');
+
+import type {PrimitiveType} from './types';
 
 const MSG_DELIM = '/';
 const TRAIN_NAME = 'thejoveexpress';
 //const MQTT_HOST = TRAIN_NAME + '.local';
 const MQTT_HOST = 'localhost';
 const MQTT_PORT = 1883;
+const SPECIAL_SUFFIXES = ['control', 'feedback'];
 
 //const feedbackTopic = getTopic('');
 
@@ -45,9 +52,9 @@ let lastChange, ws;
 
 function websocketSetup() {
   const wsServer = new WebSocket.Server({port: 1337});
-  console.log('waiting for WebSocket connection');
+  console.info('waiting for WebSocket connection');
   wsServer.on('connection', webSocket => {
-    console.log('got WebSocket connection');
+    console.info('got WebSocket connection');
     ws = webSocket;
 
     ws.on('error', error => {
@@ -65,18 +72,17 @@ function getTopic(...parts) {
   return TRAIN_NAME + MSG_DELIM + middle + 'feedback';
 }
 
-async function saveProperty(parentName, childName, property, value) {
-  const instanceId = childName
-    ? await getChildId(parentName, childName)
-    : await getParentId(parentName);
+async function saveProperty(
+  path: string,
+  property: string,
+  value: PrimitiveType
+): Promise<void> {
+  const instanceId = await getInstanceId(path);
   if (instanceId === 0) {
-    throw new Error(
-      'no instance found for ' + parentName + MSG_DELIM + childName
-    );
+    throw new Error('no instance found for ' + path);
   }
 
-  const alertsChanged =
-    await updateProperty(instanceId, property, value);
+  const alertsChanged = await updateProperty(instanceId, property, value);
 
   if (ws) {
     // Notify web client about property change.
@@ -95,11 +101,11 @@ async function saveProperty(parentName, childName, property, value) {
 function handleMessage(topic, message) {
   //console.log('message length =', message.length);
   const parts = topic.split('/');
-  parts.pop(); // removes "feedback" or "control" from end
-  const [parentName] = parts;
-  const hasChild = parts.length === 3;
-  const childName = hasChild ? parts[1] : undefined;
-  const property = hasChild ? parts[2] : parts[1];
+
+  const lastPart = parts[parts.length - 1];
+  if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
+
+  const property = parts.pop();
 
   let value;
   switch (topic) {
@@ -125,7 +131,8 @@ function handleMessage(topic, message) {
 
   if (value !== undefined) {
     //console.log(topic, '=', value);
-    saveProperty(parentName, childName, property, value);
+    const path = parts.join(PATH_DELIMITER);
+    saveProperty(path, property, value);
   } else {
     console.error('unsupported topic', topic);
   }

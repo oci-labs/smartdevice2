@@ -8,8 +8,8 @@ const {errorHandler} = require('./util/error-util');
 
 import type {AlertType, AlertTypeType, PrimitiveType} from './types';
 
-const childMap = {};
-const parentMap = {};
+const PATH_DELIMITER = '.';
+const pathToIdMap = {};
 let mySql;
 
 async function createAlerts(
@@ -64,24 +64,6 @@ function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
   return mySql.query(sql, typeId);
 }
 
-async function getChildId(
-  parentName: string,
-  childName: string
-): Promise<number> {
-  const key = parentName + '/' + childName;
-  let id = childMap[key];
-  if (id) return id;
-
-  const parentId = await getParentId(parentName);
-  if (parentId === 0) return 0; // not found
-  const sql = 'select id from instance where parentId=? and name=?';
-  const rows = await mySql.query(sql, parentId, childName);
-  if (rows.length === 0) return 0; // not found
-  [{id}] = rows;
-  childMap[key] = id;
-  return id;
-}
-
 async function getData(instanceId: number): Promise<Object> {
   const sql = 'select dataKey, dataValue from instance_data where instanceId=?';
   const rows = await mySql.query(sql, instanceId);
@@ -115,14 +97,43 @@ async function getInstanceTypeId(instanceId: number): Promise<number> {
 }
 
 async function getParentId(parentName: string): Promise<number> {
-  let id = parentMap[parentName];
+  let id = pathToIdMap[parentName];
   if (id) return id;
 
   const sql = 'select id from instance where name=?';
   const rows = await mySql.query(sql, parentName);
   if (rows.length === 0) return 0; // not found
   [{id}] = rows;
-  parentMap[parentName] = id;
+  pathToIdMap[parentName] = id;
+  return id;
+}
+
+async function getInstanceId(path: string): Promise<number> {
+  // If we have seen this path before, returns its id.
+  let id = pathToIdMap[path];
+  if (id) return id;
+
+  const parts = path.split(PATH_DELIMITER);
+
+  // Get id of first node in path.
+  let subpath = parts.shift();
+  id = await getParentId(subpath);
+  if (id === 0) return 0; // not found
+
+  for (const part of parts) {
+    const parentId = id;
+    subpath += PATH_DELIMITER + part;
+    id = pathToIdMap[subpath];
+    if (!id) {
+      const sql = 'select id from instance where parentId=? and name=?';
+      // eslint-disable-next-line no-await-in-loop
+      const rows = await mySql.query(sql, parentId, part);
+      if (rows.length === 0) return 0; // not found
+      [{id}] = rows;
+      pathToIdMap[subpath] = id;
+    }
+  }
+
   return id;
 }
 
@@ -249,7 +260,7 @@ async function updateAlerts(
 
 /**
  * Updates and instance property and returns a boolean
- * indicating whether any alerts changed.
+ * indicating whether any alertyts changed.
  */
 async function updateProperty(
   instanceId: number,
@@ -262,8 +273,9 @@ async function updateProperty(
 }
 
 module.exports = {
-  getChildId,
+  PATH_DELIMITER,
   getInstanceDataHandler,
+  getInstanceId,
   getParentId,
   instanceService,
   postInstanceDataHandler,
