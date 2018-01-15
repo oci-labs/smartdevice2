@@ -27,7 +27,7 @@ class PropertyForm extends Component<PropsType> {
         ? 'checkbox'
         : kind === 'number' ? kind : kind === 'text' ? kind : undefined;
     return type ? (
-      <Input type={type} path={'instanceData/' + name} />
+      <Input type={type} path={'instanceData.' + name} />
     ) : (
       <div>{`unsupported type ${kind}`}</div>
     );
