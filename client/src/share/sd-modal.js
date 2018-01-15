@@ -43,6 +43,21 @@ class SdModal extends Component<PropsType> {
 
   onCloseModal = hideModal;
 
+  renderMessage = () => {
+    const {message} = this.props;
+    if (!message) return null;
+
+    // If message contains newlines, honor them.
+    const lines = message.split('\n');
+    const line1 = lines.shift();
+    return (
+      <p>
+        {line1}
+        {lines.map((line, index) => [<br key={index} />, line])}
+      </p>
+    );
+  };
+
   render() {
     const {error, message, open, title} = this.props;
     let className = 'sd-modal';
@@ -63,7 +78,7 @@ class SdModal extends Component<PropsType> {
           </div>
         </header>
         <section className="body">
-          {message ? <p>{message}</p> : null}
+          {message ? this.renderMessage() : null}
           {renderFn ? renderFn() : null}
         </section>
       </Modal>

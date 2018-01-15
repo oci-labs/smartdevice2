@@ -11,18 +11,27 @@ import {showModal} from '../share/sd-modal';
 import {isSafeCode, spaceHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
-import type {AlertTypeType, NodeType, StateType, UiType} from '../types';
+import type {
+  AlertTypeType,
+  NodeType,
+  PropertyType,
+  StateType,
+  UiType
+} from '../types';
 
 import './type-alerts.css';
 
 type PropsType = {
   typeNode: NodeType,
+  typeProps: PropertyType[],
   ui: UiType
 };
 
 type MyStateType = {
   alertTypes: AlertTypeType[]
 };
+
+const ALERT_NAME_RE = /^[A-Za-z]\w*/;
 
 class TypeAlerts extends Component<PropsType, MyStateType> {
   state: MyStateType = {
@@ -36,11 +45,30 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     } = this.props;
     if (!typeNode) return;
 
+    if (!this.isValidName()) {
+      showModal({
+        error: true,
+        title: 'Invalid Alert Condition',
+        message: 'The alert name is invalid or is already in use.'
+      });
+      return;
+    }
+
     if (!isSafeCode(newAlertExpression)) {
       showModal({
         error: true,
         title: 'Invalid Alert Condition',
         message: 'Function calls are not allowed.'
+      });
+      return;
+    }
+
+    const badNames = this.getBadNames();
+    if (badNames.length) {
+      showModal({
+        error: true,
+        title: 'Invalid Alert Condition',
+        message: 'These names do not match a property:\n' + badNames.join(', ')
       });
       return;
     }
@@ -88,6 +116,24 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     let {alertTypes} = this.state;
     alertTypes = without(alertTypes, alertType);
     this.setState({alertTypes});
+  };
+
+  getBadNames = () => {
+    const {typeProps, ui: {newAlertExpression}} = this.props;
+    const expressionNames = newAlertExpression
+      .split(' ')
+      .filter(word => ALERT_NAME_RE.test(word));
+    const propNames = typeProps.map(typeProp => typeProp.name);
+    return expressionNames.filter(n => !propNames.includes(n));
+  };
+
+  isValidName = () => {
+    const {alertTypes} = this.state;
+    const {ui: {newAlertName}} = this.props;
+    const alertNames = alertTypes.map(at => at.name);
+    return (
+      ALERT_NAME_RE.test(newAlertName) && !alertNames.includes(newAlertName)
+    );
   };
 
   async loadAlertTypes(typeNode: ?NodeType) {
@@ -193,9 +239,9 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
 const mapState = (state: StateType): PropsType => {
   const {typeNodeMap, ui} = state;
-  const {selectedTypeNodeId} = ui;
+  const {selectedTypeNodeId, typeProps} = ui;
   const typeNode = typeNodeMap[selectedTypeNodeId];
-  return {typeNode, ui};
+  return {typeNode, typeProps, ui};
 };
 
 export default connect(mapState)(TypeAlerts);
