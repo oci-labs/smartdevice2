@@ -15,7 +15,7 @@ let renderFn: ?Function;
 
 export function hideModal(): void {
   renderFn = null;
-  dispatchSet('ui/modal', {open: false});
+  dispatchSet('ui.modal', {open: false});
 }
 
 export function showModal(options: ModalType): void {
@@ -24,7 +24,7 @@ export function showModal(options: ModalType): void {
 
   // Using a setTimeout allows this to be called from a reducer.
   setTimeout(() => {
-    dispatchSet('ui/modal', {error, open: true, message, title});
+    dispatchSet('ui.modal', {error, open: true, message, title});
   });
 }
 

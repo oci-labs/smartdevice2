@@ -121,7 +121,7 @@ async function reallyAddNode(
     dispatch('addNode', payload);
 
     // Clear the node name input.
-    dispatchSet(`ui/${kind}Name`, '');
+    dispatchSet(`ui.${kind}Name`, '');
   } catch (e) {
     console.error('tree-builder.js addNode:', e.message);
   }

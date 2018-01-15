@@ -2,10 +2,10 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
-import Input from '../share/input';
+//import Input from '../share/input';
 import {postJson} from '../util/rest-util';
 import {hideModal} from '../share/sd-modal';
 

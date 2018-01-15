@@ -47,7 +47,7 @@ class LeftNav extends Component<PropsType> {
   handleTabSelect = (index: number, lastIndex: number) => {
     if (index === lastIndex) return;
     const treeType = index === 0 ? 'type' : 'instance';
-    dispatchSet('ui/treeType', treeType);
+    dispatchSet('ui.treeType', treeType);
   };
 
   render() {

@@ -1,7 +1,6 @@
 // @flow
 
 import cloneDeep from 'lodash/clonedeep';
-import upperFirst from 'lodash/upperfirst';
 import {reducer, reduxSetup} from 'redux-easy';
 
 import initialState from './initial-state';
@@ -23,6 +22,7 @@ describe('reducer', () => {
     reduxSetup({initialState: state});
   });
 
+  /*
   function testSetUiProp(prop: string) {
     const type = 'set' + upperFirst(prop);
     const payload = true;
@@ -30,6 +30,7 @@ describe('reducer', () => {
     state = reducer(state, action);
     expect(state.ui[prop]).toBe(payload);
   }
+  */
 
   function addRootNode() {
     const parentId = ROOT_ID;

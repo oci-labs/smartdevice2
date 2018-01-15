@@ -115,11 +115,12 @@ function handleMessage(topic, message) {
     case enginePowerTopic:
     case engineCalibrationTopic:
     case lightsAmbientTopic:
-    case lightsCalibrationTopic:
-      value = message.readIntBE(0, 8);
-      //const maxValue = message.readIntBE(8, 8);
-      //console.log('maxValue =', maxValue);
+    case lightsCalibrationTopic: {
+      const rawValue = message.readIntBE(0, 8);
+      const maxValue = message.readIntBE(8, 8);
+      value = 100 * (rawValue / maxValue);
       break;
+    }
   }
 
   if (value !== undefined) {

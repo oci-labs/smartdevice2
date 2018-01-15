@@ -104,7 +104,7 @@ class InstanceDetail extends Component<PropsType> {
 
   async loadData(instanceNode: NodeType) {
     const typeNode = await getTypeNode(instanceNode);
-    dispatchSet('ui/typeName', typeNode ? typeNode.name : '');
+    dispatchSet('ui.typeName', typeNode ? typeNode.name : '');
 
     reloadAlerts();
 
@@ -131,7 +131,7 @@ class InstanceDetail extends Component<PropsType> {
     const json = await getJson(`types/${typeNode.id}/data`);
     const properties = ((json: any): PropertyType[]);
     const sortedProperties = sortBy(properties, ['name']);
-    dispatchSet('ui/typeProps', sortedProperties);
+    dispatchSet('ui.typeProps', sortedProperties);
   }
 
   renderAlerts = () => {
@@ -180,10 +180,12 @@ class InstanceDetail extends Component<PropsType> {
   renderProperty = (typeProp: PropertyType, instanceData: Object) => {
     const {kind, name} = typeProp;
     let value = instanceData[name];
-    const isBoolean = kind === 'boolean';
-    value = isBoolean
-      ? Boolean(Number(value))
-      : value === undefined ? 'unset' : value;
+    value =
+      kind === 'boolean'
+        ? Boolean(Number(value))
+        : kind === 'percent'
+          ? Number(value).toFixed(2) + '%'
+          : value === undefined ? 'unset' : value;
 
     return (
       <tr key={name}>

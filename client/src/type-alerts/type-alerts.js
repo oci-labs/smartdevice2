@@ -53,22 +53,22 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     };
     await postJson('alert_type', alertType);
 
-    dispatchSet('ui/newAlertName', '');
-    dispatchSet('ui/newAlertExpression', '');
-    dispatchSet('ui/newAlertSticky', false);
+    dispatchSet('ui.newAlertName', '');
+    dispatchSet('ui.newAlertExpression', '');
+    dispatchSet('ui.newAlertSticky', false);
   };
 
   alertExpressionChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     const {value} = e.target;
-    dispatchSet('ui/newAlertExpression', value);
+    dispatchSet('ui.newAlertExpression', value);
   };
 
   alertNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui/newAlertName', e.target.value);
+    dispatchSet('ui.newAlertName', e.target.value);
   };
 
   alertStickyChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui/newAlertSticky', e.target.checked);
+    dispatchSet('ui.newAlertSticky', e.target.checked);
   };
 
   componentWillMount() {

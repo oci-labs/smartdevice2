@@ -2,12 +2,11 @@
 
 import capitalize from 'lodash/capitalize';
 import React, {Component} from 'react';
-import {dispatch, getState} from 'redux-easy';
+import {dispatch, getState, Input} from 'redux-easy';
 
 import TreeNode from './tree-node';
 import {addNode} from './tree-util';
 import Button from '../share/button';
-import Input from '../share/input';
 import {getJson} from '../util/rest-util';
 
 import './tree-builder.css';

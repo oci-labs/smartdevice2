@@ -38,7 +38,7 @@ class TypeProperties extends Component<PropsType, MyStateType> {
       typeId: typeNode.id
     };
     await postJson('type_data', typeData);
-    dispatchSet('ui/newPropName', '');
+    dispatchSet('ui.newPropName', '');
   };
 
   componentWillMount() {
@@ -70,11 +70,11 @@ class TypeProperties extends Component<PropsType, MyStateType> {
   }
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui/newPropName', e.target.value);
+    dispatchSet('ui.newPropName', e.target.value);
   };
 
   propTypeChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui/newPropType', e.target.value);
+    dispatchSet('ui.newPropType', e.target.value);
   };
 
   renderTableHead = () => (
@@ -103,6 +103,7 @@ class TypeProperties extends Component<PropsType, MyStateType> {
           <select onChange={this.propTypeChange} value={newPropType}>
             <option>boolean</option>
             <option>number</option>
+            <option>percent</option>
             <option>text</option>
           </select>
         </td>

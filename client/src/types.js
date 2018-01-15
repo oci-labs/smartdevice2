@@ -87,7 +87,7 @@ export type ModalType = {
 
 export type PrimitiveType = boolean | number | string;
 
-export type PropertyKindType = 'boolean' | 'number' | 'text';
+export type PropertyKindType = 'boolean' | 'number' | 'percent' | 'text';
 
 export type PropertyType = {
   id: number,

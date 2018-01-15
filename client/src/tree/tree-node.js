@@ -41,7 +41,7 @@ class TreeNode extends Component<PropsType> {
   };
 
   editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
-    dispatchSet('ui/editedName', event.target.value);
+    dispatchSet('ui.editedName', event.target.value);
 
   handleEscape = (event: SyntheticInputEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') this.toggleEdit();
