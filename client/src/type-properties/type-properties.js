@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
 import Button from '../share/button';
+import {showModal} from '../share/sd-modal';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
@@ -23,6 +24,8 @@ type MyStateType = {
   typeProps: PropertyType[]
 };
 
+const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
+
 class TypeProperties extends Component<PropsType, MyStateType> {
   state: MyStateType = {
     typeProps: []
@@ -31,6 +34,15 @@ class TypeProperties extends Component<PropsType, MyStateType> {
   addProp = async () => {
     const {typeNode, ui: {newPropName, newPropType}} = this.props;
     if (!typeNode) return;
+
+    if (!this.isValidName()) {
+      showModal({
+        error: true,
+        title: 'Invalid Property',
+        message: 'The property name is invalid or is already in use.'
+      });
+      return;
+    }
 
     const typeData = {
       kind: newPropType,
@@ -58,6 +70,15 @@ class TypeProperties extends Component<PropsType, MyStateType> {
     let {typeProps} = this.state;
     typeProps = without(typeProps, typeProp);
     this.setState({typeProps});
+  };
+
+  isValidName = () => {
+    const {typeProps} = this.state;
+    const {ui: {newPropName}} = this.props;
+    const propNames = typeProps.map(at => at.name);
+    return (
+      PROPERTY_NAME_RE.test(newPropName) && !propNames.includes(newPropName)
+    );
   };
 
   async loadTypeProps(typeNode: ?NodeType) {
