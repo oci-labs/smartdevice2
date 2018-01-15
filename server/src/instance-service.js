@@ -143,9 +143,25 @@ function instanceService(
 ): void {
   mySql = connection;
 
-  const URL_PREFIX = '/instances/:instanceId/data';
-  app.get(URL_PREFIX, getInstanceDataHandler);
-  app.post(URL_PREFIX, postInstanceDataHandler);
+  const URL_PREFIX = '/instances/:instanceId/';
+  app.get(URL_PREFIX + 'data', getInstanceDataHandler);
+  app.get(URL_PREFIX + 'inuse', inUseHandler);
+  app.post(URL_PREFIX + 'data', postInstanceDataHandler);
+}
+
+async function inUseHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {instanceId} = req.params;
+  const sql = 'select id from instance where parentId = ?';
+  try {
+    const referIds = await mySql.query(sql, instanceId);
+    res.send(referIds.length > 0);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
 }
 
 function isTriggered(expression: string, instanceData: Object): boolean {

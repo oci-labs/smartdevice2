@@ -41,6 +41,14 @@ export type ChangeType = {
   value: PrimitiveType
 };
 
+export type ConfirmType = {
+  message: string,
+  noCb: Function,
+  open?: boolean,
+  title: string,
+  yesCb: Function
+};
+
 export type HistoryType = {
   location: {
     pathname: string

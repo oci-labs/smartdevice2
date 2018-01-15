@@ -5,8 +5,9 @@ const MySqlConnection = require('mysql-easier');
 
 const {errorHandler} = require('./util/error-util');
 
+let mySql;
+
 async function getTypeAlertsHandler(
-  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -23,7 +24,6 @@ async function getTypeAlertsHandler(
 }
 
 async function getTypeDataHandler(
-  mySql: MySqlConnection,
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -39,10 +39,34 @@ async function getTypeDataHandler(
   }
 }
 
-function typeService(app: express$Application, mySql: MySqlConnection): void {
+async function inUseHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {typeId} = req.params;
+  const sql = 'select id from type where parentId = ?';
+  try {
+    let referIds = await mySql.query(sql, typeId);
+    if (referIds.length === 0) {
+      const sql = 'select id from instance where typeId = ?';
+      referIds = await mySql.query(sql, typeId);
+    }
+    res.send(referIds.length > 0);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
+function typeService(
+  app: express$Application,
+  connection: MySqlConnection
+): void {
+  mySql = connection;
   const URL_PREFIX = '/types/:typeId/';
-  app.get(URL_PREFIX + 'data', getTypeDataHandler.bind(null, mySql));
-  app.get(URL_PREFIX + 'alerts', getTypeAlertsHandler.bind(null, mySql));
+  app.get(URL_PREFIX + 'inuse', inUseHandler);
+  app.get(URL_PREFIX + 'data', getTypeDataHandler);
+  app.get(URL_PREFIX + 'alerts', getTypeAlertsHandler);
 }
 
 module.exports = {

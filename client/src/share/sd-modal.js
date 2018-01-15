@@ -7,7 +7,7 @@ import {dispatchSet} from 'redux-easy';
 
 import './sd-modal.css';
 
-import type {ModalType, StateType} from '../types';
+import type {ConfirmType, ModalType, StateType} from '../types';
 
 type PropsType = ModalType;
 
@@ -16,6 +16,32 @@ let renderFn: ?Function;
 export function hideModal(): void {
   renderFn = null;
   dispatchSet('ui.modal', {open: false});
+}
+
+export function showConfirm(options: ConfirmType): void {
+  const {message, noCb, title, yesCb} = options;
+
+  const handleYes = () => {
+    hideModal();
+    yesCb();
+  };
+
+  const handleNo = () => {
+    hideModal();
+    noCb();
+  };
+
+  renderFn = () => (
+    <div className="button-row">
+      <button onClick={handleYes}>Yes</button>
+      <button onClick={handleNo}>No</button>
+    </div>
+  );
+
+  // Using a setTimeout allows this to be called from a reducer.
+  setTimeout(() => {
+    dispatchSet('ui.modal', {open: true, message, renderFn, title});
+  });
 }
 
 export function showModal(options: ModalType): void {

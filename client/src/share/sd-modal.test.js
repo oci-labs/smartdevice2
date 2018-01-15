@@ -53,7 +53,7 @@ describe('SdModal', () => {
     const [action] = actions;
     expect(action.type).toBe('@setPath');
     expect(action.payload).toEqual({
-      path: 'ui/modal',
+      path: 'ui.modal',
       value: {open: false}
     });
   });

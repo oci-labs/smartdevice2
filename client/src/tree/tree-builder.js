@@ -74,7 +74,7 @@ class TreeBuilder extends Component<PropsType> {
         <div className="new-div">
           <label>New {capitalize(kind)}</label>
           <Input
-            path={`ui/${kind}Name`}
+            path={`ui.${kind}Name`}
             type="text"
             autoFocus
           />

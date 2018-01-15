@@ -104,7 +104,6 @@ class InstanceDetail extends Component<PropsType> {
 
   async loadData(instanceNode: NodeType) {
     const typeNode = await getTypeNode(instanceNode);
-    dispatchSet('ui.typeName', typeNode ? typeNode.name : '');
 
     reloadAlerts();
 
