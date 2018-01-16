@@ -44,9 +44,6 @@ types of supported devices.
 * `java -jar TheJoveExpress.jar`
 
 ## Outstanding Issues
-* Check for NaN% displayed in InstanceDetail.
-* Clear new alert inputs at some point.
-* Investigate issue with condition not matching property names.
 * Add "MQTT Servers" tab to enter hosts.
   In the future we may need to specify
   port, clientId, cleanSession, keepAlive, and lastWill.

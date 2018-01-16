@@ -34,6 +34,8 @@ type MyStateType = {
 const ALERT_NAME_RE = /^[A-Za-z]\w*/;
 
 class TypeAlerts extends Component<PropsType, MyStateType> {
+  added: boolean;
+
   state: MyStateType = {
     alertTypes: []
   };
@@ -81,6 +83,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     };
     await postJson('alert_type', alertType);
 
+    this.added = true;
     dispatchSet('ui.newAlertName', '');
     dispatchSet('ui.newAlertExpression', '');
     dispatchSet('ui.newAlertSticky', false);
@@ -104,11 +107,16 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {typeNode, ui: {newAlertName}} = nextProps;
+    const {typeNode} = nextProps;
     if (!typeNode) return;
 
-    // If a new alert was just added ...
-    if (newAlertName === '') this.loadAlertTypes(typeNode);
+    const currentTypeNode = this.props.typeNode;
+    const newTypeSelected =
+      !currentTypeNode || typeNode.id !== currentTypeNode.id;
+
+    // If the type changed or a new alert was just added ...
+    if (newTypeSelected || this.added) this.loadAlertTypes(typeNode);
+    this.added = false;
   }
 
   deleteAlertType = async (alertType: AlertTypeType) => {

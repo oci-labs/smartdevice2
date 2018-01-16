@@ -180,11 +180,11 @@ class InstanceDetail extends Component<PropsType> {
     const {kind, name} = typeProp;
     let value = instanceData[name];
     value =
-      kind === 'boolean'
-        ? Boolean(Number(value))
-        : kind === 'percent'
-          ? Number(value).toFixed(2) + '%'
-          : value === undefined ? 'unset' : value;
+      value === undefined
+        ? 'unset'
+        : kind === 'boolean'
+          ? Boolean(Number(value))
+          : kind === 'percent' ? Number(value).toFixed(2) + '%' : value;
 
     return (
       <tr key={name}>

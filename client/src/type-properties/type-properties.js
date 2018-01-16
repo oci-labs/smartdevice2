@@ -20,16 +20,10 @@ type PropsType = {
   ui: UiType
 };
 
-type MyStateType = {
-  typeProps: PropertyType[]
-};
-
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
-class TypeProperties extends Component<PropsType, MyStateType> {
-  state: MyStateType = {
-    typeProps: []
-  };
+class TypeProperties extends Component<PropsType> {
+  added: boolean;
 
   addProp = async () => {
     const {typeNode, ui: {newPropName, newPropType}} = this.props;
@@ -50,6 +44,8 @@ class TypeProperties extends Component<PropsType, MyStateType> {
       typeId: typeNode.id
     };
     await postJson('type_data', typeData);
+
+    this.added = true;
     dispatchSet('ui.newPropName', '');
   };
 
@@ -58,23 +54,27 @@ class TypeProperties extends Component<PropsType, MyStateType> {
   }
 
   componentWillReceiveProps(nextProps) {
-    const {typeNode, ui: {newPropName}} = nextProps;
+    const {typeNode} = nextProps;
     if (!typeNode) return;
 
-    // If a new prop was just added ...
-    if (newPropName === '') this.loadTypeProps(typeNode);
+    const currentTypeNode = this.props.typeNode;
+    const newTypeSelected =
+      !currentTypeNode || typeNode.id !== currentTypeNode.id;
+
+    // If the type changed or a new property was just added ...
+    if (newTypeSelected || this.added) this.loadTypeProps(typeNode);
+    this.added = false;
   }
 
   deleteProp = async (typeProp: PropertyType) => {
     await deleteResource(`type_data/${typeProp.id}`);
-    let {typeProps} = this.state;
+    let {typeProps} = this.props.ui;
     typeProps = without(typeProps, typeProp);
-    this.setState({typeProps});
+    dispatchSet('ui.typeProps', typeProps);
   };
 
   isValidName = () => {
-    const {typeProps} = this.state;
-    const {ui: {newPropName}} = this.props;
+    const {ui: {newPropName, typeProps}} = this.props;
     const propNames = typeProps.map(at => at.name);
     return (
       PROPERTY_NAME_RE.test(newPropName) && !propNames.includes(newPropName)
@@ -87,7 +87,7 @@ class TypeProperties extends Component<PropsType, MyStateType> {
     const json = await getJson(`types/${typeNode.id}/data`);
     const typeProps = ((json: any): PropertyType[]);
     const sortedTypeProps = sortBy(typeProps, ['name']);
-    this.setState({typeProps: sortedTypeProps});
+    dispatchSet('ui.typeProps', sortedTypeProps);
   }
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -157,7 +157,7 @@ class TypeProperties extends Component<PropsType, MyStateType> {
   );
 
   render() {
-    const {typeNode} = this.props;
+    const {typeNode, ui: {typeProps}} = this.props;
     if (!typeNode) {
       return (
         <section className="type-properties">
@@ -166,7 +166,6 @@ class TypeProperties extends Component<PropsType, MyStateType> {
       );
     }
 
-    const {typeProps} = this.state;
     return (
       <section className="type-properties">
         <h3>Properties for type &quot;{typeNode.name}&quot;</h3>
