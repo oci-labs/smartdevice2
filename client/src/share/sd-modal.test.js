@@ -51,7 +51,7 @@ describe('SdModal', () => {
     const actions = store.getActions();
     expect(actions.length).toBe(1);
     const [action] = actions;
-    expect(action.type).toBe('@setPath');
+    expect(action.type).toBe('@@set');
     expect(action.payload).toEqual({
       path: 'ui.modal',
       value: {open: false}

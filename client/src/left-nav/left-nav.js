@@ -46,26 +46,28 @@ class LeftNav extends Component<PropsType> {
 
   handleTabSelect = (index: number, lastIndex: number) => {
     if (index === lastIndex) return;
-    const treeType = index === 0 ? 'type' : 'instance';
-    dispatchSet('ui.treeType', treeType);
+    if (index === 1) dispatchSet('ui.treeType', 'type');
+    if (index === 2) dispatchSet('ui.treeType', 'instance');
   };
 
   render() {
-    const {treeType} = this.props.ui;
-    const isType = treeType === 'type';
-    const tabIndex = isType ? 0 : 1;
-
+    //const {treeType} = this.props.ui;
+    //const isType = treeType === 'type';
+    //const tabIndex = isType ? 1 : 2;
     return (
       <section className="left-nav">
-        <Tabs onSelect={this.handleTabSelect} selectedIndex={tabIndex}>
+        <Tabs onSelect={this.handleTabSelect}>
           <TabList>
+            <Tab>MQTT Servers</Tab>
             <Tab>Type</Tab>
             <Tab>Instance</Tab>
           </TabList>
-          <TabPanel />
-          <TabPanel />
+          <TabPanel>
+            Add MQTT servers.
+          </TabPanel>
+          <TabPanel>{this.getTree()}</TabPanel>
+          <TabPanel>{this.getTree()}</TabPanel>
         </Tabs>
-        {this.getTree()}
       </section>
     );
   }
