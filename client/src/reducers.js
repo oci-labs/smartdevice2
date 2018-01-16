@@ -197,7 +197,7 @@ addReducer(
 );
 
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
-  const {kind, nodes} = payload;
+  const {kind, nodes = []} = payload;
 
   const nodeMap = nodes.reduce((map, node) => {
     const {id} = node;
