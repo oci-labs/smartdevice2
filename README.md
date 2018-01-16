@@ -23,9 +23,10 @@ types of supported devices.
 * open a terminal window
 * `cd server`
 * `npm install` (initially and for each new version)
-* `npm run dbstart`
-* `npm run dbsetup`
-* `npm run start-dev`
+* `npm run dbstart` (only if MySQL server isn't running)
+* `npm run dbsetup` (initially and only after schema changes)
+* `npm run build` (initially and for each new version)
+* `npm run start`
 
 ## Client Setup
 * open a terminal window
@@ -34,7 +35,7 @@ types of supported devices.
 * `npm run start`
 * a new tab will open in the default web browser
 * add types in the hierarchy
-* add properties to each type
+* define properties to each type
 * define alerts for each type
 * create instances of each type
 
