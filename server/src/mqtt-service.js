@@ -123,7 +123,9 @@ function handleMessage(topic, message) {
     case lightsAmbientTopic:
     case lightsCalibrationTopic: {
       const rawValue = message.readIntBE(0, 8);
+      console.log('mqtt-service.js handleMessage: rawValue =', rawValue);
       const maxValue = message.readIntBE(8, 8);
+      console.log('mqtt-service.js handleMessage: maxValue =', maxValue);
       value = 100 * (rawValue / maxValue);
       break;
     }
