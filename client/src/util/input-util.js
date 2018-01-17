@@ -26,7 +26,7 @@ function isDigit(keyCode: number): boolean {
 }
 
 export function isHostName(value: string) {
-  return /^[A-Za-z0-9-]+$/.test(value);
+  return /^[A-Za-z0-9-.]+$/.test(value);
 }
 
 export function isIpAddress(value: string) {
@@ -103,7 +103,7 @@ export function validNameHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   if (isNavigation(keyCode)) return;
 
   const isEmpty = value.length === 0;
-  if (isEmpty && !isDigit(keyCode)) e.preventDefault();
+  if (isEmpty && isDigit(keyCode)) e.preventDefault();
 
   if (!isLetter(keyCode) && !isDigit(keyCode)) e.preventDefault();
 }
