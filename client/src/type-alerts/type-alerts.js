@@ -4,15 +4,17 @@ import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatch, dispatchSet} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
 import {isSafeCode, spaceHandler} from '../util/input-util';
-import {deleteResource, getJson, postJson} from '../util/rest-util';
+import {deleteResource, getJson, postJson, putJson} from '../util/rest-util';
 
 import type {
   AlertTypeType,
+  MessageServerType,
+  NodePayloadType,
   NodeType,
   PropertyType,
   StateType,
@@ -28,7 +30,8 @@ type PropsType = {
 };
 
 type MyStateType = {
-  alertTypes: AlertTypeType[]
+  alertTypes: AlertTypeType[],
+  messageServers: MessageServerType[]
 };
 
 const ALERT_NAME_RE = /^[A-Za-z]\w*/;
@@ -37,7 +40,8 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   added: boolean;
 
   state: MyStateType = {
-    alertTypes: []
+    alertTypes: [],
+    messageServers: []
   };
 
   addAlertType = async () => {
@@ -104,6 +108,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
   componentWillMount() {
     this.loadAlertTypes(this.props.typeNode);
+    this.loadMessageServers();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -116,6 +121,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
     // If the type changed or a new alert was just added ...
     if (newTypeSelected || this.added) this.loadAlertTypes(typeNode);
+    if (newTypeSelected) this.loadMessageServers();
     this.added = false;
   }
 
@@ -133,6 +139,39 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
       .filter(word => ALERT_NAME_RE.test(word));
     const propNames = typeProps.map(typeProp => typeProp.name);
     return expressionNames.filter(n => !propNames.includes(n));
+  };
+
+  getMessageServerUi = (typeNode: NodeType) => {
+    const isTopLevel = typeNode.parentId === 1;
+    if (!isTopLevel) return null;
+
+    const {messageServers} = this.state;
+    return (
+      <div className="message-server">
+        <h3>Message Server for type &quot;{typeNode.name}&quot;</h3>
+        <select
+          onChange={this.handleServerChange}
+          value={typeNode.messageServerId}
+        >
+          {messageServers.map(server => (
+            <option key={server.id} value={server.id}>
+              {server.host}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
+  handleServerChange = (event: SyntheticInputEvent<HTMLSelectElement>) => {
+    const {typeNode} = this.props;
+    const messageServerId = Number(event.target.value);
+    const url = `types/${typeNode.id}/server/${messageServerId}`;
+    putJson(url);
+
+    const newTypeNode: NodeType = {...typeNode, messageServerId};
+    const payload: NodePayloadType = {kind: 'type', node: newTypeNode};
+    dispatch('saveNode', payload);
   };
 
   isValidName = () => {
@@ -157,6 +196,13 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
     const sortedAlertTypes = sortBy(alertTypes, ['name']);
     this.setState({alertTypes: sortedAlertTypes});
+  }
+
+  async loadMessageServers() {
+    const json = await getJson('message_server');
+    const servers = ((json: any): MessageServerType[]);
+    const sortedServers = sortBy(servers, ['host']);
+    this.setState({messageServers: sortedServers});
   }
 
   renderTableHead = () => (
@@ -232,6 +278,8 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     const {alertTypes} = this.state;
     return (
       <section className="type-alerts">
+        {this.getMessageServerUi(typeNode)}
+
         <h3>Alerts for type &quot;{typeNode.name}&quot;</h3>
         <table>
           {this.renderTableHead()}

@@ -73,11 +73,7 @@ class TreeBuilder extends Component<PropsType> {
       <div className="tree-builder">
         <div className="new-div">
           <label>New {capitalize(kind)}</label>
-          <Input
-            path={`ui.${kind}Name`}
-            type="text"
-            autoFocus
-          />
+          <Input path={`ui.${kind}Name`} type="text" autoFocus />
         </div>
         <Button
           icon={isExpanded ? 'compress' : 'expand'}

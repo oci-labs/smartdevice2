@@ -99,6 +99,7 @@ export type NodeType = {
   id: number,
   children: number[],
   expanded?: boolean,
+  messageServerId?: number,
   name: string,
   parentId: number,
   selected?: boolean,

@@ -54,8 +54,8 @@ class TreeNode extends Component<PropsType> {
       showConfirm({
         title: 'Node In Use',
         message:
-        'Are you sure you want to delete this node?\n' +
-        'At least one other node refers to it.',
+          'Are you sure you want to delete this node?\n' +
+          'At least one other node refers to it.',
         yesCb: () => doDelete(),
         noCb: () => {}
       });

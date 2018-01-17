@@ -58,6 +58,21 @@ async function inUseHandler(
   }
 }
 
+async function setServerHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {serverId, typeId} = req.params;
+  const sql = 'update type set messageServerId=? where id=?';
+  try {
+    await mySql.query(sql, serverId, typeId);
+    res.send();
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
 function typeService(
   app: express$Application,
   connection: MySqlConnection
@@ -67,6 +82,7 @@ function typeService(
   app.get(URL_PREFIX + 'inuse', inUseHandler);
   app.get(URL_PREFIX + 'data', getTypeDataHandler);
   app.get(URL_PREFIX + 'alerts', getTypeAlertsHandler);
+  app.put(URL_PREFIX + 'server/:serverId', setServerHandler);
 }
 
 module.exports = {

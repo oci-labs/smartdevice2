@@ -8,11 +8,13 @@
 export function hostHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   const {keyCode} = e;
 
-  if (!isNavigation(keyCode) &&
+  if (
+    !isNavigation(keyCode) &&
     !isDash(keyCode) &&
     !isDigit(keyCode) &&
     !isLetter(keyCode) &&
-    !isPeriod(keyCode)) e.preventDefault();
+    !isPeriod(keyCode)
+  ) e.preventDefault();
 }
 
 function isDash(keyCode: number): boolean {

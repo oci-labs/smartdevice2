@@ -62,3 +62,20 @@ export async function postJson(
   if (!res.ok) handleError(res.statusText);
   return res;
 }
+
+export async function putJson(
+  urlSuffix: string,
+  bodyObj?: Object = {}
+): Promise<Object> {
+  const url = getUrlPrefix() + urlSuffix;
+  const options = {
+    method: 'PUT',
+    body: JSON.stringify(bodyObj),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  const res = await fetch(url, options);
+  if (!res.ok) handleError(res.statusText);
+  return res;
+}

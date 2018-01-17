@@ -1,6 +1,14 @@
 @import '../share.scss';
 
 .type-alerts {
+  .message-server {
+    margin-bottom: 20px;
+  }
+
+  select {
+    font-size: 18px;
+  }
+
   table {
     width: 100%;
   }

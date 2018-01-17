@@ -80,17 +80,12 @@ class MessageServers extends Component<PropsType> {
 
   loadMessageServers = async () => {
     const json = await getJson('message_server');
-    console.log('message-servers.js loadMessageServers: json =', json);
     const servers = ((json: any): MessageServerType[]);
     const messageServerMap = servers.reduce((map, server) => {
       map[server.id] = server;
       return map;
     }, {});
     dispatchSet('messageServerMap', messageServerMap);
-  };
-
-  onKeyDown = (event: SyntheticInputEvent<HTMLInputElement>) => {
-    console.log('message-servers.js onKeyDown: event.key =', event.key);
   };
 
   serverNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {

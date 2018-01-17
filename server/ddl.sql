@@ -8,7 +8,11 @@ use smartdevice;
 create table type (
   id int auto_increment primary key,
   name text not null,
+  messageServerId int null,
   parentId int null, -- okay to not have parent
+  foreign key (messageServerId)
+    references message_server (id)
+    on delete cascade
   foreign key (parentId)
     references type (id)
     on delete cascade
