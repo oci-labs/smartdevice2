@@ -18,6 +18,7 @@ thejoveexpress/lights/calibration/feedback - rational
 
 const isEqual = require('lodash/isEqual');
 const mqtt = require('mqtt');
+const MySqlConnection = require('mysql-easier');
 const WebSocket = require('ws');
 
 const {
@@ -26,16 +27,11 @@ const {
   updateProperty
 } = require('./instance-service');
 
-import type {PrimitiveType} from './types';
+import type {NodeType, MessageServerType, PrimitiveType} from './types';
 
 const MSG_DELIM = '/';
 const TRAIN_NAME = 'thejoveexpress';
-//const MQTT_HOST = TRAIN_NAME + '.local';
-const MQTT_HOST = 'localhost';
-const MQTT_PORT = 1883;
 const SPECIAL_SUFFIXES = ['control', 'feedback'];
-
-//const feedbackTopic = getTopic('');
 
 // To get a zero, kill train app.
 // To get a one, restart train app.
@@ -48,28 +44,31 @@ const engineCalibrationTopic = getTopic('engine', 'calibration');
 const lightsAmbientTopic = getTopic('lights', 'ambient');
 const lightsCalibrationTopic = getTopic('lights', 'calibration');
 
-let lastChange, ws;
+let lastChange, mySql, ws;
 
-function websocketSetup() {
-  const wsServer = new WebSocket.Server({port: 1337});
-  console.info('waiting for WebSocket connection');
-  wsServer.on('connection', webSocket => {
-    console.info('got WebSocket connection');
-    ws = webSocket;
-
-    ws.on('error', error => {
-      if (error.code !== 'ECONNRESET') {
-        console.error('websocket error:', error.code);
-      }
-    });
-  });
+function getInstances(type: NodeType) {
+  const sql = 'select name from instance where typeId=?';
+  return mySql.query(sql, type.id);
 }
 
-websocketSetup();
+async function getMessageServer(type: NodeType) {
+  const {messageServerId} = type;
+  if (!messageServerId) return;
+
+  const sql = 'select * from message_server where id=?';
+  const rows = await mySql.query(sql, messageServerId);
+  const [server] = rows;
+  return server;
+}
 
 function getTopic(...parts) {
   const middle = parts.length ? parts.join(MSG_DELIM) + MSG_DELIM : '';
   return TRAIN_NAME + MSG_DELIM + middle + 'feedback';
+}
+
+function getTopLevelTypes() {
+  const sql = 'select * from type where parentId = 1';
+  return mySql.query(sql);
 }
 
 async function saveProperty(
@@ -139,12 +138,68 @@ function handleMessage(topic, message) {
   }
 }
 
-function mqttService() {
-  const client = mqtt.connect('mqtt://' + MQTT_HOST + ':' + MQTT_PORT);
-  // Listen for messages on all topics.
-  client.on('connect', () => client.subscribe('#'));
-  client.on('message', handleMessage);
+async function mqttService(connection: MySqlConnection) {
+  mySql = connection;
+
+  const serverMap = {};
+  const topicsMap = {};
+
+  const topLevelTypes = await getTopLevelTypes();
+
+  for (const type of topLevelTypes) {
+    // eslint-disable-next-line no-await-in-loop
+    const server = await getMessageServer(type);
+    if (server) {
+      serverMap[server.id] = server;
+
+      // eslint-disable-next-line no-await-in-loop
+      const instances = await getInstances(type);
+      const newTopics = instances.map(instance => instance.name + '/#');
+
+      const topics = topicsMap[server.id] || [];
+      topics.push(...newTopics);
+      topicsMap[server.id] = topics;
+    } else {
+      console.error(
+        `The type "${type.name}" has no associated message server!`
+      );
+    }
+  }
+
+  const servers = ((Object.values(serverMap): any): MessageServerType[]);
+  servers.forEach(server => {
+    const url = `mqtt://${server.host}:${server.port}`;
+    const client = mqtt.connect(url);
+    console.info('connected to', url);
+
+    client.on('message', handleMessage);
+
+    client.on('connect', () => {
+      const topics = topicsMap[server.id];
+      for (const topic of topics) {
+        client.subscribe(topic);
+        console.info('subscribed to MQTT topic', topic);
+      }
+    });
+  });
 }
+
+function websocketSetup() {
+  const wsServer = new WebSocket.Server({port: 1337});
+  console.info('waiting for WebSocket connection');
+  wsServer.on('connection', webSocket => {
+    console.info('got WebSocket connection');
+    ws = webSocket;
+
+    ws.on('error', error => {
+      if (error.code !== 'ECONNRESET') {
+        console.error('websocket error:', error.code);
+      }
+    });
+  });
+}
+
+websocketSetup();
 
 module.exports = {
   mqttService

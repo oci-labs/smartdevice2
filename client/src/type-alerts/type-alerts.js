@@ -145,14 +145,13 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     const isTopLevel = typeNode.parentId === 1;
     if (!isTopLevel) return null;
 
+    const value = typeNode.messageServerId || 0;
     const {messageServers} = this.state;
     return (
       <div className="message-server">
         <h3>Message Server for type &quot;{typeNode.name}&quot;</h3>
-        <select
-          onChange={this.handleServerChange}
-          value={typeNode.messageServerId}
-        >
+        <select onChange={this.handleServerChange} value={value}>
+          <option value="0">unset</option>
           {messageServers.map(server => (
             <option key={server.id} value={server.id}>
               {server.host}

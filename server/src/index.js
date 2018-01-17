@@ -45,7 +45,7 @@ app.set('etag', 'strong');
 
 alertService(app, mySql);
 instanceService(app, mySql);
-mqttService();
+mqttService(mySql);
 treeService(app, mySql);
 typeService(app, mySql);
 crudService(app, mySql, 'alert');

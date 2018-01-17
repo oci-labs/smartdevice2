@@ -63,9 +63,12 @@ async function setServerHandler(
   res: express$Response
 ): Promise<void> {
   const {serverId, typeId} = req.params;
-  const sql = 'update type set messageServerId=? where id=?';
+  const idValue = typeId ? '?' : 'null';
+  const sql = `update type set messageServerId=? where id=${idValue}`;
   try {
-    await mySql.query(sql, serverId, typeId);
+    const args = [sql, serverId];
+    if (typeId) args.push(typeId);
+    await mySql.query(...args);
     res.send();
   } catch (e) {
     // istanbul ignore next
