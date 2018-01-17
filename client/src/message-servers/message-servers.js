@@ -7,7 +7,7 @@ import {dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
 //import {validNameHandler} from '../util/input-util';
-import {deleteResource, postJson} from '../util/rest-util';
+import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {
   MessageServerMapType,
@@ -48,6 +48,10 @@ class MessageServers extends Component<PropsType> {
     dispatchSet('messageServerMap', newMap);
   };
 
+  componentWillMount() {
+    this.loadMessageServers();
+  }
+
   deleteServer = async (server: MessageServerType) => {
     const {messageServerMap} = this.props;
     await deleteResource(`message_server/${server.id}`);
@@ -62,6 +66,17 @@ class MessageServers extends Component<PropsType> {
     return (
       PROPERTY_NAME_RE.test(newPropName) && !propNames.includes(newPropName)
     );
+  };
+
+  loadMessageServers = async () => {
+    const json = await getJson('message_server');
+    console.log('message-servers.js loadMessageServers: json =', json);
+    const servers = ((json: any): MessageServerType[]);
+    const messageServerMap = servers.reduce((map, server) => {
+      map[server.id] = server;
+      return map;
+    }, {});
+    dispatchSet('messageServerMap', messageServerMap);
   };
 
   serverNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -87,10 +102,10 @@ class MessageServers extends Component<PropsType> {
     return (
       <tr>
         <td>
-          <Input path="ui.newServerHost" />
+          <Input className="host-input" path="ui.newServerHost" />
         </td>
         <td>
-          <Input path="ui.newServerPort" />
+          <Input className="port-input" path="ui.newServerPort" type="number" />
         </td>
         <td className="actions-column">
           <Button

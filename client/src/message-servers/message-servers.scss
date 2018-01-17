@@ -5,7 +5,17 @@
     border: none;
   }
 
+  .host-input {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .port-input {
+    width: 40px;
+  }
+
   table {
+    border: solid red 2px;
     width: 100%;
   }
 }
