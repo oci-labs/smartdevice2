@@ -68,6 +68,26 @@ export type InstanceType = {
   type: NodeType
 };
 
+export type MessageServerMapType = {[id: number]: MessageServerType};
+
+export type MessageServerType = {
+  id: number,
+  cleanSession?: string,
+  clientId?: number,
+  host: string,
+  keepAlive?: boolean,
+  lastWill?: string,
+  port: number
+};
+
+export type ModalType = {
+  error?: boolean,
+  message?: string,
+  open?: boolean,
+  renderFn?: Function,
+  title: string
+};
+
 export type NodeMapType = {[id: number]: NodeType};
 
 export type NodePayloadType = {
@@ -83,14 +103,6 @@ export type NodeType = {
   parentId: number,
   selected?: boolean,
   typeId?: number // for instance nodes
-};
-
-export type ModalType = {
-  error?: boolean,
-  message?: string,
-  open?: boolean,
-  renderFn?: Function,
-  title: string
 };
 
 export type PrimitiveType = boolean | number | string;
@@ -115,6 +127,7 @@ export type StateType = {
   errors: Set<string>,
   instanceData: Object,
   instanceNodeMap: NodeMapType,
+  messageServerMap: MessageServerMapType,
   typeNodeMap: NodeMapType,
   ui: UiType,
   user: UserType
@@ -148,6 +161,8 @@ export type UiType = {
   newAlertSticky: boolean,
   newPropName: string,
   newPropType: string,
+  newServerHost: string,
+  newServerPort: number,
   selectedChildNodeId: number,
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,

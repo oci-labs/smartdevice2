@@ -6,6 +6,10 @@
   height: 100vh;
   text-align: center;
 
+  .add {
+    color: $add-color;
+  }
+
   .app-header {
     background-color: #222;
     height: 60px;
@@ -28,6 +32,10 @@
         margin-top: 0;
       }
     }
+  }
+
+  .delete {
+    color: $delete-color;
   }
 
   input {
@@ -79,7 +87,7 @@ table {
   }
 
   .delete {
-    color: red;
+    color: $delete-color;
   }
 
   td {

@@ -83,6 +83,16 @@ create table instance_data (
     on delete cascade
 );
 
+create table message_server (
+  id int auto_increment primary key,
+  host text not null,
+  port int,
+  cleanSession text,
+  clientId int,
+  keepAlive boolean,
+  lastWill text
+);
+
 create table role (
   id int auto_increment primary key,
   name text not null

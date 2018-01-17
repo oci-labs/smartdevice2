@@ -85,7 +85,7 @@ class TreeBuilder extends Component<PropsType> {
           tooltip={isExpanded ? 'collapse all' : 'expand all'}
         />
         <Button
-          className="add-node"
+          className="add"
           disabled={newNodeName === ''}
           icon="plus"
           onClick={() => addNode(kind, newNodeName, rootNode)}

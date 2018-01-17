@@ -52,6 +52,7 @@ crudService(app, mySql, 'alert');
 crudService(app, mySql, 'alert_type');
 crudService(app, mySql, 'instance');
 crudService(app, mySql, 'instance_data');
+crudService(app, mySql, 'message_server');
 crudService(app, mySql, 'snooze');
 crudService(app, mySql, 'subscription');
 crudService(app, mySql, 'type');

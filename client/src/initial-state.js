@@ -7,6 +7,7 @@ const state: StateType = {
   errors: new Set(),
   instanceData: {},
   instanceNodeMap: {},
+  messageServerMap: {},
   typeNodeMap: {},
   ui: {
     editedName: '',
@@ -22,6 +23,8 @@ const state: StateType = {
     newAlertSticky: false,
     newPropName: '',
     newPropType: 'number',
+    newServerHost: '',
+    newServerPort: 1883,
     selectedChildNodeId: 0,
     selectedInstanceNodeId: 0,
     selectedTypeNodeId: 0,

@@ -6,9 +6,10 @@ import {connect} from 'react-redux';
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
 import {dispatchSet} from 'redux-easy';
 
+import MessageServers from '../message-servers/message-servers';
 import TreeBuilder from '../tree/tree-builder';
 
-import type {NodeMapType, StateType, UiType} from '../types';
+import type {NodeMapType, StateType, TreeType, UiType} from '../types';
 
 import './left-nav.css';
 import 'react-tabs/style/react-tabs.css';
@@ -21,9 +22,9 @@ type PropsType = {
 };
 
 class LeftNav extends Component<PropsType> {
-  getTree = () => {
+  getTree = (treeType: TreeType) => {
     const {instanceNodeMap, subscriptions, typeNodeMap, ui} = this.props;
-    const {editedName, editingNode, instanceName, typeName, treeType} = ui;
+    const {editedName, editingNode, instanceName, typeName} = ui;
 
     const isType = treeType === 'type';
     const newNodeName = isType ? typeName : instanceName;
@@ -58,15 +59,15 @@ class LeftNav extends Component<PropsType> {
       <section className="left-nav">
         <Tabs onSelect={this.handleTabSelect}>
           <TabList>
-            <Tab>MQTT Servers</Tab>
+            <Tab>Servers</Tab>
             <Tab>Type</Tab>
             <Tab>Instance</Tab>
           </TabList>
           <TabPanel>
-            Add MQTT servers.
+            <MessageServers />
           </TabPanel>
-          <TabPanel>{this.getTree()}</TabPanel>
-          <TabPanel>{this.getTree()}</TabPanel>
+          <TabPanel>{this.getTree('type')}</TabPanel>
+          <TabPanel>{this.getTree('instance')}</TabPanel>
         </Tabs>
       </section>
     );

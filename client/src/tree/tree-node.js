@@ -161,14 +161,14 @@ class TreeNode extends Component<PropsType> {
           </div>
         )}
         <Button
-          className="add-node"
+          className="add"
           disabled={newNodeName === ''}
           icon="plus"
           onClick={() => addNode(kind, newNodeName, node)}
           tooltip="add"
         />
         <Button
-          className="delete-node"
+          className="delete"
           icon="trash-o"
           onClick={() => this.deleteNode(node)}
           tooltip="delete"

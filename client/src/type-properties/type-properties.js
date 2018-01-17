@@ -130,7 +130,7 @@ class TypeProperties extends Component<PropsType> {
         </td>
         <td className="actions-column">
           <Button
-            className="add-prop"
+            className="add"
             disabled={newPropName === ''}
             icon="plus"
             onClick={this.addProp}
