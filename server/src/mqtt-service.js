@@ -79,7 +79,8 @@ async function saveProperty(
 ): Promise<void> {
   const instanceId = await getInstanceId(path);
   if (instanceId === 0) {
-    throw new Error('no instance found for ' + path);
+    console.error('no instance found for ' + path);
+    return;
   }
 
   const alertsChanged = await updateProperty(instanceId, property, value);

@@ -1,6 +1,48 @@
 // @flow
 
 /**
+ * This can be used for the onKeyDown handler
+ * of an HTML input that should only allow entry
+ * of host names and IP addresses.
+ */
+export function hostHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
+  const {keyCode} = e;
+
+  if (!isNavigation(keyCode) &&
+    !isDash(keyCode) &&
+    !isDigit(keyCode) &&
+    !isLetter(keyCode)) e.preventDefault();
+}
+
+function isDash(keyCode: number): boolean {
+  return keyCode === 189;
+}
+
+function isDigit(keyCode: number): boolean {
+  return 48 <= keyCode && keyCode <= 57;
+}
+
+export function isIpAddress(value: string) {
+  const parts = value.split('.');
+  if (parts.length !== 4) return false;
+  return parts.every(part => {
+    const n = Number(part);
+    return !Number.isNaN(n) && 0 <= n && n <= 255;
+  });
+}
+
+function isLetter(keyCode: number): boolean {
+  return 65 <= keyCode && keyCode <= 90;
+}
+
+// backspace, left arrow, right arrow
+const NAVIGATION_KEY_CODES = [8, 37, 39];
+
+function isNavigation(keyCode: number): boolean {
+  return NAVIGATION_KEY_CODES.includes(keyCode);
+}
+
+/**
  * This returns a boolean indicating whether
  * a string of JavaScript code is "safe".
  * It determines this by looking for function calls.
@@ -14,15 +56,20 @@ export function isSafeCode(jsCode: string) {
   return !re.test(jsCode);
 }
 
+function isSpace(keyCode: number): boolean {
+  return keyCode === 32;
+}
+
 /**
  * This can be used for the onKeyDown handler
  * of an HTML input to prevent entry of
- * values that are not valid JavaScript names.
+ * values that begin with a space or contain
+ * multiple, consecutive spaces.
  */
 export function spaceHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   // $FlowFixMe - doesn't think target.value exists
   const {keyCode, target: {value}} = e;
-  if (keyCode !== 32) return;
+  if (isSpace(keyCode)) return;
 
   // Don't allow a leading space.
   const isEmpty = value.length === 0;
@@ -42,14 +89,10 @@ export function validNameHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   // $FlowFixMe - doesn't think target.value exists
   const {keyCode, target: {value}} = e;
 
-  if (keyCode === 8) return; // backspace
-  if (keyCode === 37) return; // left arrow
-  if (keyCode === 39) return; // right arrow
+  if (isNavigation(keyCode)) return;
 
   const isEmpty = value.length === 0;
-  const isDigit = 48 <= keyCode && keyCode <= 57;
-  if (isEmpty && isDigit) e.preventDefault();
+  if (isEmpty && !isDigit(keyCode)) e.preventDefault();
 
-  const isLetter = 65 <= keyCode && keyCode <= 90;
-  if (!isLetter && !isDigit) e.preventDefault();
+  if (!isLetter(keyCode) && !isDigit(keyCode)) e.preventDefault();
 }

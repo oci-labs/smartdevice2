@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
-//import {validNameHandler} from '../util/input-util';
+import {hostHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {
@@ -79,6 +79,10 @@ class MessageServers extends Component<PropsType> {
     dispatchSet('messageServerMap', messageServerMap);
   };
 
+  onKeyDown = (event: SyntheticInputEvent<HTMLInputElement>) => {
+    console.log('message-servers.js onKeyDown: event.key =', event.key);
+  };
+
   serverNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatchSet('ui.newServerName', e.target.value);
   };
@@ -102,7 +106,11 @@ class MessageServers extends Component<PropsType> {
     return (
       <tr>
         <td>
-          <Input className="host-input" path="ui.newServerHost" />
+          <Input
+            className="host-input"
+            onKeyDown={hostHandler}
+            path="ui.newServerHost"
+          />
         </td>
         <td>
           <Input className="port-input" path="ui.newServerPort" type="number" />
