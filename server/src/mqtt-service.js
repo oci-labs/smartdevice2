@@ -122,9 +122,9 @@ function handleMessage(topic, message) {
     case engineCalibrationTopic:
     case lightsAmbientTopic:
     case lightsCalibrationTopic: {
-      const rawValue = message.readIntBE(0, 8);
+      const rawValue = message.readIntBE(0, 4);
       console.log('mqtt-service.js handleMessage: rawValue =', rawValue);
-      const maxValue = message.readIntBE(8, 8);
+      const maxValue = message.readIntBE(4, 4);
       console.log('mqtt-service.js handleMessage: maxValue =', maxValue);
       value = 100 * (rawValue / maxValue);
       break;
