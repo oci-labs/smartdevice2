@@ -21,6 +21,8 @@ type PropsType = {
   ui: UiType
 };
 
+const TREE_TYPES = ['', 'type', 'instance'];
+
 class LeftNav extends Component<PropsType> {
   getTree = (treeType: TreeType) => {
     const {instanceNodeMap, subscriptions, typeNodeMap, ui} = this.props;
@@ -47,8 +49,7 @@ class LeftNav extends Component<PropsType> {
 
   handleTabSelect = (index: number, lastIndex: number) => {
     if (index === lastIndex) return;
-    if (index === 1) dispatchSet('ui.treeType', 'type');
-    if (index === 2) dispatchSet('ui.treeType', 'instance');
+    dispatchSet('ui.treeType', TREE_TYPES[index]);
   };
 
   render() {

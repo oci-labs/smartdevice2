@@ -18,6 +18,18 @@ type PropsType = {
   treeType: TreeType
 };
 
+const middleMap = {
+  '': null,
+  instance: <InstanceHierarchy />,
+  type: <TypeProperties />
+};
+
+const rightMap = {
+  '': null,
+  instance: <InstanceDetail />,
+  type: <TypeAlerts />
+};
+
 class App extends Component<PropsType> {
 
   render() {
@@ -29,9 +41,8 @@ class App extends Component<PropsType> {
         </header>
         <section id="body">
           <LeftNav />
-
-          {treeType === 'type' ? <TypeProperties /> : <InstanceHierarchy />}
-          {treeType === 'type' ? <TypeAlerts /> : <InstanceDetail />}
+          {middleMap[treeType]}
+          {rightMap[treeType]}
         </section>
         <SdModal />
       </div>
