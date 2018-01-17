@@ -25,6 +25,7 @@ types of supported devices.
 * `npm install` (initially and for each new version)
 * `npm run dbstart` (only if MySQL server isn't running)
 * `npm run dbsetup` (initially and only after schema changes)
+  WARNING: This will delete all data in the database.
 * `npm run build` (initially and for each new version)
 * `npm run start`
 
