@@ -6,7 +6,8 @@ import {connect} from 'react-redux';
 import {dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
-import {hostHandler} from '../util/input-util';
+import {showModal} from '../share/sd-modal';
+import {hostHandler, isHostName, isIpAddress} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {
@@ -30,6 +31,15 @@ class MessageServers extends Component<PropsType> {
 
   addServer = async () => {
     const {messageServerMap, ui: {newServerHost, newServerPort}} = this.props;
+
+    if (!isHostName(newServerHost) && !isIpAddress(newServerHost)) {
+      showModal({
+        error: true,
+        title: 'Invalid Host',
+        message: 'The value is not a valid host name or IP address.'
+      });
+      return;
+    }
 
     const server: MessageServerType = {
       id: 0,

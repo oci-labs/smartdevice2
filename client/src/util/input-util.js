@@ -11,7 +11,8 @@ export function hostHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   if (!isNavigation(keyCode) &&
     !isDash(keyCode) &&
     !isDigit(keyCode) &&
-    !isLetter(keyCode)) e.preventDefault();
+    !isLetter(keyCode) &&
+    !isPeriod(keyCode)) e.preventDefault();
 }
 
 function isDash(keyCode: number): boolean {
@@ -20,6 +21,10 @@ function isDash(keyCode: number): boolean {
 
 function isDigit(keyCode: number): boolean {
   return 48 <= keyCode && keyCode <= 57;
+}
+
+export function isHostName(value: string) {
+  return /^[A-Za-z0-9-]+$/.test(value);
 }
 
 export function isIpAddress(value: string) {
@@ -40,6 +45,10 @@ const NAVIGATION_KEY_CODES = [8, 37, 39];
 
 function isNavigation(keyCode: number): boolean {
   return NAVIGATION_KEY_CODES.includes(keyCode);
+}
+
+function isPeriod(keyCode: number): boolean {
+  return keyCode === 190;
 }
 
 /**
