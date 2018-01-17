@@ -8,7 +8,7 @@ import {dispatchSet, Input} from 'redux-easy';
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
 import {hostHandler, isHostName, isIpAddress} from '../util/input-util';
-import {deleteResource, getJson, postJson} from '../util/rest-util';
+import {deleteResource, getJson, postJson, putJson} from '../util/rest-util';
 
 import type {
   MessageServerMapType,
@@ -63,6 +63,13 @@ class MessageServers extends Component<PropsType> {
   }
 
   deleteServer = async (server: MessageServerType) => {
+    // Remove this message server from all top-level types
+    // that are currently associated with it.
+    // Using a type id of zero signals to do this.
+    const url = `types/0/server/${server.id}`;
+    await putJson(url);
+
+    // Delete the message server.
     const {messageServerMap} = this.props;
     await deleteResource(`message_server/${server.id}`);
     const newMap = {...messageServerMap};

@@ -62,12 +62,39 @@ async function setServerHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const {serverId, typeId} = req.params;
-  const idValue = typeId ? '?' : 'null';
-  const sql = `update type set messageServerId=? where id=${idValue}`;
+  const {serverId: s, typeId: t} = req.params;
+
+  // serverId set to zero means clear messageServerId
+  // for the specified type.
+  const serverId = Number(s); // zero to clear
+
+  // typeId set to zero means clear the messageServerId
+  // for all types that use the value in serverId.
+  const typeId = Number(t);
+
+  let sql = 'update type set messageServerId = ';
+  const args = [];
+  if (serverId === 0) {
+    if (typeId === 0) {
+      throw new Error('serverId or typeId must be set');
+    }
+
+    // Clear message server for a specific type.
+    sql += 'null where id=?';
+    args.push(typeId);
+  } else if (typeId === 0) {
+    // Clear message server for all top-level types
+    // that currently use it.
+    sql += 'null where messageServerId = ?';
+    args.push(serverId);
+  } else {
+    // Set message server for a specific type.
+    sql += '? where id = ?';
+    args.push(serverId, typeId);
+  }
+  args.unshift(sql);
+
   try {
-    const args = [sql, serverId];
-    if (typeId) args.push(typeId);
     await mySql.query(...args);
     res.send();
   } catch (e) {
