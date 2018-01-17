@@ -11,7 +11,7 @@ create table type (
   messageServerId int null,
   parentId int null, -- okay to not have parent
   foreign key (messageServerId)
-    references message_server (id)
+    references message_server (id),
   foreign key (parentId)
     references type (id)
     on delete cascade
