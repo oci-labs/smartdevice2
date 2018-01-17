@@ -130,7 +130,7 @@ function handleMessage(topic, message) {
   }
 
   if (value !== undefined) {
-    //console.log(topic, '=', value);
+    console.log(topic, '=', value);
     const path = parts.join(PATH_DELIMITER);
     saveProperty(path, property, value);
   } else {
