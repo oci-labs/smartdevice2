@@ -34,7 +34,7 @@ type MyStateType = {
   messageServers: MessageServerType[]
 };
 
-const ALERT_NAME_RE = /^[A-Za-z]\w*/;
+const ALERT_NAME_RE = /^[A-Za-z]\w*$/;
 
 class TypeAlerts extends Component<PropsType, MyStateType> {
   added: boolean;

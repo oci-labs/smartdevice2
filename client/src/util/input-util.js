@@ -80,7 +80,7 @@ function isSpace(keyCode: number): boolean {
 export function spaceHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   // $FlowFixMe - doesn't think target.value exists
   const {keyCode, target: {value}} = e;
-  if (isSpace(keyCode)) return;
+  if (!isSpace(keyCode)) return;
 
   // Don't allow a leading space.
   const isEmpty = value.length === 0;
