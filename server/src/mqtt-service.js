@@ -104,10 +104,10 @@ async function getMessageServer(type: NodeType) {
   }
 }
 
-function getServerIdForType(typeId: number): Promise<number> {
+async function getServerIdForType(typeId: number): Promise<number> {
   const sql = 'select messageServerId from type where id = ?';
-  const rows = mySql.query(sql, typeId);
-  return rows[0].messageServerId;
+  const [row] = await mySql.query(sql, typeId);
+  return row ? row.messageServerId : 0;
 }
 
 function getTopic(...parts) {
@@ -153,6 +153,8 @@ async function saveProperty(
 
     // Notify web client that new alerts may be available.
     if (alertsChanged) ws.send('reload alerts');
+  } else {
+    console.error('no WebSocket connection');
   }
 }
 
@@ -189,7 +191,7 @@ function handleMessage(topic: string, message: Buffer) {
   }
 
   if (value !== undefined) {
-    //console.log(topic, '=', value);
+    console.log(topic, '=', value);
     const path = parts.join(PATH_DELIMITER);
     saveProperty(path, property, value);
   } else {
