@@ -10,6 +10,7 @@ const MySqlConnection = require('mysql-easier');
 const {alertService} = require('./alert-service');
 const crudService = require('./crud-service');
 const {instanceService} = require('./instance-service');
+const {messageServerService} = require('./message-server-service');
 const {mqttService} = require('./mqtt-service');
 const {treeService} = require('./tree-service');
 const {typeService} = require('./type-service');
@@ -45,6 +46,7 @@ app.set('etag', 'strong');
 
 alertService(app, mySql);
 instanceService(app, mySql);
+messageServerService(app, mySql);
 mqttService(mySql);
 treeService(app, mySql);
 typeService(app, mySql);

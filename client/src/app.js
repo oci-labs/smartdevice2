@@ -2,6 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {dispatchSet} from 'redux-easy';
 
 import LeftNav from './left-nav/left-nav';
 import InstanceDetail from './instance-detail/instance-detail';
@@ -31,6 +32,10 @@ const rightMap = {
 };
 
 class App extends Component<PropsType> {
+  componentWillMount() {
+    // Start on "Servers" tab in left nav on refresh.
+    dispatchSet('ui.treeType', '');
+  }
 
   render() {
     const {treeType} = this.props;

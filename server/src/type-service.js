@@ -3,6 +3,11 @@
 const sortBy = require('lodash/sortBy');
 const MySqlConnection = require('mysql-easier');
 
+const {
+  subscribe,
+  unsubscribeFromServer,
+  unsubscribeFromType
+} = require('./mqtt-service');
 const {errorHandler} = require('./util/error-util');
 
 let mySql;
@@ -74,6 +79,7 @@ async function setServerHandler(
 
   let sql = 'update type set messageServerId = ';
   const args = [];
+
   if (serverId === 0) {
     if (typeId === 0) {
       throw new Error('serverId or typeId must be set');
@@ -82,20 +88,24 @@ async function setServerHandler(
     // Clear message server for a specific type.
     sql += 'null where id=?';
     args.push(typeId);
+    unsubscribeFromType(serverId, typeId);
   } else if (typeId === 0) {
     // Clear message server for all top-level types
     // that currently use it.
     sql += 'null where messageServerId = ?';
     args.push(serverId);
+    unsubscribeFromServer(serverId);
   } else {
     // Set message server for a specific type.
     sql += '? where id = ?';
     args.push(serverId, typeId);
+    subscribe(serverId, typeId);
   }
   args.unshift(sql);
 
   try {
     await mySql.query(...args);
+
     res.send();
   } catch (e) {
     // istanbul ignore next

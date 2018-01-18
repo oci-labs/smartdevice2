@@ -46,7 +46,7 @@ class MessageServers extends Component<PropsType> {
       host: newServerHost,
       port: newServerPort
     };
-    const res = await postJson('message_server', server);
+    const res = await postJson('messageServers', server);
     server.id = await res.text();
     const newMap = {
       ...messageServerMap,
@@ -71,7 +71,7 @@ class MessageServers extends Component<PropsType> {
 
     // Delete the message server.
     const {messageServerMap} = this.props;
-    await deleteResource(`message_server/${server.id}`);
+    await deleteResource(`messageServers/${server.id}`);
     const newMap = {...messageServerMap};
     delete newMap[server.id];
     dispatchSet('messageServerMap', newMap);

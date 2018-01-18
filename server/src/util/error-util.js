@@ -14,7 +14,7 @@ function logError(msg: string): void {
   // istanbul ignore next
   if (!inTest) console.trace();
   // istanbul ignore next
-  if (!inTest) console.error(msg);
+  if (!inTest) console.error(JSON.stringify(msg));
 }
 
 module.exports = {errorHandler, logError};
