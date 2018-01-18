@@ -5,17 +5,6 @@
 // 2) optionally enter "java -jar TheJoveExpress.jar"
 //    to get lots of messages
 
-/*
-Expected Messages:
-thejoveexpress/lifecycle/feedback - boolean, 1 byte
-thejoveexpress/engine/power/feedback - rational
-thejoveexpress/engine/calibration/feedback - rational
-thejoveexpress/lights/ambient/feedback - rational
-thejoveexpress/lights/override/feedback - enum, 4 bytes 0=off, 1=on, 2=auto
-thejoveexpress/lights/power/feedback - boolean, 1 byte
-thejoveexpress/lights/calibration/feedback - rational
-*/
-
 const isEqual = require('lodash/isEqual');
 const mqtt = require('mqtt');
 const MySqlConnection = require('mysql-easier');
@@ -31,20 +20,7 @@ const {
 
 import type {NodeType, MessageServerType, PrimitiveType} from './types';
 
-const MSG_DELIM = '/';
-const TRAIN_NAME = 'thejoveexpress';
 const SPECIAL_SUFFIXES = ['control', 'feedback'];
-
-// To get a zero, kill train app.
-// To get a one, restart train app.
-const lifecycleTopic = getTopic('lifecycle');
-
-const lightsOverrideTopic = getTopic('lights', 'override');
-const lightsPowerTopic = getTopic('lights', 'power');
-const enginePowerTopic = getTopic('engine', 'power');
-const engineCalibrationTopic = getTopic('engine', 'calibration');
-const lightsAmbientTopic = getTopic('lights', 'ambient');
-const lightsCalibrationTopic = getTopic('lights', 'calibration');
 
 const clientMap = {}; // keys are server ids
 const serverMap = {}; // keys are server ids
@@ -110,9 +86,33 @@ async function getServerIdForType(typeId: number): Promise<number> {
   return row ? row.messageServerId : 0;
 }
 
-function getTopic(...parts) {
-  const middle = parts.length ? parts.join(MSG_DELIM) + MSG_DELIM : '';
-  return TRAIN_NAME + MSG_DELIM + middle + 'feedback';
+async function getTopicType(topic: string): Promise<string> {
+  const parts = topic.split('/');
+
+  const lastPart = parts[parts.length - 1];
+  if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
+
+  const property = parts.pop();
+
+  let parentId = 0, row;
+  for (const part of parts) {
+    let sql = 'select id, parentId, typeId from instance where name = ?';
+    let args = [];
+    if (parentId) {
+      sql += ' and parentId = ?';
+      args = [parentId];
+    }
+    // eslint-disable-next-line no-await-in-loop
+    [row] = await mySql.query(sql, part, ...args);
+    if (!row) return '';
+    parentId = row.id;
+  }
+  if (!row) return '';
+
+  const {typeId} = row;
+  const sql = 'select kind from type_data where name = ? and typeId = ?';
+  [row] = await mySql.query(sql, property, typeId);
+  return row.kind;
 }
 
 async function getTypeTopics(typeId: number): Promise<string[]> {
@@ -154,12 +154,13 @@ async function saveProperty(
     // Notify web client that new alerts may be available.
     if (alertsChanged) ws.send('reload alerts');
   } else {
-    console.error('no WebSocket connection');
+    console.error('refresh browser to establish WebSocket connection');
   }
 }
 
-// message is a Buffer
-function handleMessage(topic: string, message: Buffer) {
+async function handleMessage(topic: string, message: Buffer) {
+  const type = await getTopicType(topic);
+
   //console.log('message length =', message.length);
   const parts = topic.split('/');
 
@@ -169,25 +170,25 @@ function handleMessage(topic: string, message: Buffer) {
   const property = parts.pop();
 
   let value;
-  switch (topic) {
-    case lifecycleTopic:
-    case lightsPowerTopic:
+  switch (type) {
+    case 'boolean':
       value = message.readInt8(0);
       break;
 
-    case lightsOverrideTopic:
+    case 'number':
       value = message.readInt32BE(0);
       break;
 
-    case enginePowerTopic:
-    case engineCalibrationTopic:
-    case lightsAmbientTopic:
-    case lightsCalibrationTopic: {
+    case 'percent': {
       const rawValue = message.readIntBE(0, 4);
       const maxValue = message.readIntBE(4, 4);
       value = 100 * (rawValue / maxValue);
       break;
     }
+
+    case 'text':
+      value = message.toString();
+      break;
   }
 
   if (value !== undefined) {
