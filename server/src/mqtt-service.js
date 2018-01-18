@@ -37,7 +37,6 @@ function connect(server: MessageServerType, typeId: number = 0) {
     subscribe(id, typeId);
   } else {
     const url = `mqtt://${server.host}:${server.port}`;
-    //const options = {keepalive: true};
     const options = {};
     const client = mqtt.connect(url, options);
     clientMap[id] = client;
@@ -47,7 +46,7 @@ function connect(server: MessageServerType, typeId: number = 0) {
       subscribe(id, typeId);
     });
 
-    client.on('message', handleMessage);
+    client.on('message', handleMessage.bind(null, client));
 
     client.on('close', () => {
       console.info('MQTT server connection was closed.');
@@ -180,8 +179,9 @@ async function saveProperty(
   }
 }
 
-async function handleMessage(topic: string, message: Buffer) {
+async function handleMessage(client, topic: string, message: Buffer) {
   try {
+    //console.log('mqtt-service.js handleMessage: topic =', topic);
     const type = await getTopicType(topic);
 
     //console.log('message length =', message.length);
@@ -190,12 +190,24 @@ async function handleMessage(topic: string, message: Buffer) {
     const lastPart = parts[parts.length - 1];
     if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
 
+    if (parts.length < 2) {
+      console.info('ignoring message with topic', topic);
+      return;
+    }
+
     const property = parts.pop();
 
     let value;
     switch (type) {
       case 'boolean':
         value = message.readInt8(0);
+        if (
+          property === 'lifecycle' &&
+          lastPart === 'feedback' &&
+          value === 1
+        ) {
+          requestFeedback(client, parts);
+        }
         break;
 
       case 'number':
@@ -205,9 +217,11 @@ async function handleMessage(topic: string, message: Buffer) {
       case 'percent': {
         if (message.length !== 8) {
           console.error(
-            'received MQTT message with topic', topic,
+            'received MQTT message with topic',
+            topic,
             'which has type percent,',
-            'but length is', message.length,
+            'but length is',
+            message.length,
             'instead of 8'
           );
           return;
@@ -262,6 +276,12 @@ async function mqttService(connection: MySqlConnection) {
   }
 }
 
+function requestFeedback(client, parts: string[]): void {
+  const feedbackTopic = parts.join('/') + '/feedback';
+  console.info('publishing', feedbackTopic);
+  client.publish(feedbackTopic);
+}
+
 async function subscribe(serverId: number, typeId: number) {
   const client = clientMap[serverId];
   const topics = await getTypeTopics(typeId);
@@ -307,6 +327,12 @@ function websocketSetup() {
       if (error.code !== 'ECONNRESET') {
         console.error('WebSocket error:', error.code);
       }
+    });
+
+    Object.values(clientMap).forEach(client => {
+      // $FlowFixMe - doesn't know about client methods
+      client.publish('thejoveexpress/feedback');
+      console.log('mqtt-service.js websocketSetup: published feedback request');
     });
   });
 }

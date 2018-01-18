@@ -178,9 +178,11 @@ addReducer(
   (state: StateType, nodeId: number): StateType => {
     const prop = 'selectedChildNodeId';
     const oldSelectedId = state.ui[prop];
-    const newSelectedId = nodeId !== oldSelectedId ? nodeId : 0;
-    const newState = setUiProp(state, 'selectedInstanceNodeId', newSelectedId);
-    return setUiProp(newState, prop, newSelectedId);
+
+    if (nodeId === oldSelectedId) return state;
+
+    const newState = setUiProp(state, 'selectedInstanceNodeId', nodeId);
+    return setUiProp(newState, prop, nodeId);
   }
 );
 
@@ -191,10 +193,6 @@ addReducer(
     const prop = `selected${upperFirst(kind)}NodeId`;
 
     const oldSelectedId = state.ui[prop];
-
-    // This commented out logic makes it so no node is
-    // selected if the currently selected node is clicked.
-    //const newSelectedId = node && node.id !== oldSelectedId ? node.id : 0;
 
     // Don't change the state if the currently selected node
     // is selected again.
