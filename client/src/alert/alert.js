@@ -50,10 +50,15 @@ class Alert extends Component<PropsType> {
     const {alert, instanceNodeMap, typeNodeMap} = this.props;
     if (!alert) return null;
 
+    // Get the type name for instance associated with this alert.
     const {instanceId} = alert;
     const instance = instanceNodeMap[instanceId];
     const {typeId} = instance;
-    const typeName = typeId ? typeNodeMap[typeId].name : 'unknown';
+    let typeName = 'unknown';
+    if (typeId) {
+      const typeNode = typeNodeMap[typeId];
+      if (typeNode) typeName = typeNode.name;
+    }
 
     return (
       <div

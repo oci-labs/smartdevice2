@@ -37,12 +37,30 @@ function connect(server: MessageServerType, typeId: number = 0) {
     subscribe(id, typeId);
   } else {
     const url = `mqtt://${server.host}:${server.port}`;
-    const client = mqtt.connect(url);
+    //const options = {keepalive: true};
+    const options = {};
+    const client = mqtt.connect(url, options);
     clientMap[id] = client;
-    console.info('connected to', url);
+
+    client.on('connect', () => {
+      console.info('connected to MQTT server at', url);
+      subscribe(id, typeId);
+    });
 
     client.on('message', handleMessage);
-    client.on('connect', () => subscribe(id, typeId));
+
+    client.on('close', () => {
+      console.info('MQTT server connection was closed.');
+    });
+    client.on('error', err => {
+      console.error('MQTT server error:', err);
+    });
+    client.on('offline', () => {
+      console.info('MQTT server is offline.');
+    });
+    client.on('reconnect', () => {
+      console.info('MQTT server reconnect started.');
+    });
   }
 }
 
@@ -94,7 +112,8 @@ async function getTopicType(topic: string): Promise<string> {
 
   const property = parts.pop();
 
-  let parentId = 0, row;
+  let parentId = 0,
+    row;
   for (const part of parts) {
     let sql = 'select id, parentId, typeId from instance where name = ?';
     let args = [];
@@ -112,7 +131,10 @@ async function getTopicType(topic: string): Promise<string> {
   const {typeId} = row;
   const sql = 'select kind from type_data where name = ? and typeId = ?';
   [row] = await mySql.query(sql, property, typeId);
-  return row.kind;
+  if (!row) {
+    console.error('REST server failed to get type of topic', topic);
+  }
+  return row ? row.kind : '';
 }
 
 async function getTypeTopics(typeId: number): Promise<string[]> {
@@ -159,44 +181,61 @@ async function saveProperty(
 }
 
 async function handleMessage(topic: string, message: Buffer) {
-  const type = await getTopicType(topic);
+  try {
+    const type = await getTopicType(topic);
 
-  //console.log('message length =', message.length);
-  const parts = topic.split('/');
+    //console.log('message length =', message.length);
+    const parts = topic.split('/');
 
-  const lastPart = parts[parts.length - 1];
-  if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
+    const lastPart = parts[parts.length - 1];
+    if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
 
-  const property = parts.pop();
+    const property = parts.pop();
 
-  let value;
-  switch (type) {
-    case 'boolean':
-      value = message.readInt8(0);
-      break;
+    let value;
+    switch (type) {
+      case 'boolean':
+        value = message.readInt8(0);
+        break;
 
-    case 'number':
-      value = message.readInt32BE(0);
-      break;
+      case 'number':
+        value = message.readInt32BE(0);
+        break;
 
-    case 'percent': {
-      const rawValue = message.readIntBE(0, 4);
-      const maxValue = message.readIntBE(4, 4);
-      value = 100 * (rawValue / maxValue);
-      break;
+      case 'percent': {
+        if (message.length !== 8) {
+          console.error(
+            'received MQTT message with topic', topic,
+            'which has type percent,',
+            'but length is', message.length,
+            'instead of 8'
+          );
+          return;
+        }
+
+        const rawValue = message.readIntBE(0, 4);
+        const maxValue = message.readIntBE(4, 4);
+        value = 100 * (rawValue / maxValue);
+        break;
+      }
+
+      case 'text':
+        value = message.toString();
+        break;
     }
 
-    case 'text':
-      value = message.toString();
-      break;
-  }
-
-  if (value !== undefined) {
-    console.log(topic, '=', value);
-    const path = parts.join(PATH_DELIMITER);
-    saveProperty(path, property, value);
-  } else {
-    console.error('unsupported topic', topic);
+    if (value !== undefined) {
+      //console.log(topic, '=', value);
+      const path = parts.join(PATH_DELIMITER);
+      saveProperty(path, property, value);
+    } else {
+      console.error('unsupported topic', topic);
+    }
+  } catch (e) {
+    console.error('\nREST server error:', e.message);
+    console.error('REST server error: topic =', topic);
+    console.error('REST server error: message length =', message.length);
+    //process.exit(1); //TODO: only for debugging
   }
 }
 
@@ -259,9 +298,14 @@ function websocketSetup() {
     console.info('got WebSocket connection');
     ws = webSocket;
 
+    ws.on('close', () => {
+      console.info('WebSocket connection closed');
+      ws = null;
+    });
+
     ws.on('error', error => {
       if (error.code !== 'ECONNRESET') {
-        console.error('websocket error:', error.code);
+        console.error('WebSocket error:', error.code);
       }
     });
   });
