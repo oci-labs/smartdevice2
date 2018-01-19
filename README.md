@@ -19,6 +19,10 @@ types of supported devices.
   On a Mac with Homebrew installed,
   this can be done by running `brew install mysql`.
 
+## MQTT Setup
+
+See MosquittoNotes.txt in the top directory.
+
 ## Server Setup
 * open a terminal window
 * `cd server`

@@ -1,0 +1,51 @@
+Mosquitto Notes
+
+Overview
+- "Mosquitto" is a name for the MQTT protocol.
+- It supports publish and subscribe operations.
+
+To install
+- brew install mosquitto
+
+To have the MQTT server automatically start on reboots
+- ln -sfv /usr/local/opt/mosquitto/*.plist ~/Library/LaunchAgents
+
+To initially start the MQTT server
+- launchctl load ~/Library/LaunchAgents/homebrew.mxcl.mosquitto.plist
+- this starts a process using /usr/local/opt/mosquitto/sbin/mosquitto
+
+To stop the server
+- launchctl stop homebrew.mxcl.mosquitto
+
+To restart the server
+- launchctl start homebrew.mxcl.mosquitto
+
+To subscribe to topic
+- mosquitto_sub -t topic/state
+- no quotes are needed around the -t value
+
+To publish a message on a topic
+- open a new terminal
+- mosquitto_pub -t topic/state -m "Hello World"
+- no quotes are needed around the -t value
+
+To use from Node.js or browser JavaScript
+- npm install mqtt
+- example code:
+const mqtt = require('mqtt');
+const host = 'localhost';
+const port = 1883;
+const client = mqtt.connect('mqtt://' + host + ':' + port);
+
+const topic = 'foo/bar';
+
+client.on('connect', () => {
+  client.subscribe(topic);
+  client.publish(topic, 'Hello from MQTT!');
+});
+
+client.on('message', (topic, message) => {
+  console.log(message.toString()); // message is a Buffer
+  client.end(); // don't call to continue listening
+});
+
