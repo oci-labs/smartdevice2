@@ -49,8 +49,9 @@ class TypeProperties extends Component<PropsType> {
       return;
     }
 
+    const enumId = this.getEnumId(newPropType);
     const typeData = {
-      enumId: this.getEnumId(newPropType),
+      enumId: enumId === -1 ? undefined : enumId,
       kind: newPropType,
       name: newPropName,
       typeId: typeNode.id

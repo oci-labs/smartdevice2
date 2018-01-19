@@ -12,7 +12,7 @@ create table enum (
 
 create table enum_member (
   id int auto_increment primary key,
-  enumId int,
+  enumId int not null,
   name text not null,
   value int not null,
   foreign key (enumId)

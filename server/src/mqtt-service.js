@@ -134,14 +134,12 @@ async function getTopicType(topic: string): Promise<string> {
     const sql = 'select enumId, kind from type_data ' +
       'where name = ? and typeId = ?';
     [row] = await mySql.query(sql, property, typeId);
-    console.log('mqtt-service.js getTopicType: row1 =', row);
     if (row) {
-      if (row.enumId !== undefined) {
+      if (row.enumId !== null) {
         // It is not a builtin type.
         // Determine if it is an enumerated type.
         const sql = 'select name from enum where id = ?';
         [row] = await mySql.query(sql, row.enumId);
-        console.log('mqtt-service.js getTopicType: row2 =', row);
         if (row) type = ENUM_PREFIX + row.name;
       } else {
         type = row.kind;
@@ -200,13 +198,11 @@ async function saveProperty(
 }
 
 async function handleMessage(client, topic: string, message: Buffer) {
-  const ignore = topic === 'thejoveexpress/lights/ambient/feedback';
-  if (ignore) return;
+  //const ignore = topic === 'thejoveexpress/lights/ambient/feedback';
+  //if (ignore) return;
 
   try {
-    console.log('mqtt-service.js handleMessage: topic =', topic);
     const type = await getTopicType(topic);
-    console.log('mqtt-service.js handleMessage: type =', type);
 
     //console.log('message length =', message.length);
     const parts = topic.split('/');
@@ -267,7 +263,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
     }
 
     if (value !== undefined) {
-      //console.log(topic, '=', value);
+      console.log(topic, '=', value);
       const path = parts.join(PATH_DELIMITER);
       saveProperty(path, property, value);
     } else {
@@ -360,7 +356,7 @@ function websocketSetup() {
     Object.values(clientMap).forEach(client => {
       // $FlowFixMe - doesn't know about client methods
       client.publish('thejoveexpress/feedback');
-      console.log('mqtt-service.js websocketSetup: published feedback request');
+      //console.log('mqtt-service.js: published feedback request');
     });
   });
 }
