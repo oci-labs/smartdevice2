@@ -1,5 +1,6 @@
 // @flow
 
+import omit from 'lodash/omit';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
@@ -47,7 +48,7 @@ class Enums extends Component<PropsType> {
       name: newEnumName,
       memberMap: {}
     };
-    const res = await postJson('enum', anEnum);
+    const res = await postJson('enum', omit(anEnum, ['memberMap']));
     anEnum.id = await res.text();
     anEnum.memberMap = {};
     const newMap = {

@@ -126,7 +126,7 @@ export type NodeType = {
 export type PrimitiveType = boolean | number | string;
 
 export type PropertyKindType =
-  'boolean' | 'enum' | 'number' | 'percent' | 'text';
+  'boolean' | 'number' | 'percent' | 'text';
 
 export type PropertyType = {
   id: number,

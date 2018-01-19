@@ -12,14 +12,24 @@ import {showModal} from '../share/sd-modal';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
-import type {NodeType, PropertyType, StateType, UiType} from '../types';
+import type {
+  EnumMapType,
+  EnumType,
+  NodeType,
+  PropertyType,
+  StateType,
+  UiType
+} from '../types';
 
 import './type-properties.css';
 
 type PropsType = {
+  enumMap: EnumMapType,
   typeNode: ?NodeType,
   ui: UiType
 };
+
+const BUILTIN_TYPES = ['boolean', 'number', 'percent', 'text'];
 
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
@@ -110,7 +120,12 @@ class TypeProperties extends Component<PropsType> {
   );
 
   renderTableInputRow = () => {
-    const {ui: {newPropName, newPropType}} = this.props;
+    const {enumMap, ui: {newPropName, newPropType}} = this.props;
+
+    const enums = ((Object.values(enumMap): any): EnumType[]);
+    const enumNames = enums.map(obj => obj.name);
+    const typeNames = [...BUILTIN_TYPES, ...enumNames].sort();
+
     return (
       <tr>
         <td>
@@ -123,11 +138,9 @@ class TypeProperties extends Component<PropsType> {
         </td>
         <td>
           <select onChange={this.propTypeChange} value={newPropType}>
-            <option>boolean</option>
-            <option>enum</option>
-            <option>number</option>
-            <option>percent</option>
-            <option>text</option>
+            {typeNames.map(typeName => (
+              <option key={typeName}>{typeName}</option>
+            ))}
           </select>
         </td>
         <td className="actions-column">
@@ -186,10 +199,10 @@ class TypeProperties extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {typeNodeMap, ui} = state;
+  const {enumMap, typeNodeMap, ui} = state;
   const {selectedTypeNodeId} = ui;
   const typeNode = typeNodeMap[selectedTypeNodeId];
-  return {typeNode, ui};
+  return {enumMap, typeNode, ui};
 };
 
 export default connect(mapState)(TypeProperties);

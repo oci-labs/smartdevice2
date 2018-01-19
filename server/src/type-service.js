@@ -10,17 +10,19 @@ const {
 } = require('./mqtt-service');
 const {errorHandler} = require('./util/error-util');
 
+const BUILTIN_TYPES = ['boolean', 'number', 'percent', 'text'];
+
 let mySql;
 
 async function getEnumsHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const sql = 'select * from enum_member where enumId = ?';
   try {
     const enums = await mySql.query('select * from enum');
 
     // Build the memberMap for each enum.
+    const sql = 'select * from enum_member where enumId = ?';
     const promises = enums.map(anEnum => mySql.query(sql, anEnum.id));
     const enumMembersArr = await Promise.all(promises);
     enums.forEach((anEnum, index) => {
@@ -92,10 +94,9 @@ async function getTypeNamesHandler(
   res: express$Response
 ): Promise<void> {
   try {
-    const typeNames = await mySql.query('select name from type');
     const enumNames = await mySql.query('select name from enum');
     const names = [
-      ...typeNames.map(obj => obj.name),
+      ...BUILTIN_TYPES,
       ...enumNames.map(obj => obj.name)
     ];
     names.sort();
