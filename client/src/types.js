@@ -53,11 +53,6 @@ export type EnumMapType = {[id: number]: EnumType};
 
 export type EnumMemberMapType = {[id: number]: EnumMemberType};
 
-export type EnumMemberPayloadType = {
-  enumId: number,
-  enumMemberId: number
-};
-
 export type EnumMemberType = {
   id: number,
   enumId: number,
