@@ -3,6 +3,7 @@
 import omit from 'lodash/omit';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import {dispatch, dispatchSet, Input} from 'redux-easy';
 
@@ -28,6 +29,7 @@ type PropsType = {
 
 class Enums extends Component<PropsType> {
   added: boolean;
+  enumMemberNameInput;
 
   addEnum = async () => {
     const {enumMap, ui: {newEnumName}} = this.props;
@@ -61,6 +63,8 @@ class Enums extends Component<PropsType> {
     dispatchSet('enumMap', newMap);
     dispatchSet('ui.newEnumName', '');
     dispatchSet('ui.newEnumMemberValue', 0);
+
+    this.focusMemberNameInput();
   };
 
   addEnumMember = async () => {
@@ -89,6 +93,8 @@ class Enums extends Component<PropsType> {
     this.added = true;
 
     dispatch('addEnumMember', enumMember);
+
+    this.focusMemberNameInput();
   };
 
   componentWillMount() {
@@ -124,6 +130,15 @@ class Enums extends Component<PropsType> {
     await deleteResource(`enum_member/${enumMember.id}`);
 
     dispatch('deleteEnumMember', enumMember);
+  };
+
+  focusMemberNameInput = () => {
+    if (this.enumMemberNameInput) {
+      // eslint-disable-next-line react/no-find-dom-node
+      const domNode = ReactDOM.findDOMNode(this.enumMemberNameInput);
+      // $FlowFixMe - doesn't think focus is a method
+      if (domNode) domNode.focus();
+    }
   };
 
   getSelectedEnum = () => {
@@ -191,6 +206,7 @@ class Enums extends Component<PropsType> {
             className="enum-member-name-input"
             onKeyDown={validNameHandler}
             path="ui.newEnumMemberName"
+            ref={input => this.enumMemberNameInput = input}
           />
         </td>
         <td>

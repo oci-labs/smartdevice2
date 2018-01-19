@@ -42,8 +42,8 @@ function isLetter(keyCode: number): boolean {
   return 65 <= keyCode && keyCode <= 90;
 }
 
-// backspace, left arrow, right arrow
-const NAVIGATION_KEY_CODES = [8, 37, 39];
+// backspace, tab, left arrow, and right arrow
+const NAVIGATION_KEY_CODES = [8, 9, 37, 39];
 
 function isNavigation(keyCode: number): boolean {
   return NAVIGATION_KEY_CODES.includes(keyCode);
