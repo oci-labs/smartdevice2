@@ -42,7 +42,7 @@ class App extends Component<PropsType> {
     return (
       <div className="app">
         <header className="app-header">
-          <h1 className="app-title">SmartDevice</h1>
+          <h1 className="app-title">Open Edge Device Management</h1>
         </header>
         <section id="body">
           <LeftNav />
