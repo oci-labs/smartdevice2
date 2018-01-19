@@ -2,7 +2,8 @@
 
 import omit from 'lodash/omit';
 import sortBy from 'lodash/sortBy';
-import React, {Component} from 'react';
+// $FlowFixMe - doesn't know about Fragment yet
+import React, {Component, Fragment} from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 import {dispatch, dispatchSet, Input} from 'redux-easy';
@@ -295,6 +296,7 @@ class Enums extends Component<PropsType> {
     const {enumMap, ui: {selectedEnumId}} = this.props;
     const enums = ((Object.values(enumMap): any): EnumType[]);
     const sortedEnums = sortBy(enums, ['name']);
+    const selectedEnum = this.getSelectedEnum();
 
     let sortedEnumMembers = [];
     if (selectedEnumId) {
@@ -310,7 +312,6 @@ class Enums extends Component<PropsType> {
     return (
       <section className="enums">
         <h3>Enums</h3>
-
         <table className="enum-table">
           {this.renderEnumTableHead()}
           <tbody>
@@ -319,16 +320,19 @@ class Enums extends Component<PropsType> {
           </tbody>
         </table>
 
-        {selectedEnumId !== -1 && (
-          <table className="enum-member-table">
-            {this.renderEnumMemberTableHead()}
-            <tbody>
-              {this.renderEnumMemberTableInputRow()}
-              {sortedEnumMembers.map(enumMember =>
-                this.renderEnumMemberTableRow(enumMember)
-              )}
-            </tbody>
-          </table>
+        {selectedEnum && (
+          <Fragment>
+            <h3>Members of &quot;{selectedEnum.name}&quot;</h3>
+            <table className="enum-member-table">
+              {this.renderEnumMemberTableHead()}
+              <tbody>
+                {this.renderEnumMemberTableInputRow()}
+                {sortedEnumMembers.map(enumMember =>
+                  this.renderEnumMemberTableRow(enumMember)
+                )}
+              </tbody>
+            </table>
+          </Fragment>
         )}
       </section>
     );
