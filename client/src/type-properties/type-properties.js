@@ -50,6 +50,7 @@ class TypeProperties extends Component<PropsType> {
     }
 
     const typeData = {
+      enumId: this.getEnumId(newPropType),
       kind: newPropType,
       name: newPropName,
       typeId: typeNode.id
@@ -58,6 +59,13 @@ class TypeProperties extends Component<PropsType> {
 
     this.added = true;
     dispatchSet('ui.newPropName', '');
+  };
+
+  getEnumId = (enumName: string): number => {
+    const {enumMap} = this.props;
+    const enums = ((Object.values(enumMap): any): EnumType[]);
+    const anEnum = enums.find(anEnum => anEnum.name === enumName);
+    return anEnum ? anEnum.id : -1;
   };
 
   componentWillMount() {

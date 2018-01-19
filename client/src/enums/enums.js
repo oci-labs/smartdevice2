@@ -30,6 +30,7 @@ class Enums extends Component<PropsType> {
   added: boolean;
 
   addEnum = async () => {
+    console.log('enums.js addEnum: entered');
     const {enumMap, ui: {newEnumName}} = this.props;
 
     if (await this.isDuplicateTypeName(newEnumName)) {
@@ -62,6 +63,7 @@ class Enums extends Component<PropsType> {
   };
 
   addEnumMember = async () => {
+    console.log('enums.js addEnumMember: entered');
     const {
       ui: {newEnumMemberName, newEnumMemberValue, selectedEnumId}
     } = this.props;

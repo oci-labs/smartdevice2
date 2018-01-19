@@ -14,6 +14,9 @@ import {showModal} from '../share/sd-modal';
 
 import type {
   AlertType,
+  EnumMemberType,
+  EnumMapType,
+  EnumType,
   InstanceDataType,
   NodeMapType,
   NodeType,
@@ -25,6 +28,7 @@ import './instance-detail.css';
 
 type PropsType = {
   alerts: AlertType[],
+  enumMap: EnumMapType,
   instanceData: Object,
   instanceNodeMap: NodeMapType,
   node: NodeType,
@@ -176,20 +180,36 @@ class InstanceDetail extends Component<PropsType> {
     );
   };
 
+  formatValue = (kind, value) => {
+    if (value === undefined) return 'unset';
+    if (kind === 'boolean') return Boolean(Number(value));
+    if (kind === 'percent') return Number(value).toFixed(2) + '%';
+    if (kind === 'number') return value;
+    if (kind === 'text') return value;
+
+    // Define if this is an enumerated type ...
+    const {enumMap} = this.props;
+    const enums = ((Object.values(enumMap): any): EnumType[]);
+    const anEnum = enums.find(anEnum => anEnum.name === kind);
+    if (anEnum) {
+      const members = ((Object.values(
+        anEnum.memberMap
+      ): any): EnumMemberType[]);
+      const v = Number(value);
+      const member = members.find(member => member.value === v);
+      return member ? member.name : 'bad enum value ' + value;
+    }
+
+    return value; // works for kind = 'number', 'text', ...
+  };
+
   renderProperty = (typeProp: PropertyType, instanceData: Object) => {
     const {kind, name} = typeProp;
-    let value = instanceData[name];
-    value =
-      value === undefined
-        ? 'unset'
-        : kind === 'boolean'
-          ? Boolean(Number(value))
-          : kind === 'percent' ? Number(value).toFixed(2) + '%' : value;
-
+    const value = instanceData[name];
     return (
       <tr key={name}>
         <td>{name}</td>
-        <td className={kind}>{String(value)}</td>
+        <td className={kind}>{String(this.formatValue(kind, value))}</td>
       </tr>
     );
   };
@@ -221,10 +241,18 @@ class InstanceDetail extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {alerts, instanceData, instanceNodeMap, ui} = state;
+  const {alerts, enumMap, instanceData, instanceNodeMap, ui} = state;
   const {selectedChildNodeId, typeName, typeProps} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
-  return {alerts, instanceData, instanceNodeMap, node, typeName, typeProps};
+  return {
+    alerts,
+    enumMap,
+    instanceData,
+    instanceNodeMap,
+    node,
+    typeName,
+    typeProps
+  };
 };
 
 export default connect(mapState)(InstanceDetail);

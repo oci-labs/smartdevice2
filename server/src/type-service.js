@@ -201,7 +201,7 @@ function typeService(
   mySql = connection;
   const URL_PREFIX = '/types/';
   app.get(URL_PREFIX + 'enums', getEnumsHandler);
-  app.get(URL_PREFIX + 'enums/used-by', getTypesUsingEnumHandler);
+  app.get(URL_PREFIX + 'enums/used-by/:enumId', getTypesUsingEnumHandler);
   app.get(URL_PREFIX + 'enums/:enumId', getEnumValuesHandler);
   app.get(URL_PREFIX + 'names', getTypeNamesHandler);
   app.get(URL_PREFIX + ':typeId/inuse', inUseHandler);

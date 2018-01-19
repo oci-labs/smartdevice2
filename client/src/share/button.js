@@ -26,8 +26,13 @@ export default ({
   if (icon) classes += ` fa fa-${icon}`;
   if (disabled) classes += ' disabled';
   return (
-    <div className={classes} onClick={onClick} title={tooltip}>
+    <button
+      className={classes}
+      disabled={disabled}
+      onClick={onClick}
+      title={tooltip}
+    >
       {label}
-    </div>
+    </button>
   );
 };

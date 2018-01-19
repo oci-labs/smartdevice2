@@ -20,6 +20,7 @@ const {
 
 import type {NodeType, MessageServerType, PrimitiveType} from './types';
 
+const ENUM_PREFIX = 'enum:';
 const SPECIAL_SUFFIXES = ['control', 'feedback'];
 
 const clientMap = {}; // keys are server ids
@@ -104,15 +105,15 @@ async function getServerIdForType(typeId: number): Promise<number> {
 }
 
 async function getTopicType(topic: string): Promise<string> {
-  const parts = topic.split('/');
+  let type = '';
 
+  const parts = topic.split('/');
   const lastPart = parts[parts.length - 1];
   if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
-
   const property = parts.pop();
 
-  let parentId = 0,
-    row;
+  let parentId = 0;
+  let row;
   for (const part of parts) {
     let sql = 'select id, parentId, typeId from instance where name = ?';
     let args = [];
@@ -125,15 +126,34 @@ async function getTopicType(topic: string): Promise<string> {
     if (!row) return '';
     parentId = row.id;
   }
-  if (!row) return '';
 
-  const {typeId} = row;
-  const sql = 'select kind from type_data where name = ? and typeId = ?';
-  [row] = await mySql.query(sql, property, typeId);
-  if (!row) {
-    console.error('REST server failed to get type of topic', topic);
+  // If we found the instance for this topic ...
+  if (row) {
+    // Try to get the type of this instance.
+    const {typeId} = row;
+    const sql = 'select enumId, kind from type_data ' +
+      'where name = ? and typeId = ?';
+    [row] = await mySql.query(sql, property, typeId);
+    console.log('mqtt-service.js getTopicType: row1 =', row);
+    if (row) {
+      if (row.enumId !== undefined) {
+        // It is not a builtin type.
+        // Determine if it is an enumerated type.
+        const sql = 'select name from enum where id = ?';
+        [row] = await mySql.query(sql, row.enumId);
+        console.log('mqtt-service.js getTopicType: row2 =', row);
+        if (row) type = ENUM_PREFIX + row.name;
+      } else {
+        type = row.kind;
+      }
+    }
   }
-  return row ? row.kind : '';
+
+  if (!type) {
+    console.error('failed to get type of topic', topic);
+  }
+
+  return type;
 }
 
 async function getTypeTopics(typeId: number): Promise<string[]> {
@@ -180,9 +200,13 @@ async function saveProperty(
 }
 
 async function handleMessage(client, topic: string, message: Buffer) {
+  const ignore = topic === 'thejoveexpress/lights/ambient/feedback';
+  if (ignore) return;
+
   try {
-    //console.log('mqtt-service.js handleMessage: topic =', topic);
+    console.log('mqtt-service.js handleMessage: topic =', topic);
     const type = await getTopicType(topic);
+    console.log('mqtt-service.js handleMessage: type =', type);
 
     //console.log('message length =', message.length);
     const parts = topic.split('/');
@@ -236,6 +260,10 @@ async function handleMessage(client, topic: string, message: Buffer) {
       case 'text':
         value = message.toString();
         break;
+    }
+
+    if (type.startsWith(ENUM_PREFIX)) {
+      value = message.readInt32BE(0);
     }
 
     if (value !== undefined) {
