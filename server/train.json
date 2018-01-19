@@ -1,0 +1,51 @@
+{
+  "enums": {
+    "EngineState": {
+      "reverse": -1,
+      "idle": 0,
+      "forward": 1
+    },
+    "LightCommand": {
+      "off": 0,
+      "on": 1,
+      "auto": 2
+    }
+  },
+  "types": {
+    "site": {
+      "department": {
+        "machine": {
+          "compressor": {
+            "pressure": "number",
+            "temperature": "number"
+          },
+          "valve": {
+            "cycleCount": "number",
+            "pressure": "number"
+          }
+        }
+      }
+    },
+    "train": {
+      "alive": "boolean",
+      "sound": "percent",
+      "engine": {
+        "calibration": "percent",
+        "power": "percent",
+        "state": "EngineState"
+      },
+      "lights": {
+        "ambient": "percent",
+        "calibration": "percent",
+        "override": "LightCommand",
+        "power": "boolean"
+      }
+    }
+  },
+  "instances": {
+    "thejoveexpress": {
+      "engine": {},
+      "lights": {}
+    }
+  }
+}

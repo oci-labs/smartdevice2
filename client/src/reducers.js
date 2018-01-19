@@ -8,6 +8,7 @@ import {showModal} from './share/sd-modal';
 import type {
   AddNodePayloadType,
   ChangeType,
+  EnumMemberType,
   NodeMapType,
   NodePayloadType,
   NodeType,
@@ -57,6 +58,31 @@ function validNewName(nodeMap: NodeMapType, parentId: number, name: string) {
 }
 
 addReducer(
+  'addEnumMember',
+  (state: StateType, enumMember: EnumMemberType) => {
+    const {enumId, id} = enumMember;
+
+    const {enumMap, ui} = state;
+    const anEnum = enumMap[enumId];
+    if (!anEnum) {
+      console.error('invalid enum id', enumId);
+      return state;
+    }
+
+    const newMemberMap = {...anEnum.memberMap};
+    newMemberMap[id] = enumMember;
+    const newEnum = {...anEnum, memberMap: newMemberMap};
+    const newEnumMap = {...enumMap, [enumId]: newEnum};
+    const newUi = {
+      ...ui,
+      newEnumMemberName: '',
+      newEnumMemberValue: ui.newEnumMemberValue + 1
+    };
+    return {...state, enumMap: newEnumMap, ui: newUi};
+  }
+);
+
+addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
     const {id, kind, name, parentId, typeId} = payload;
@@ -101,6 +127,26 @@ addReducer('deleteAlert', (state: StateType, alertId: number) => {
   const newAlerts = alerts.filter(alert => alert.id !== alertId);
   return setTopProp(state, 'alerts', newAlerts);
 });
+
+addReducer(
+  'deleteEnumMember',
+  (state: StateType, enumMember: EnumMemberType) => {
+    const {enumId, id} = enumMember;
+
+    const {enumMap} = state;
+    const anEnum = enumMap[enumId];
+    if (!anEnum) {
+      console.error('invalid enum id', enumId);
+      return state;
+    }
+
+    const newMemberMap = {...anEnum.memberMap};
+    delete newMemberMap[id];
+    const newEnum = {...anEnum, memberMap: newMemberMap};
+    const newEnumMap = {...enumMap, [enumId]: newEnum};
+    return {...state, enumMap: newEnumMap};
+  }
+);
 
 addReducer(
   'deleteNode',

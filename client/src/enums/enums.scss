@@ -1,0 +1,33 @@
+@import '../share.scss';
+
+.enums {
+  margin-top: 20px;
+  text-align: left;
+
+  .button {
+    border: none;
+  }
+
+  .enum-member-name-input,
+  .enum-member-value-input,
+  .enum-name-input {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .enum-member-table {
+    margin-top: 20px;
+  }
+
+  .port-input {
+    width: 40px;
+  }
+
+  .selected-enum {
+    background-color: $selected-bg-color;
+  }
+
+  table {
+    width: 100%;
+  }
+}

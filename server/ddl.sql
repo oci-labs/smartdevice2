@@ -5,6 +5,21 @@ create database smartdevice;
 
 use smartdevice;
 
+create table enum (
+  id int auto_increment primary key,
+  name text not null
+);
+
+create table enum_member (
+  id int auto_increment primary key,
+  enumId int,
+  name text not null,
+  value int not null,
+  foreign key (enumId)
+    references enum (id)
+    on delete cascade
+);
+
 create table message_server (
   id int auto_increment primary key,
   host text not null,
@@ -29,9 +44,13 @@ create table type (
 
 create table type_data (
   id int auto_increment primary key,
+  enumId int null,
   kind text not null,
   name text not null,
   typeId int,
+  foreign key (enumId)
+    references enum (id)
+    on delete cascade,
   foreign key (typeId)
     references type (id)
     on delete cascade

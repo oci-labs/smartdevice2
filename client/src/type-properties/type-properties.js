@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
 import Button from '../share/button';
+import Enums from '../enums/enums';
 import {showModal} from '../share/sd-modal';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
@@ -123,6 +124,7 @@ class TypeProperties extends Component<PropsType> {
         <td>
           <select onChange={this.propTypeChange} value={newPropType}>
             <option>boolean</option>
+            <option>enum</option>
             <option>number</option>
             <option>percent</option>
             <option>text</option>
@@ -176,6 +178,8 @@ class TypeProperties extends Component<PropsType> {
             {typeProps.map(typeProp => this.renderTableRow(typeProp))}
           </tbody>
         </table>
+
+        <Enums />
       </section>
     );
   }

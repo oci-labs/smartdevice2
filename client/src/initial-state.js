@@ -4,6 +4,7 @@ import type {StateType} from './types';
 
 const state: StateType = {
   alerts: [],
+  enumMap: {},
   errors: new Set(),
   instanceData: {},
   instanceNodeMap: {},
@@ -21,11 +22,15 @@ const state: StateType = {
     newAlertExpression: '',
     newAlertName: '',
     newAlertSticky: false,
+    newEnumMemberName: '',
+    newEnumMemberValue: 0,
+    newEnumName: '',
     newPropName: '',
     newPropType: 'number',
     newServerHost: '',
     newServerPort: 1883,
     selectedChildNodeId: 0,
+    selectedEnumId: -1, // 0 is a valid id
     selectedInstanceNodeId: 0,
     selectedTypeNodeId: 0,
     // Need to start with treeType set to "type"

@@ -49,6 +49,28 @@ export type ConfirmType = {
   yesCb: Function
 };
 
+export type EnumMapType = {[id: number]: EnumType};
+
+export type EnumMemberMapType = {[id: number]: EnumMemberType};
+
+export type EnumMemberPayloadType = {
+  enumId: number,
+  enumMemberId: number
+};
+
+export type EnumMemberType = {
+  id: number,
+  enumId: number,
+  name: string,
+  value: number
+};
+
+export type EnumType = {
+  id: number,
+  name: string,
+  memberMap: EnumMemberMapType
+};
+
 export type HistoryType = {
   location: {
     pathname: string
@@ -108,7 +130,8 @@ export type NodeType = {
 
 export type PrimitiveType = boolean | number | string;
 
-export type PropertyKindType = 'boolean' | 'number' | 'percent' | 'text';
+export type PropertyKindType =
+  'boolean' | 'enum' | 'number' | 'percent' | 'text';
 
 export type PropertyType = {
   id: number,
@@ -125,6 +148,7 @@ export type SetNodesPayloadType = {
 
 export type StateType = {
   alerts: AlertType[],
+  enumMap: EnumMapType,
   errors: Set<string>,
   instanceData: Object,
   instanceNodeMap: NodeMapType,
@@ -160,11 +184,15 @@ export type UiType = {
   newAlertExpression: string,
   newAlertName: string,
   newAlertSticky: boolean,
+  newEnumMemberName: string,
+  newEnumMemberValue: number,
+  newEnumName: string,
   newPropName: string,
   newPropType: string,
   newServerHost: string,
   newServerPort: number,
   selectedChildNodeId: number,
+  selectedEnumId: number,
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,
   treeType: TreeType,

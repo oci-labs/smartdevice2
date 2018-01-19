@@ -12,6 +12,49 @@ const {errorHandler} = require('./util/error-util');
 
 let mySql;
 
+async function getEnumsHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const sql = 'select * from enum_member where enumId = ?';
+  try {
+    const enums = await mySql.query('select * from enum');
+
+    // Build the memberMap for each enum.
+    const promises = enums.map(anEnum => mySql.query(sql, anEnum.id));
+    const enumMembersArr = await Promise.all(promises);
+    enums.forEach((anEnum, index) => {
+      const enumMembers = enumMembersArr[index];
+      anEnum.memberMap = enumMembers.reduce((map, enumMember) => {
+        map[enumMember.id] = enumMember;
+        return map;
+      }, {});
+    });
+
+    const sorted = sortBy(enums, ['name']);
+    res.send(sorted);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
+async function getEnumValuesHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {enumId} = req.params;
+  const sql = 'select * from enum_value where enumId = ?';
+  try {
+    const enumValues = await mySql.query(sql, enumId);
+    const sorted = sortBy(enumValues, ['value']);
+    res.send(sorted);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
 async function getTypeAlertsHandler(
   req: express$Request,
   res: express$Response
@@ -37,6 +80,43 @@ async function getTypeDataHandler(
   try {
     const typeDatas = await mySql.query(sql, typeId);
     const sorted = sortBy(typeDatas, ['name']);
+    res.send(sorted);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
+async function getTypeNamesHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  try {
+    const typeNames = await mySql.query('select name from type');
+    const enumNames = await mySql.query('select name from enum');
+    const names = [
+      ...typeNames.map(obj => obj.name),
+      ...enumNames.map(obj => obj.name)
+    ];
+    names.sort();
+    res.send(names);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
+async function getTypesUsingEnumHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {enumId} = req.params;
+  const sql = 'select t.name ' +
+    'from type t, type_data td ' +
+    'where td.enumId = ? and t.id = td.typeId';
+  try {
+    const types = await mySql.query(sql, enumId);
+    const sorted = sortBy(types, ['name']);
     res.send(sorted);
   } catch (e) {
     // istanbul ignore next
@@ -118,11 +198,15 @@ function typeService(
   connection: MySqlConnection
 ): void {
   mySql = connection;
-  const URL_PREFIX = '/types/:typeId/';
-  app.get(URL_PREFIX + 'inuse', inUseHandler);
-  app.get(URL_PREFIX + 'data', getTypeDataHandler);
-  app.get(URL_PREFIX + 'alerts', getTypeAlertsHandler);
-  app.put(URL_PREFIX + 'server/:serverId', setServerHandler);
+  const URL_PREFIX = '/types/';
+  app.get(URL_PREFIX + 'enums', getEnumsHandler);
+  app.get(URL_PREFIX + 'enums/used-by', getTypesUsingEnumHandler);
+  app.get(URL_PREFIX + 'enums/:enumId', getEnumValuesHandler);
+  app.get(URL_PREFIX + 'names', getTypeNamesHandler);
+  app.get(URL_PREFIX + ':typeId/inuse', inUseHandler);
+  app.get(URL_PREFIX + ':typeId/data', getTypeDataHandler);
+  app.get(URL_PREFIX + ':typeId/alerts', getTypeAlertsHandler);
+  app.put(URL_PREFIX + ':typeId/server/:serverId', setServerHandler);
 }
 
 module.exports = {

@@ -1,7 +1,9 @@
+@import '../share.scss';
+
 .tree-node {
   &.selected {
     & > .tree-node-name {
-      background-color: lightblue;
+      background-color: $selected-bg-color;
     }
   }
 
