@@ -111,9 +111,19 @@ class InstanceDetail extends Component<PropsType> {
 
     reloadAlerts();
 
+    this.loadEnums();
     this.loadTypeProps(typeNode);
-
     this.loadInstanceData(instanceNode);
+  }
+
+  async loadEnums() {
+    const json = await getJson('types/enums');
+    const enums = ((json: any): EnumType[]);
+    const enumMap = enums.reduce((map, anEnum) => {
+      map[anEnum.id] = anEnum;
+      return map;
+    }, {});
+    dispatchSet('enumMap', enumMap);
   }
 
   async loadInstanceData(instanceNode: NodeType) {

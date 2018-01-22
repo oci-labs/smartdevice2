@@ -182,7 +182,7 @@ async function saveProperty(
 ): Promise<void> {
   const instanceId = await getInstanceId(path);
   if (instanceId === 0) {
-    console.error('no instance found for ' + path);
+    console.error('no instance found for', path);
     return;
   }
 

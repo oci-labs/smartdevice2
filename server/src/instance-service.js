@@ -242,17 +242,18 @@ async function saveProperty(
   property: string,
   value: PrimitiveType
 ): Promise<void> {
-  // Get the id of the existing instance_data row if any.
-  const sql = 'select id from instance_data where instanceId=?';
-  const [row] = await mySql.query(sql, instanceId);
-  const id = row ? row.id : undefined;
-
   const obj = {
-    id,
     instanceId,
     dataKey: property,
     dataValue: value
   };
+
+  // Get the id of the existing instance_data row if any.
+  const sql = 'select id from instance_data where instanceId=? and dataKey=?';
+  const [row] = await mySql.query(sql, instanceId, property);
+  // $FlowFixMe - allow adding id
+  if (row) obj.id = row.id;
+
   mySql.upsert('instance_data', obj);
 }
 
