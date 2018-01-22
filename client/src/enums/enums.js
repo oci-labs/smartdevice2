@@ -199,7 +199,7 @@ class Enums extends Component<PropsType> {
   );
 
   renderEnumMemberTableInputRow = () => {
-    const {ui: {newEnumMemberName}} = this.props;
+    const {ui: {newEnumMemberName, newEnumMemberValue}} = this.props;
     return (
       <tr>
         <td>
@@ -220,7 +220,7 @@ class Enums extends Component<PropsType> {
         <td className="actions-column">
           <Button
             className="add"
-            disabled={newEnumMemberName === ''}
+            disabled={newEnumMemberName === '' || newEnumMemberValue === ''}
             icon="plus"
             onClick={this.addEnumMember}
             tooltip="add enum member"
