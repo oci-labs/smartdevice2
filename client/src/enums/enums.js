@@ -157,11 +157,11 @@ class Enums extends Component<PropsType> {
     if (!selectedEnum) return false;
 
     const {memberMap} = selectedEnum;
-    const dupName = memberMap
-      ? Object.keys(memberMap).includes(enumMember.name)
-      : false;
-    const dupValue = Object.values(memberMap).includes(enumMember.value);
-    return dupName || dupValue;
+    const members = ((Object.values(memberMap): any): EnumMemberType[]);
+    const {name, value} = enumMember;
+    return members.some(
+      member => member.name === name || member.value === value
+    );
   };
 
   isDuplicateTypeName = async (enumName: string): Promise<boolean> => {
@@ -207,7 +207,7 @@ class Enums extends Component<PropsType> {
             className="enum-member-name-input"
             onKeyDown={validNameHandler}
             path="ui.newEnumMemberName"
-            ref={input => this.enumMemberNameInput = input}
+            ref={input => (this.enumMemberNameInput = input)}
           />
         </td>
         <td>
