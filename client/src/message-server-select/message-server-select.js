@@ -19,7 +19,8 @@ import './message-server-select.css';
 
 type PropsType = {
   treeType: TreeType,
-  typeNode?: NodeType
+  typeNode?: NodeType,
+  typeRootId: number
 };
 
 type MyStateType = {
@@ -69,10 +70,10 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
   }
 
   render() {
-    const {typeNode} = this.props;
+    const {typeNode, typeRootId} = this.props;
     if (!typeNode) return null;
 
-    const isTopLevel = typeNode.parentId === 1;
+    const isTopLevel = typeNode.parentId === typeRootId;
     if (!isTopLevel) return null;
 
     const value = typeNode.messageServerId || 0;
@@ -94,8 +95,8 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {ui: {treeType}} = state;
-  return {treeType};
+  const {typeRootId, ui: {treeType}} = state;
+  return {treeType, typeRootId};
 };
 
 export default connect(mapState)(MessageServerSelect);

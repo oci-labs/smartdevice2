@@ -147,8 +147,10 @@ export type StateType = {
   errors: Set<string>,
   instanceData: Object,
   instanceNodeMap: NodeMapType,
+  instanceRootId: number,
   messageServerMap: MessageServerMapType,
   typeNodeMap: NodeMapType,
+  typeRootId: number,
   ui: UiType,
   user: UserType
 };

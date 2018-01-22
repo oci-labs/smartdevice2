@@ -148,6 +148,13 @@ addReducer(
   }
 );
 
+function deleteNodeAndDescendants(nodeMap, id) {
+  delete nodeMap[id];
+  const nodes = ((Object.values(nodeMap): any): NodeType[]);
+  const children = nodes.filter(node => node.parentId === id);
+  children.forEach(child => deleteNodeAndDescendants(nodeMap, child.id));
+}
+
 addReducer(
   'deleteNode',
   (state: StateType, payload: NodePayloadType): StateType => {
@@ -158,7 +165,7 @@ addReducer(
     // nodeMap is immutable, so make a copy that can be modified.
     const newNodeMap = {...nodeMap};
 
-    delete newNodeMap[id];
+    deleteNodeAndDescendants(newNodeMap, id);
 
     if (parentId) {
       const parentNode = nodeMap[parentId];
@@ -251,6 +258,9 @@ addReducer(
 addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
   const {kind, nodes = []} = payload;
 
+  const rootNode = nodes.find(node => node.name === 'root');
+  const rootId = rootNode ? rootNode.id : 0;
+
   const nodeMap = nodes.reduce((map, node) => {
     const {id} = node;
     node.children = nodes.filter(n => n.parentId === id).map(n => n.id);
@@ -258,7 +268,11 @@ addReducer('setNodes', (state: StateType, payload: SetNodesPayloadType) => {
     return map;
   }, {});
 
-  return {...state, [kind + 'NodeMap']: nodeMap};
+  return {
+    ...state,
+    [kind + 'NodeMap']: nodeMap,
+    [kind + 'RootId']: rootId
+  };
 });
 
 addReducer('toggleEditNode', (state: StateType, node: NodeType): StateType => {

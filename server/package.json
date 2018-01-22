@@ -13,6 +13,7 @@
     "dbstop": "mysql.server stop",
     "flow": "flow",
     "format": "prettier-eslint --write src/**/*.js",
+    "load": "node src/load-json.js load.json",
     "lint": "eslint --quiet src --ext .js",
     "postinstall": "flow-typed install",
     "Xprepush": "npm run verify",

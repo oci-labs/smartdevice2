@@ -27,8 +27,8 @@
       }
     },
     "train": {
-      "alive": "boolean",
-      "sound": "percent",
+      "fault": "boolean",
+      "lifecycle": "boolean",
       "engine": {
         "calibration": "percent",
         "power": "percent",
@@ -44,8 +44,11 @@
   },
   "instances": {
     "thejoveexpress": {
-      "engine": {},
-      "lights": {}
+      "type": "train",
+      "children": {
+        "engine": "engine",
+        "lights": "lights"
+      }
     }
   }
 }

@@ -20,7 +20,9 @@ function crudService(
   tableName: string
 ) {
 
-  /* This code works, but should it be provided?
+  /**
+   * This code works, but should it be provided?
+   */
   async function deleteAllHandler(
     req: express$Request,
     res: express$Response
@@ -33,7 +35,6 @@ function crudService(
       errorHandler(res, e);
     }
   }
-  */
 
   async function deleteByIdHandler(
     req: express$Request,
@@ -123,7 +124,7 @@ function crudService(
   }
 
   const URL_PREFIX = '/' + tableName;
-  //app.delete(URL_PREFIX, deleteAllHandler);
+  app.delete(URL_PREFIX, deleteAllHandler);
   app.delete(URL_PREFIX + '/:id', deleteByIdHandler);
   app.get(URL_PREFIX, getAllHandler);
   app.get(URL_PREFIX + '/query', queryHandler);

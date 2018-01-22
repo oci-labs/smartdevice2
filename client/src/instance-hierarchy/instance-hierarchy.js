@@ -43,7 +43,7 @@ class ParentInstances extends Component<PropsType> {
     if (!parentId) return <div>none</div>;
 
     const parent = instanceNodeMap[parentId];
-    if (parent.name === 'root') return <div>none</div>;
+    if (!parent || parent.name === 'root') return <div>none</div>;
 
     const isSelected = parent.id === selectedChildNodeId;
     return <Node isSelected={isSelected} node={parent} />;

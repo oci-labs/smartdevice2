@@ -89,11 +89,24 @@ async function getInstanceDataHandler(
   }
 }
 
+async function getInstanceRootIdHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  try {
+    const sql = 'select id from instance where name = "root"';
+    const [row] = await mySql.query(sql);
+    res.send(String(row ? row.id : 0));
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
 async function getInstanceTypeId(instanceId: number): Promise<number> {
   const sql = 'select typeId from instance where id=?';
-  const rows = await mySql.query(sql, instanceId);
-  const [{typeId}] = rows;
-  return Number(typeId);
+  const [row] = await mySql.query(sql, instanceId);
+  return row ? Number(row.typeId) : 0;
 }
 
 async function getParentId(parentName: string): Promise<number> {
@@ -101,9 +114,9 @@ async function getParentId(parentName: string): Promise<number> {
   if (id) return id;
 
   const sql = 'select id from instance where name=?';
-  const rows = await mySql.query(sql, parentName);
-  if (rows.length === 0) return 0; // not found
-  [{id}] = rows;
+  const [row] = await mySql.query(sql, parentName);
+  if (!row) return 0; // not found
+  ({id} = row);
   pathToIdMap[parentName] = id;
   return id;
 }
@@ -127,9 +140,9 @@ async function getInstanceId(path: string): Promise<number> {
     if (!id) {
       const sql = 'select id from instance where parentId=? and name=?';
       // eslint-disable-next-line no-await-in-loop
-      const rows = await mySql.query(sql, parentId, part);
-      if (rows.length === 0) return 0; // not found
-      [{id}] = rows;
+      const [row] = await mySql.query(sql, parentId, part);
+      if (!row) return 0; // not found
+      ({id} = row);
       pathToIdMap[subpath] = id;
     }
   }
@@ -143,10 +156,11 @@ function instanceService(
 ): void {
   mySql = connection;
 
-  const URL_PREFIX = '/instances/:instanceId/';
-  app.get(URL_PREFIX + 'data', getInstanceDataHandler);
-  app.get(URL_PREFIX + 'inuse', inUseHandler);
-  app.post(URL_PREFIX + 'data', postInstanceDataHandler);
+  const URL_PREFIX = '/instances/';
+  app.get(URL_PREFIX + 'root', getInstanceRootIdHandler);
+  app.get(URL_PREFIX + ':instanceId/data', getInstanceDataHandler);
+  app.get(URL_PREFIX + ':instanceId/inuse', inUseHandler);
+  app.post(URL_PREFIX + ':instanceId/data', postInstanceDataHandler);
 }
 
 async function inUseHandler(
@@ -230,8 +244,8 @@ async function saveProperty(
 ): Promise<void> {
   // Get the id of the existing instance_data row if any.
   const sql = 'select id from instance_data where instanceId=?';
-  const rows = await mySql.query(sql, instanceId);
-  const id = rows.length ? rows[0].id : undefined;
+  const [row] = await mySql.query(sql, instanceId);
+  const id = row ? row.id : undefined;
 
   const obj = {
     id,
@@ -292,6 +306,7 @@ module.exports = {
   PATH_DELIMITER,
   getInstanceDataHandler,
   getInstanceId,
+  getInstanceRootIdHandler,
   getParentId,
   instanceService,
   postInstanceDataHandler,

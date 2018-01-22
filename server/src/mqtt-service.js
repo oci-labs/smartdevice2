@@ -75,7 +75,10 @@ function disconnect(server: MessageServerType) {
 }
 
 function getAllTopLevelTypes() {
-  const sql = 'select * from type where parentId = 1';
+  const sql =
+    'select t1.id, t1.name, t1.messageServerId ' +
+    'from type t1, type t2 ' +
+    'where t1.parentId = t2.id and t2.name = "root"';
   return mySql.query(sql);
 }
 
@@ -90,8 +93,7 @@ async function getMessageServer(type: NodeType) {
 
   try {
     const sql = 'select * from message_server where id=?';
-    const rows = await mySql.query(sql, messageServerId);
-    const [server] = rows;
+    const [server] = await mySql.query(sql, messageServerId);
     return server;
   } catch (e) {
     logError(e.message);
@@ -131,8 +133,8 @@ async function getTopicType(topic: string): Promise<string> {
   if (row) {
     // Try to get the type of this instance.
     const {typeId} = row;
-    const sql = 'select enumId, kind from type_data ' +
-      'where name = ? and typeId = ?';
+    const sql =
+      'select enumId, kind from type_data where name = ? and typeId = ?';
     [row] = await mySql.query(sql, property, typeId);
     if (row) {
       if (row.enumId !== null) {
@@ -165,7 +167,11 @@ async function getTypeTopics(typeId: number): Promise<string[]> {
 }
 
 function getTopLevelTypesForServer(serverId: number) {
-  const sql = 'select * from type where parentId = 1 and messageServerId = ?';
+  const sql =
+    'select * from type t1, type t2 ' +
+    'where t1.messageServerId = ? ' +
+    'and t1.parentId = t2.id ' +
+    'and t2.name = "root"';
   return mySql.query(sql, serverId);
 }
 
@@ -308,6 +314,11 @@ function requestFeedback(client, parts: string[]): void {
 
 async function subscribe(serverId: number, typeId: number) {
   const client = clientMap[serverId];
+  if (!client) {
+    console.error('no client for server id', serverId);
+    return;
+  }
+
   const topics = await getTypeTopics(typeId);
   for (const topic of topics) {
     client.subscribe(topic);

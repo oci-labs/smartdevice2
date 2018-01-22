@@ -2,12 +2,12 @@
 
 import capitalize from 'lodash/capitalize';
 import React, {Component} from 'react';
-import {dispatch, getState, Input} from 'redux-easy';
+import {dispatch, dispatchSet, getState, Input} from 'redux-easy';
 
 import TreeNode from './tree-node';
 import {addNode} from './tree-util';
 import Button from '../share/button';
-import {getJson} from '../util/rest-util';
+import {getJson, getText} from '../util/rest-util';
 
 import './tree-builder.css';
 
@@ -28,13 +28,21 @@ type PropsType = {
   subscriptions: number[]
 };
 
-const ROOT_ID = 1;
+const getRootId = kind => getState()[kind + 'RootId'];
+
+const getRootNode = (kind, nodeMap) => nodeMap[getRootId(kind)];
 
 function haveNodeMap(kind: TreeType): boolean {
   const prop = kind + 'NodeMap';
   const nodeMap = getState()[prop];
-  return Object.keys(nodeMap).length > 0;
+  // We have have zero nodes or just the root node.
+  // In either case, treat it like
+  // we haven't loaded the real nodes yet.
+  return Object.keys(nodeMap).length > 1;
 }
+
+const haveRootId = (kind: TreeType): boolean =>
+  Boolean(getRootId(kind));
 
 class TreeBuilder extends Component<PropsType> {
   componentDidMount() {
@@ -49,6 +57,11 @@ class TreeBuilder extends Component<PropsType> {
 
   // Loads nodes from database.
   load = async (kind: TreeType) => {
+    if (!haveRootId(kind)) {
+      const rootId = Number(await getText(`${kind}s/root`));
+      dispatchSet(kind + 'RootId', rootId);
+    }
+
     if (haveNodeMap(kind)) return;
 
     const json = await getJson(kind);
@@ -64,7 +77,7 @@ class TreeBuilder extends Component<PropsType> {
 
   render() {
     const {kind, newNodeName, nodeMap} = this.props;
-    const rootNode = nodeMap[ROOT_ID];
+    const rootNode = getRootNode(kind, nodeMap);
     if (!rootNode) return null;
 
     const isExpanded = rootNode.expanded;

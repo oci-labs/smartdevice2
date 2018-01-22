@@ -107,6 +107,20 @@ async function getTypeNamesHandler(
   }
 }
 
+async function getTypeRootIdHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  try {
+    const sql = 'select id from type where name = "root"';
+    const [row] = await mySql.query(sql);
+    res.send(String(row ? row.id : 0));
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
 async function getTypesUsingEnumHandler(
   req: express$Request,
   res: express$Response
@@ -204,6 +218,7 @@ function typeService(
   app.get(URL_PREFIX + 'enums/used-by/:enumId', getTypesUsingEnumHandler);
   app.get(URL_PREFIX + 'enums/:enumId', getEnumValuesHandler);
   app.get(URL_PREFIX + 'names', getTypeNamesHandler);
+  app.get(URL_PREFIX + 'root', getTypeRootIdHandler);
   app.get(URL_PREFIX + ':typeId/inuse', inUseHandler);
   app.get(URL_PREFIX + ':typeId/data', getTypeDataHandler);
   app.get(URL_PREFIX + ':typeId/alerts', getTypeAlertsHandler);

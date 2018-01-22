@@ -23,6 +23,18 @@ export async function getJson(urlSuffix: string): Promise<mixed> {
   return json;
 }
 
+export async function getText(urlSuffix: string): Promise<mixed> {
+  const url = getUrlPrefix() + urlSuffix;
+  const options = {method: 'GET'};
+  const res = await fetch(url, options);
+  if (res.status !== OK) {
+    return handleError(res.statusText);
+  }
+
+  const text = await res.text();
+  return text;
+}
+
 // This function will contain more logic
 // when we are ready for production deployment.
 export function getUrlPrefix() {
