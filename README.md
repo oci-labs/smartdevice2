@@ -12,16 +12,22 @@ types of supported devices.
   from https://nodejs.org.
   On a Mac with Homebrew installed,
   this can be done by running `brew install node`.
+  On a RaspberryPi,
+sudo apt-get install git && git clone https://github.com/audstanley/NodeJs-Raspberry-Pi-Arm7 && cd NodeJs-Raspberry-Pi-Arm7 && chmod +x Install-Node.sh && sudo ./Install-Node.sh;
 
 * Install MySQL
 
   Follow the instructions at https://dev.mysql.com/downloads/mysql/.
   On a Mac with Homebrew installed,
   this can be done by running `brew install mysql`.
+  On a RaspberryPi,
+  sudo apt-get install mysql-server
 
 ## MQTT Setup
 
-See MosquittoNotes.txt in the top directory.
+See MosquittoNotes.txt in the top directory for Mac
+On a RaspberryPi,
+sudo apt-get install mosquitto
 
 ## Server Setup
 * open a terminal window
