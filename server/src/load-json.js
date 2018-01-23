@@ -8,6 +8,7 @@ import {mySql} from './database';
 import {deleteAll, getAll, post} from './crud-service';
 import {getEnums} from './enum-service';
 import {BUILTIN_TYPES, type EnumType} from './types';
+import {errorHandler} from './util/error-util';
 
 const enumNames = [];
 
@@ -38,6 +39,20 @@ async function loadEnum(name, valueMap) {
   console.log('loaded enum', name);
 }
 
+async function loadHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  const {jsonPath} = req.params;
+  try {
+    await processFile(jsonPath);
+    res.send();
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
 async function loadInstance(parentId, name, typeDescriptor) {
   if (typeof typeDescriptor === 'string') {
     const typeId = await getTypeId(typeDescriptor);
@@ -55,6 +70,10 @@ async function loadInstance(parentId, name, typeDescriptor) {
   } else {
     throw new Error('invalid instance type: ' + typeDescriptor);
   }
+}
+
+export function loadService(app: express$Application): void {
+  app.get('/load/:jsonPath', loadHandler);
 }
 
 async function loadType(parentId, name, valueMap) {
@@ -137,6 +156,11 @@ async function processTypes(types) {
 }
 
 async function processFile(jsonPath) {
+  if (!jsonPath) {
+    console.error('processFile requires a JSON file path');
+    return;
+  }
+
   console.log('loading', jsonPath);
   const json = fs.readFileSync(jsonPath, {encoding: 'utf8'});
   try {
@@ -160,5 +184,7 @@ function validKind(kind) {
     enumNames.includes(kind);
 }
 
-const [, , jsonPath] = process.argv;
-processFile(jsonPath);
+if (require.main === module) {
+  const [, , jsonPath] = process.argv;
+  processFile(jsonPath);
+}

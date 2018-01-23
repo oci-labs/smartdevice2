@@ -7,9 +7,7 @@ import {errorHandler} from './util/error-util';
 
 import type {EnumType} from './types';
 
-function enumService(
-  app: express$Application
-): void {
+function enumService(app: express$Application): void {
   const URL_PREFIX = '/enums';
   app.get(URL_PREFIX, getEnumsHandler);
   app.get(URL_PREFIX + '/:enumId', getEnumValuesHandler);
