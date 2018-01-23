@@ -8,8 +8,10 @@ const state: StateType = {
   errors: new Set(),
   instanceData: {},
   instanceNodeMap: {},
+  instanceRootId: 0,
   messageServerMap: {},
   typeNodeMap: {},
+  typeRootId: 0,
   ui: {
     editedName: '',
     editingNode: null,

@@ -117,7 +117,7 @@ class InstanceDetail extends Component<PropsType> {
   }
 
   async loadEnums() {
-    const json = await getJson('types/enums');
+    const json = await getJson('enums');
     const enums = ((json: any): EnumType[]);
     const enumMap = enums.reduce((map, anEnum) => {
       map[anEnum.id] = anEnum;

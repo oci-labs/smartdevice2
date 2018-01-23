@@ -7,17 +7,20 @@ use smartdevice;
 
 create table enum (
   id int auto_increment primary key,
-  name text not null
+  name varchar(100) not null,
+  unique uniqueName (name)
 );
 
 create table enum_member (
   id int auto_increment primary key,
   enumId int not null,
-  name text not null,
+  name varchar(100) not null,
   value int not null,
   foreign key (enumId)
     references enum (id)
-    on delete cascade
+    on delete cascade,
+  unique uniqueName (enumId, name),
+  unique uniqueValue (enumId, value)
 );
 
 create table message_server (

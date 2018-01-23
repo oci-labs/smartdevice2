@@ -9,6 +9,7 @@ const MySqlConnection = require('mysql-easier');
 
 const {alertService} = require('./alert-service');
 const crudService = require('./crud-service');
+const {enumService} = require('./enum-service');
 const {instanceService} = require('./instance-service');
 const {messageServerService} = require('./message-server-service');
 const {mqttService} = require('./mqtt-service');
@@ -45,6 +46,7 @@ app.set('etag', 'strong');
 //const healthCheckPath = /^\/$/;
 
 alertService(app, mySql);
+enumService(app, mySql);
 instanceService(app, mySql);
 messageServerService(app, mySql);
 mqttService(mySql);

@@ -3,8 +3,13 @@
 
 const fs = require('fs');
 const got = require('got');
+const jsonValidator = require('json-dup-key-validator');
+
+const {BUILTIN_TYPES} = require('./types');
 
 const URL_PREFIX = 'http://localhost:3001/';
+
+const enumNames = [];
 
 function deleteAll(urlSuffix) {
   const url = URL_PREFIX + urlSuffix;
@@ -12,7 +17,7 @@ function deleteAll(urlSuffix) {
 }
 
 async function getEnumId(enumName) {
-  const url = URL_PREFIX + 'types/enums';
+  const url = URL_PREFIX + 'enums';
   const {body} = await got.get(url);
   const enums = JSON.parse(body);
   const anEnum = enums.find(anEnum => anEnum.name === enumName);
@@ -30,6 +35,9 @@ async function getTypeId(typeName) {
 async function loadEnum(name, valueMap) {
   const res = await post('enum', {name});
   const enumId = res.body;
+
+  enumNames.push(name);
+
   const valueNames = Object.keys(valueMap);
   const promises = valueNames.map(name => {
     const value = Number(valueMap[name]);
@@ -73,6 +81,9 @@ async function loadType(parentId, name, valueMap) {
   for (const name of propertyNames) {
     const kind = valueMap[name];
     const data = {enumId: null, typeId, name, kind};
+    if (!validKind(kind)) {
+      throw new Error(`invalid kind "${kind}"`);
+    }
 
     const enumId = await getEnumId(kind);
     if (enumId) data.enumId = enumId;
@@ -91,42 +102,70 @@ function post(urlSuffix, body) {
   return got.post(url, options);
 }
 
-async function processFile(jsonPath) {
-  const json = fs.readFileSync(jsonPath, {encoding: 'utf8'});
-  const {enums, instances, types} = JSON.parse(json);
+async function processEnums(enums) {
+  if (!enums) return;
 
   // Clear the tables that will be loaded.
-  // enum_member, instance_data, and type_data
-  // are cleared through cascading deletes.
+  // enum_member is cleared through cascading deletes.
   await deleteAll('enum');
+
+  const enumNames = Object.keys(enums);
+  for (const name of enumNames) {
+    await loadEnum(name, enums[name]);
+  }
+}
+
+async function processInstances(instances) {
+  if (!instances) return;
+
+  // Clear the tables that will be loaded.
+  // instance_data is cleared through cascading deletes.
   await deleteAll('instance');
+
+  // Add instance root node.
+  const {body: instanceRootId} = await post('instance', {name: 'root'});
+
+  const instanceNames = Object.keys(instances);
+  for (const name of instanceNames) {
+    await loadInstance(instanceRootId, name, instances[name]);
+  }
+}
+
+async function processTypes(types) {
+  if (!types) return;
+
+  // Clear the tables that will be loaded.
+  // type_data is cleared through cascading deletes.
   await deleteAll('type');
 
-  try {
-    // Load enums.
-    const enumNames = Object.keys(enums);
-    for (const name of enumNames) {
-      await loadEnum(name, enums[name]);
-    }
+  // Add type root node.
+  const {body: typeRootId} = await post('type', {name: 'root'});
 
-    // Load types.
-    // Add type root node.
-    const {body: typeRootId} = await post('type', {name: 'root'});
-    const typeNames = Object.keys(types);
-    for (const name of typeNames) {
-      await loadType(typeRootId, name, types[name]);
-    }
-
-    // Load instances.
-    // Add instance root node.
-    const {body: instanceRootId} = await post('instance', {name: 'root'});
-    const instanceNames = Object.keys(instances);
-    for (const name of instanceNames) {
-      await loadInstance(instanceRootId, name, instances[name]);
-    }
-  } catch (e) {
-    console.error(e);
+  const typeNames = Object.keys(types);
+  for (const name of typeNames) {
+    await loadType(typeRootId, name, types[name]);
   }
+}
+
+async function processFile(jsonPath) {
+  const json = fs.readFileSync(jsonPath, {encoding: 'utf8'});
+  try {
+    // Check for duplicate keys.
+    jsonValidator.parse(json);
+
+    const {enums, instances, types} = JSON.parse(json);
+
+    await processEnums(enums);
+    await processTypes(types);
+    await processInstances(instances);
+  } catch (e) {
+    console.error(e.message);
+  }
+}
+
+function validKind(kind) {
+  return BUILTIN_TYPES.includes(kind) ||
+    enumNames.includes(kind);
 }
 
 const [, , jsonPath] = process.argv;

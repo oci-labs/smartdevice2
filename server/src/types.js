@@ -14,6 +14,8 @@ export type AlertTypeType = {
   typeId: number
 };
 
+export const BUILTIN_TYPES = ['boolean', 'number', 'percent', 'text'];
+
 export type MessageServerType = {
   id: number,
   host: string,

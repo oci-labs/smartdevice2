@@ -149,7 +149,7 @@ class Enums extends Component<PropsType> {
   };
 
   getTypesUsingEnum = async (anEnum: EnumType): Promise<string[]> => {
-    const res = await getJson('types/enums/used-by/' + anEnum.id);
+    const res = await getJson('enums/used-by/' + anEnum.id);
     return ((res: any): string[]);
   };
 
@@ -171,7 +171,7 @@ class Enums extends Component<PropsType> {
   };
 
   loadEnums = async () => {
-    const json = await getJson('types/enums');
+    const json = await getJson('enums');
     const enums = ((json: any): EnumType[]);
     const enumMap = enums.reduce((map, anEnum) => {
       map[anEnum.id] = anEnum;
