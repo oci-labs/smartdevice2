@@ -6,6 +6,47 @@ import {errorHandler} from './util/error-util';
 const NOT_FOUND = 404;
 const OK = 200;
 
+export function deleteAll(tableName: string): Promise<void> {
+  return mySql.deleteAll(tableName);
+}
+
+export async function deleteById(
+  tableName: string,
+  id: number
+): Promise<number> {
+  const {affectedRows} = await mySql.deleteById(tableName, id);
+  return affectedRows;
+}
+
+export function getAll(tableName: string): Promise<Object[]> {
+  return mySql.getAll(tableName);
+}
+
+export function getById(tableName: string, id: number): Promise<Object> {
+  return mySql.getById(tableName, id);
+}
+
+export async function patch(
+  tableName: string,
+  id: number,
+  changes: Object
+): Promise<Object> {
+  const type = await mySql.getById(tableName, id);
+  const newType = {...type, ...changes};
+  await mySql.updateById(tableName, id, newType);
+  return newType;
+}
+
+export function post(tableName: string, data: Object): Promise<number> {
+  return mySql.insert(tableName, data);
+}
+
+export function query(tableName: string, where: string): Promise<Object[]> {
+  //TODO: Should we be concerned about SQL injection here?
+  const sql = `select * from ${tableName} where ${where}`;
+  return mySql.query(sql);
+}
+
 /**
  * This implements CRUD REST services for a given database table.
  * It currently has the following limitations:
@@ -13,8 +54,10 @@ const OK = 200;
  * 2) The table must have an "id" column
  *    that is an "int auto_increment primary key".
  */
-function crudService(app: express$Application, tableName: string) {
-
+export default function crudService(
+  app: express$Application,
+  tableName: string
+) {
   /**
    * This code works, but should it be provided?
    */
@@ -23,7 +66,7 @@ function crudService(app: express$Application, tableName: string) {
     res: express$Response
   ): Promise<void> {
     try {
-      await mySql.deleteAll(tableName);
+      await deleteAll(tableName);
       res.send();
     } catch (e) {
       // istanbul ignore next
@@ -35,9 +78,9 @@ function crudService(app: express$Application, tableName: string) {
     req: express$Request,
     res: express$Response
   ): Promise<void> {
-    const {id} = req.params;
+    const id = Number(req.params.id);
     try {
-      const {affectedRows} = await mySql.deleteById(tableName, id);
+      const affectedRows = await deleteById(tableName, id);
       res.send(String(affectedRows));
     } catch (e) {
       // istanbul ignore next
@@ -50,7 +93,7 @@ function crudService(app: express$Application, tableName: string) {
     res: express$Response
   ): Promise<void> {
     try {
-      const rows = await mySql.getAll(tableName);
+      const rows = await getAll(tableName);
       res.send(JSON.stringify(rows));
     } catch (e) {
       // istanbul ignore next
@@ -62,10 +105,10 @@ function crudService(app: express$Application, tableName: string) {
     req: express$Request,
     res: express$Response
   ): Promise<void> {
-    const {id} = req.params;
+    const id = Number(req.params.id);
     try {
-      const type = await mySql.getById(tableName, id);
-      res.status(type ? OK : NOT_FOUND).send(JSON.stringify(type));
+      const row = await getById(tableName, id);
+      res.status(row ? OK : NOT_FOUND).send(JSON.stringify(row));
     } catch (e) {
       // istanbul ignore next
       errorHandler(res, e);
@@ -76,12 +119,10 @@ function crudService(app: express$Application, tableName: string) {
     req: express$Request,
     res: express$Response
   ): Promise<void> {
-    const {id} = req.params;
+    const id = Number(req.params.id);
     const changes = req.body;
     try {
-      const type = await mySql.getById(tableName, id);
-      const newType = {...type, ...changes};
-      await mySql.updateById(tableName, id, newType);
+      const newType = await patch(tableName, id, changes);
       res.status(OK).send(JSON.stringify(newType));
     } catch (e) {
       // istanbul ignore next
@@ -94,7 +135,7 @@ function crudService(app: express$Application, tableName: string) {
     res: express$Response
   ): Promise<void> {
     try {
-      const rows = await mySql.insert(tableName, req.body);
+      const rows = await post(tableName, req.body);
       res.send(JSON.stringify(rows));
     } catch (e) {
       // istanbul ignore next
@@ -106,11 +147,9 @@ function crudService(app: express$Application, tableName: string) {
     req: express$Request,
     res: express$Response
   ): Promise<void> {
-    const whereClause = req.body;
-    //TODO: Should we be concerned about SQL injection here?
-    const sql = `select * from ${tableName} where ${whereClause}`;
+    const where = req.body;
     try {
-      const rows = await mySql.query(sql);
+      const rows = await query(tableName, where);
       res.send(JSON.stringify(rows));
     } catch (e) {
       // istanbul ignore next
@@ -127,5 +166,3 @@ function crudService(app: express$Application, tableName: string) {
   app.patch(URL_PREFIX + '/:id', patchHandler);
   app.post(URL_PREFIX, postHandler);
 }
-
-module.exports = crudService;

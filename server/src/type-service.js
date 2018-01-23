@@ -27,7 +27,7 @@ async function getTypeAlertsHandler(
   }
 }
 
-async function getTypeDataHandler(
+export async function getTypeDataHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -162,7 +162,7 @@ async function setServerHandler(
   }
 }
 
-function typeService(app: express$Application): void {
+export function typeService(app: express$Application): void {
   const URL_PREFIX = '/types/';
   app.get(URL_PREFIX + 'enums/used-by/:enumId', getTypesUsingEnumHandler);
   app.get(URL_PREFIX + 'names', getTypeNamesHandler);
@@ -172,9 +172,3 @@ function typeService(app: express$Application): void {
   app.get(URL_PREFIX + ':typeId/alerts', getTypeAlertsHandler);
   app.put(URL_PREFIX + ':typeId/server/:serverId', setServerHandler);
 }
-
-module.exports = {
-  BUILTIN_TYPES,
-  typeService,
-  getTypeDataHandler
-};

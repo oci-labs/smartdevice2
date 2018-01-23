@@ -2,44 +2,29 @@
 /* eslint-disable no-await-in-loop */
 
 import fs from 'fs';
-import got from 'got';
 import jsonValidator from 'json-dup-key-validator';
 
 import {mySql} from './database';
+import {deleteAll, getAll, post} from './crud-service';
 import {getEnums} from './enum-service';
 import {BUILTIN_TYPES, type EnumType} from './types';
 
-const URL_PREFIX = 'http://localhost:3001/';
-
 const enumNames = [];
 
-function deleteAll(urlSuffix) {
-  const url = URL_PREFIX + urlSuffix;
-  return got.delete(url);
-}
-
 async function getEnumId(enumName): Promise<number> {
-  /*
-  const url = URL_PREFIX + 'enums';
-  const {body} = await got.get(url);
-  const enums = JSON.parse(body);
-  */
   const enums: EnumType[] = await getEnums();
   const anEnum = enums.find(anEnum => anEnum.name === enumName);
   return anEnum ? anEnum.id : 0;
 }
 
 async function getTypeId(typeName) {
-  const url = URL_PREFIX + 'type';
-  const {body} = await got.get(url);
-  const types = JSON.parse(body);
+  const types = await getAll('type');
   const type = types.find(type => type.name === typeName);
   return type ? type.id : 0;
 }
 
 async function loadEnum(name, valueMap) {
-  const res = await post('enum', {name});
-  const enumId = res.body;
+  const enumId = await post('enum', {name});
 
   enumNames.push(name);
 
@@ -60,7 +45,7 @@ async function loadInstance(parentId, name, typeDescriptor) {
   } else if (typeof typeDescriptor === 'object') {
     const {children, type} = typeDescriptor;
     const typeId = await getTypeId(type);
-    const {body: id} = await post('instance', {name, parentId, typeId});
+    const id = await post('instance', {name, parentId, typeId});
 
     const childNames = Object.keys(children);
     for (const name of childNames) {
@@ -83,8 +68,7 @@ async function loadType(parentId, name, valueMap) {
     return typeof value === 'object';
   });
 
-  const res = await post('type', {name, parentId});
-  const typeId = res.body;
+  const typeId = await post('type', {name, parentId});
 
   for (const name of propertyNames) {
     const kind = valueMap[name];
@@ -105,12 +89,6 @@ async function loadType(parentId, name, valueMap) {
   }
 
   console.log('loaded type', name);
-}
-
-function post(urlSuffix, body) {
-  const url = URL_PREFIX + urlSuffix;
-  const options = {body, json: true};
-  return got.post(url, options);
 }
 
 async function processEnums(enums) {
@@ -134,7 +112,7 @@ async function processInstances(instances) {
   await deleteAll('instance');
 
   // Add instance root node.
-  const {body: instanceRootId} = await post('instance', {name: 'root'});
+  const instanceRootId = await post('instance', {name: 'root'});
 
   const instanceNames = Object.keys(instances);
   for (const name of instanceNames) {
@@ -150,7 +128,7 @@ async function processTypes(types) {
   await deleteAll('type');
 
   // Add type root node.
-  const {body: typeRootId} = await post('type', {name: 'root'});
+  const typeRootId = await post('type', {name: 'root'});
 
   const typeNames = Object.keys(types);
   for (const name of typeNames) {
