@@ -1,17 +1,15 @@
 // @flow
 
-const sortBy = require('lodash/sortBy');
-const MySqlConnection = require('mysql-easier');
+import sortBy from 'lodash/sortBy';
 
-const {
+import {mySql} from './database';
+import {
   subscribe,
   unsubscribeFromServer,
   unsubscribeFromType
-} = require('./mqtt-service');
-const {BUILTIN_TYPES} = require('./types');
-const {errorHandler} = require('./util/error-util');
-
-let mySql;
+} from './mqtt-service';
+import {BUILTIN_TYPES} from './types';
+import {errorHandler} from './util/error-util';
 
 async function getTypeAlertsHandler(
   req: express$Request,
@@ -164,11 +162,7 @@ async function setServerHandler(
   }
 }
 
-function typeService(
-  app: express$Application,
-  connection: MySqlConnection
-): void {
-  mySql = connection;
+function typeService(app: express$Application): void {
   const URL_PREFIX = '/types/';
   app.get(URL_PREFIX + 'enums/used-by/:enumId', getTypesUsingEnumHandler);
   app.get(URL_PREFIX + 'names', getTypeNamesHandler);

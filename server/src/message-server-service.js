@@ -1,11 +1,8 @@
 // @flow
 
-const MySqlConnection = require('mysql-easier');
-
-const {connect, disconnect} = require('./mqtt-service');
-const {errorHandler} = require('./util/error-util');
-
-let mySql;
+import {mySql} from './database';
+import {connect, disconnect} from './mqtt-service';
+import {errorHandler} from './util/error-util';
 
 async function addServerHandler(
   req: express$Request,
@@ -41,11 +38,7 @@ async function deleteServerHandler(
   }
 }
 
-function messageServerService(
-  app: express$Application,
-  connection: MySqlConnection
-): void {
-  mySql = connection;
+function messageServerService(app: express$Application): void {
   const URL_PREFIX = '/messageServers';
   app.delete(URL_PREFIX + '/:serverId', deleteServerHandler);
   app.post(URL_PREFIX, addServerHandler);

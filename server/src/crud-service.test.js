@@ -5,7 +5,7 @@
  * because it sends HTTP requests to it.
  */
 
-const got = require('got');
+import got from 'got';
 
 const HOST = 'localhost';
 const PORT = 3001;

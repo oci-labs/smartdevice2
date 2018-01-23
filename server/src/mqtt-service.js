@@ -5,18 +5,17 @@
 // 2) optionally enter "java -jar TheJoveExpress.jar"
 //    to get lots of messages
 
-const isEqual = require('lodash/isEqual');
-const mqtt = require('mqtt');
-const MySqlConnection = require('mysql-easier');
-const WebSocket = require('ws');
+import isEqual from 'lodash/isEqual';
+import mqtt from 'mqtt';
+import WebSocket from 'ws';
 
-const {logError} = require('./util/error-util');
-
-const {
+import {mySql} from './database';
+import {
   PATH_DELIMITER,
   getInstanceId,
   updateProperty
-} = require('./instance-service');
+} from './instance-service';
+import {logError} from './util/error-util';
 
 import type {NodeType, MessageServerType, PrimitiveType} from './types';
 
@@ -26,7 +25,7 @@ const SPECIAL_SUFFIXES = ['control', 'feedback'];
 const clientMap = {}; // keys are server ids
 const serverMap = {}; // keys are server ids
 
-let lastChange, mySql, ws;
+let lastChange, ws;
 
 function connect(server: MessageServerType, typeId: number = 0) {
   const {id} = server;
@@ -283,9 +282,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
   }
 }
 
-async function mqttService(connection: MySqlConnection) {
-  mySql = connection;
-
+async function mqttService() {
   try {
     const topLevelTypes = await getAllTopLevelTypes();
 

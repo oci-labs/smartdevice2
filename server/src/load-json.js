@@ -1,11 +1,13 @@
 // @flow
 /* eslint-disable no-await-in-loop */
 
-const fs = require('fs');
-const got = require('got');
-const jsonValidator = require('json-dup-key-validator');
+import fs from 'fs';
+import got from 'got';
+import jsonValidator from 'json-dup-key-validator';
 
-const {BUILTIN_TYPES} = require('./types');
+import {mySql} from './database';
+import {getEnums} from './enum-service';
+import {BUILTIN_TYPES, type EnumType} from './types';
 
 const URL_PREFIX = 'http://localhost:3001/';
 
@@ -16,10 +18,13 @@ function deleteAll(urlSuffix) {
   return got.delete(url);
 }
 
-async function getEnumId(enumName) {
+async function getEnumId(enumName): Promise<number> {
+  /*
   const url = URL_PREFIX + 'enums';
   const {body} = await got.get(url);
   const enums = JSON.parse(body);
+  */
+  const enums: EnumType[] = await getEnums();
   const anEnum = enums.find(anEnum => anEnum.name === enumName);
   return anEnum ? anEnum.id : 0;
 }
@@ -44,6 +49,8 @@ async function loadEnum(name, valueMap) {
     return post('enum_member', {enumId, name, value});
   });
   await Promise.all(promises);
+
+  console.log('loaded enum', name);
 }
 
 async function loadInstance(parentId, name, typeDescriptor) {
@@ -59,6 +66,7 @@ async function loadInstance(parentId, name, typeDescriptor) {
     for (const name of childNames) {
       await loadInstance(id, name, children[name]);
     }
+    console.log('loaded instance', name);
   } else {
     throw new Error('invalid instance type: ' + typeDescriptor);
   }
@@ -80,12 +88,13 @@ async function loadType(parentId, name, valueMap) {
 
   for (const name of propertyNames) {
     const kind = valueMap[name];
-    const data = {enumId: null, typeId, name, kind};
     if (!validKind(kind)) {
       throw new Error(`invalid kind "${kind}"`);
     }
 
+    const data = {typeId, name, kind};
     const enumId = await getEnumId(kind);
+    // $FlowFixMe - allow adding enumId
     if (enumId) data.enumId = enumId;
     await post('type_data', data);
   }
@@ -94,6 +103,8 @@ async function loadType(parentId, name, valueMap) {
     const childType = valueMap[name];
     await loadType(typeId, name, childType);
   }
+
+  console.log('loaded type', name);
 }
 
 function post(urlSuffix, body) {
@@ -148,6 +159,7 @@ async function processTypes(types) {
 }
 
 async function processFile(jsonPath) {
+  console.log('loading', jsonPath);
   const json = fs.readFileSync(jsonPath, {encoding: 'utf8'});
   try {
     // Check for duplicate keys.
@@ -158,6 +170,8 @@ async function processFile(jsonPath) {
     await processEnums(enums);
     await processTypes(types);
     await processInstances(instances);
+    console.log('finished');
+    mySql.disconnect(); // allows process to exit
   } catch (e) {
     console.error(e.message);
   }

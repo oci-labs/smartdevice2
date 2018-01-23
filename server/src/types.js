@@ -16,6 +16,19 @@ export type AlertTypeType = {
 
 export const BUILTIN_TYPES = ['boolean', 'number', 'percent', 'text'];
 
+export type EnumMemberMapType = {[id: number]: EnumMemberType};
+export type EnumMemberType = {
+  id: number,
+  enumId: number,
+  name: string,
+  value: number
+};
+
+export type EnumType = {
+  id: number,
+  name: string,
+  memberMap: EnumMemberMapType
+};
 export type MessageServerType = {
   id: number,
   host: string,

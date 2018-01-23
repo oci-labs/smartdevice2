@@ -1,14 +1,12 @@
 // @flow
 
-const MySqlConnection = require('mysql-easier');
-
-const {errorHandler} = require('./util/error-util');
+import {mySql} from './database';
+import {errorHandler} from './util/error-util';
 
 //const inTest = process.env.NODE_ENV === 'test';
 
 const NOT_FOUND = 404;
 const OK = 200;
-let mySql;
 
 async function deleteByIdHandler(
   req: express$Request,
@@ -86,12 +84,7 @@ async function patchHandler(
   }
 }
 
-function treeService(
-  app: express$Application,
-  connection: MySqlConnection
-): void {
-  mySql = connection;
-
+function treeService(app: express$Application): void {
   const URL_PREFIX = '/tree/:kind';
 
   app.delete(URL_PREFIX + '/:id', deleteByIdHandler);

@@ -1,16 +1,15 @@
 // @flow
 
-const isEqual = require('lodash/isEqual');
-const sortBy = require('lodash/sortBy');
-const MySqlConnection = require('mysql-easier');
+import isEqual from 'lodash/isEqual';
+import sortBy from 'lodash/sortBy';
 
-const {errorHandler} = require('./util/error-util');
+import {mySql} from './database';
+import {errorHandler} from './util/error-util';
 
 import type {AlertType, AlertTypeType, PrimitiveType} from './types';
 
 const PATH_DELIMITER = '.';
 const pathToIdMap = {};
-let mySql;
 
 async function createAlerts(
   instanceId: number,
@@ -150,12 +149,7 @@ async function getInstanceId(path: string): Promise<number> {
   return id;
 }
 
-function instanceService(
-  app: express$Application,
-  connection: MySqlConnection
-): void {
-  mySql = connection;
-
+function instanceService(app: express$Application): void {
   const URL_PREFIX = '/instances/';
   app.get(URL_PREFIX + 'root', getInstanceRootIdHandler);
   app.get(URL_PREFIX + ':instanceId/data', getInstanceDataHandler);

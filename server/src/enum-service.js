@@ -1,43 +1,44 @@
 // @flow
 
-const sortBy = require('lodash/sortBy');
-const MySqlConnection = require('mysql-easier');
+import sortBy from 'lodash/sortBy';
 
-const {errorHandler} = require('./util/error-util');
+import {mySql} from './database';
+import {errorHandler} from './util/error-util';
+
+import type {EnumType} from './types';
 
 function enumService(
-  app: express$Application,
-  connection: MySqlConnection
+  app: express$Application
 ): void {
-  mySql = connection;
   const URL_PREFIX = '/enums';
   app.get(URL_PREFIX, getEnumsHandler);
   app.get(URL_PREFIX + '/:enumId', getEnumValuesHandler);
 }
 
-let mySql;
+async function getEnums(): Promise<EnumType[]> {
+  const enums = await mySql.query('select * from enum');
+
+  // Build the memberMap for each enum.
+  const sql = 'select * from enum_member where enumId = ?';
+  const promises = enums.map(anEnum => mySql.query(sql, anEnum.id));
+  const enumMembersArr = await Promise.all(promises);
+  enums.forEach((anEnum, index) => {
+    const enumMembers = enumMembersArr[index];
+    anEnum.memberMap = enumMembers.reduce((map, enumMember) => {
+      map[enumMember.id] = enumMember;
+      return map;
+    }, {});
+  });
+
+  return sortBy(enums, ['name']);
+}
 
 async function getEnumsHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
   try {
-    const enums = await mySql.query('select * from enum');
-
-    // Build the memberMap for each enum.
-    const sql = 'select * from enum_member where enumId = ?';
-    const promises = enums.map(anEnum => mySql.query(sql, anEnum.id));
-    const enumMembersArr = await Promise.all(promises);
-    enums.forEach((anEnum, index) => {
-      const enumMembers = enumMembersArr[index];
-      anEnum.memberMap = enumMembers.reduce((map, enumMember) => {
-        map[enumMember.id] = enumMember;
-        return map;
-      }, {});
-    });
-
-    const sorted = sortBy(enums, ['name']);
-    res.send(sorted);
+    res.send(await getEnums());
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
@@ -62,6 +63,7 @@ async function getEnumValuesHandler(
 
 module.exports = {
   enumService,
+  getEnums,
   getEnumsHandler,
   getEnumValuesHandler
 };

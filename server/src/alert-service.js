@@ -1,19 +1,11 @@
 // @flow
 
-const MySqlConnection = require('mysql-easier');
-
-const {errorHandler} = require('./util/error-util');
+import {mySql} from './database';
+import {errorHandler} from './util/error-util';
 
 import type {AlertType} from './types';
 
-let mySql;
-
-function alertService(
-  app: express$Application,
-  connection: MySqlConnection
-): void {
-  mySql = connection;
-
+function alertService(app: express$Application): void {
   const URL_PREFIX = '/alerts';
 
   app.get(URL_PREFIX, getAllHandler);

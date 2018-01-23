@@ -1,8 +1,7 @@
 // @flow
 
-const MySqlConnection = require('mysql-easier');
-
-const {errorHandler} = require('./util/error-util');
+import {mySql} from './database';
+import {errorHandler} from './util/error-util';
 
 const NOT_FOUND = 404;
 const OK = 200;
@@ -14,11 +13,7 @@ const OK = 200;
  * 2) The table must have an "id" column
  *    that is an "int auto_increment primary key".
  */
-function crudService(
-  app: express$Application,
-  mySql: MySqlConnection,
-  tableName: string
-) {
+function crudService(app: express$Application, tableName: string) {
 
   /**
    * This code works, but should it be provided?
