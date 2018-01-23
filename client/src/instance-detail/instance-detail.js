@@ -9,12 +9,12 @@ import {dispatchSet} from 'redux-easy';
 import PropertyForm from '../property-form/property-form';
 import Alert from '../alert/alert';
 import Button from '../share/button';
+import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
 import {showModal} from '../share/sd-modal';
 
 import type {
   AlertType,
-  EnumMemberType,
   EnumMapType,
   EnumType,
   InstanceDataType,
@@ -199,12 +199,10 @@ class InstanceDetail extends Component<PropsType> {
 
     // Define if this is an enumerated type ...
     const {enumMap} = this.props;
-    const enums = ((Object.values(enumMap): any): EnumType[]);
+    const enums = values(enumMap);
     const anEnum = enums.find(anEnum => anEnum.name === kind);
     if (anEnum) {
-      const members = ((Object.values(
-        anEnum.memberMap
-      ): any): EnumMemberType[]);
+      const members = values(anEnum.memberMap);
       const v = Number(value);
       const member = members.find(member => member.value === v);
       return member ? member.name : 'bad enum value ' + value;

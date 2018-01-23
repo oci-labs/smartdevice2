@@ -10,6 +10,7 @@ import {dispatch, dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
+import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
@@ -157,7 +158,7 @@ class Enums extends Component<PropsType> {
     if (!selectedEnum) return false;
 
     const {memberMap} = selectedEnum;
-    const members = ((Object.values(memberMap): any): EnumMemberType[]);
+    const members = values(memberMap);
     const {name, value} = enumMember;
     return members.some(
       member => member.name === name || member.value === value
@@ -294,7 +295,7 @@ class Enums extends Component<PropsType> {
 
   render() {
     const {enumMap, ui: {selectedEnumId}} = this.props;
-    const enums = ((Object.values(enumMap): any): EnumType[]);
+    const enums = values(enumMap);
     const sortedEnums = sortBy(enums, ['name']);
     const selectedEnum = this.getSelectedEnum();
 
@@ -302,9 +303,7 @@ class Enums extends Component<PropsType> {
     if (selectedEnumId) {
       const selectedEnum = this.getSelectedEnum();
       if (selectedEnum) {
-        const enumMembers = ((Object.values(
-          selectedEnum.memberMap
-        ): any): EnumMemberType[]);
+        const enumMembers = values(selectedEnum.memberMap);
         sortedEnumMembers = sortBy(enumMembers, ['value']);
       }
     }

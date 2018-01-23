@@ -9,12 +9,12 @@ import {dispatchSet} from 'redux-easy';
 import Button from '../share/button';
 import Enums from '../enums/enums';
 import {showModal} from '../share/sd-modal';
+import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {
   EnumMapType,
-  EnumType,
   NodeType,
   PropertyType,
   StateType,
@@ -64,7 +64,7 @@ class TypeProperties extends Component<PropsType> {
 
   getEnumId = (enumName: string): number => {
     const {enumMap} = this.props;
-    const enums = ((Object.values(enumMap): any): EnumType[]);
+    const enums = values(enumMap);
     const anEnum = enums.find(anEnum => anEnum.name === enumName);
     return anEnum ? anEnum.id : -1;
   };
@@ -131,7 +131,7 @@ class TypeProperties extends Component<PropsType> {
   renderTableInputRow = () => {
     const {enumMap, ui: {newPropName, newPropType}} = this.props;
 
-    const enums = ((Object.values(enumMap): any): EnumType[]);
+    const enums = values(enumMap);
     const enumNames = enums.map(obj => obj.name);
     const typeNames = [...BUILTIN_TYPES, ...enumNames].sort();
 

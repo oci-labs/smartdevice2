@@ -8,6 +8,7 @@ import {dispatch, dispatchSet, getState} from 'redux-easy';
 import {postJson} from '../util/rest-util';
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
+import {values} from '../util/flow-util';
 
 import type {AddNodePayloadType, NodeType, TreeType} from '../types';
 
@@ -36,9 +37,7 @@ export function addNode(kind: TreeType, name: string, parent: NodeType): void {
     childTypes = childTypeIds.map(id => typeNodeMap[id]);
   } else {
     // Find the root type node.
-    const typeNodes: NodeType[] = ((Object.values(
-      typeNodeMap
-    ): any): NodeType[]);
+    const typeNodes: NodeType[] = values(typeNodeMap);
     const rootTypeNode = typeNodes.find(typeNode => !typeNode.parentId);
     if (!rootTypeNode) throw new Error('failed to find root type node');
 

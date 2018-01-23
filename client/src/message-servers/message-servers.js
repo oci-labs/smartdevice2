@@ -7,6 +7,7 @@ import {dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
+import {values} from '../util/flow-util';
 import {hostHandler, isHostName, isIpAddress} from '../util/input-util';
 import {deleteResource, getJson, postJson, putJson} from '../util/rest-util';
 
@@ -157,7 +158,7 @@ class MessageServers extends Component<PropsType> {
 
   render() {
     const {messageServerMap} = this.props;
-    let servers = ((Object.values(messageServerMap): any): MessageServerType[]);
+    let servers = values(messageServerMap);
     servers = sortBy(servers, ['host']);
 
     return (

@@ -4,6 +4,7 @@ import upperFirst from 'lodash/upperFirst';
 import {addReducer} from 'redux-easy';
 
 import {showModal} from './share/sd-modal';
+import {values} from './util/flow-util';
 
 import type {
   AddNodePayloadType,
@@ -150,7 +151,7 @@ addReducer(
 
 function deleteNodeAndDescendants(nodeMap, id) {
   delete nodeMap[id];
-  const nodes = ((Object.values(nodeMap): any): NodeType[]);
+  const nodes = values(nodeMap);
   const children = nodes.filter(node => node.parentId === id);
   children.forEach(child => deleteNodeAndDescendants(nodeMap, child.id));
 }
@@ -301,7 +302,7 @@ addReducer('toggleExpandAll', (state: StateType, kind: TreeType): StateType => {
   const key = kind + 'NodeMap';
   const nodeMap = state[key];
 
-  const [firstNode] = ((Object.values(nodeMap): any): NodeType);
+  const [firstNode] = values(nodeMap);
   const expanded = !firstNode.expanded;
 
   const newNodeMap = {};

@@ -7,6 +7,7 @@ import {reduxSetup} from 'redux-easy';
 
 import App from './app';
 import initialState from './initial-state';
+import {getElementById} from './util/flow-util';
 import {websocketSetup} from './websocket';
 import './reducers';
 
@@ -14,17 +15,12 @@ import './index.css';
 
 const store = reduxSetup({initialState, render});
 
-// Using this to get elements makes Flow happy.
-function getElement(id: string): Element {
-  return ((document.getElementById(id): any): Element); // type cast
-}
-
 function render() {
   ReactDOM.render(
     <Provider store={store}>
       <App />
     </Provider>,
-    getElement('root')
+    getElementById('root')
   );
 }
 
