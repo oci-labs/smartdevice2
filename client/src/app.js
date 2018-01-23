@@ -4,12 +4,14 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
-import LeftNav from './left-nav/left-nav';
+import ImportExport from './import-export/import-export';
 import InstanceDetail from './instance-detail/instance-detail';
 import InstanceHierarchy from './instance-hierarchy/instance-hierarchy';
+import LeftNav from './left-nav/left-nav';
+import Button from './share/button';
+import SdModal, {showModal} from './share/sd-modal';
 import TypeAlerts from './type-alerts/type-alerts';
 import TypeProperties from './type-properties/type-properties';
-import SdModal from './share/sd-modal';
 
 import type {StateType, TreeType} from './types';
 
@@ -37,12 +39,27 @@ class App extends Component<PropsType> {
     dispatchSet('ui.treeType', '');
   }
 
+  importExport = () => {
+    const renderFn = () => <ImportExport />;
+    showModal({title: 'Import/Export JSON', renderFn});
+
+    console.log('app.js importExport: entered');
+  };
+
   render() {
     const {treeType} = this.props;
     return (
       <div className="app">
         <header className="app-header">
-          <h1 className="app-title">Open Edge Device Management</h1>
+          <h1 className="app-title">
+            Open Edge Device Management
+            <Button
+              className="import-export"
+              icon="cog"
+              onClick={() => this.importExport()}
+              tooltip="import/export"
+            />
+          </h1>
         </header>
         <section id="body">
           <LeftNav />

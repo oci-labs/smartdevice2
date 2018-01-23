@@ -1,12 +1,25 @@
 @import './share.scss';
 
+input {
+  border: solid lightgray 1px;
+  border-radius: 4px;
+  box-shadow: none;
+  padding: 4px;
+}
+
+input[type=checkbox] {
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
+
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
   text-align: center;
 
-  .add {
+  .add:enabled {
     color: $add-color;
   }
 
@@ -35,15 +48,14 @@
     }
   }
 
-  .delete {
-    color: $delete-color;
+  .button {
+    border: none;
+    color: gray;
+    margin-left: 5px;
   }
 
-  input {
-    border: solid lightgray 1px;
-    border-radius: 4px;
-    box-shadow: none;
-    padding: 4px;
+  .delete {
+    color: $delete-color;
   }
 
   // Right side

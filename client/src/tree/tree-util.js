@@ -92,8 +92,8 @@ function promptForType(name, parent, childTypes: NodeType[]): void {
         ))}
       </select>
       <div className="button-row">
-        <Button label="OK" onClick={() => handleTypeSelectOk(name, parent)} />
-        <Button label="Cancel" onClick={handleTypeSelectCancel} />
+        <Button onClick={() => handleTypeSelectOk(name, parent)}>OK</Button>
+        <Button onClick={handleTypeSelectCancel}>Cancel</Button>
       </div>
     </div>
   );

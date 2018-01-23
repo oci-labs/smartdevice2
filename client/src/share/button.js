@@ -1,23 +1,23 @@
 // @flow
 
-import React from 'react';
+import React, {type Node} from 'react';
 
 import './button.css';
 
 type PropsType = {
   className?: string,
+  children?: Node,
   disabled?: boolean,
   icon?: string,
-  label?: string,
   onClick: Function,
   tooltip?: string
 };
 
 export default ({
   className,
+  children,
   disabled,
   icon,
-  label = '',
   onClick,
   tooltip
 }: PropsType) => {
@@ -32,7 +32,7 @@ export default ({
       onClick={onClick}
       title={tooltip}
     >
-      {label}
+      {children}
     </button>
   );
 };

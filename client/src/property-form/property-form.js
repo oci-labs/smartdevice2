@@ -77,10 +77,11 @@ class PropertyForm extends Component<PropsType> {
         </table>
         <Button
           className="edit-properties"
-          label="Save"
           onClick={() => this.saveProperties()}
           tooltip="save properties"
-        />
+        >
+          Save
+        </Button>
       </div>
     );
   }

@@ -177,6 +177,7 @@ export type UiType = {
   editedName: string, // within type or instance tree
   editingNode: ?NodeType, // within type or instance tree
   instanceName: string,
+  jsonPath: string,
   modal: ModalType,
   newAlertExpression: string,
   newAlertName: string,

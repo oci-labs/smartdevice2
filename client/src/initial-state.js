@@ -16,6 +16,7 @@ const state: StateType = {
     editedName: '',
     editingNode: null,
     instanceName: '',
+    jsonPath: '',
     modal: {
       message: '',
       open: false,
