@@ -25,7 +25,7 @@ const SPECIAL_SUFFIXES = ['control', 'feedback'];
 const clientMap = {}; // keys are server ids
 const serverMap = {}; // keys are server ids
 
-let lastChange, ws;
+let lastChange, mySql, ws;
 
 function connect(server: MessageServerType, typeId: number = 0) {
   const {id} = server;
@@ -74,7 +74,6 @@ function disconnect(server: MessageServerType) {
 }
 
 function getAllTopLevelTypes() {
-  const mySql = getDbConnection();
   const sql =
     'select t1.id, t1.name, t1.messageServerId ' +
     'from type t1, type t2 ' +
@@ -83,13 +82,11 @@ function getAllTopLevelTypes() {
 }
 
 function getInstances(typeId: number) {
-  const mySql = getDbConnection();
   const sql = 'select name from instance where typeId=?';
   return mySql.query(sql, typeId);
 }
 
 async function getMessageServer(type: NodeType) {
-  const mySql = getDbConnection();
   const {messageServerId} = type;
   if (!messageServerId) return;
 
@@ -103,7 +100,6 @@ async function getMessageServer(type: NodeType) {
 }
 
 async function getServerIdForType(typeId: number): Promise<number> {
-  const mySql = getDbConnection();
   const sql = 'select messageServerId from type where id = ?';
   const [row] = await mySql.query(sql, typeId);
   return row ? row.messageServerId : 0;
@@ -119,7 +115,6 @@ async function getTopicType(topic: string): Promise<string> {
 
   let parentId = 0;
   let row;
-  const mySql = getDbConnection();
 
   for (const part of parts) {
     let sql = 'select id, parentId, typeId from instance where name = ?';
@@ -172,7 +167,6 @@ async function getTypeTopics(typeId: number): Promise<string[]> {
 }
 
 function getTopLevelTypesForServer(serverId: number) {
-  const mySql = getDbConnection();
   const sql =
     'select * from type t1, type t2 ' +
     'where t1.messageServerId = ? ' +
@@ -290,6 +284,8 @@ async function handleMessage(client, topic: string, message: Buffer) {
 }
 
 async function mqttService() {
+  mySql = getDbConnection();
+
   try {
     const topLevelTypes = await getAllTopLevelTypes();
 

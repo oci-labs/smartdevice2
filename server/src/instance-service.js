@@ -11,12 +11,13 @@ import type {AlertType, AlertTypeType, PrimitiveType} from './types';
 const PATH_DELIMITER = '.';
 const pathToIdMap = {};
 
+let mySql;
+
 async function createAlerts(
   instanceId: number,
   alertTypes: AlertTypeType[]
 ): Promise<void> {
   const timestamp = Date.now();
-  const mySql = getDbConnection();
 
   const promises = alertTypes.map(alertType => {
     const data = {
@@ -32,7 +33,6 @@ async function createAlerts(
 }
 
 function deleteDynamicAlerts(instanceId: number): Promise<void> {
-  const mySql = getDbConnection();
   const sql =
     'delete a.* from alert as a ' +
     'left join alert_type as t ' +
@@ -42,13 +42,11 @@ function deleteDynamicAlerts(instanceId: number): Promise<void> {
 }
 
 function deleteInstanceData(instanceId: number): Promise<void> {
-  const mySql = getDbConnection();
   const sql = 'delete from instance_data where instanceId=?';
   return mySql.query(sql, instanceId);
 }
 
 function getAlerts(instanceId: number): Promise<AlertType[]> {
-  const mySql = getDbConnection();
   const sql =
     'select a.id, a.instanceId, t.name, a.timestamp ' +
     'from alert a, alert_type t ' +
@@ -57,20 +55,17 @@ function getAlerts(instanceId: number): Promise<AlertType[]> {
 }
 
 async function getAlertTypeIds(instanceId: number): Promise<number[]> {
-  const mySql = getDbConnection();
   const sql = 'select alertTypeId from alert where instanceId=?';
   const rows = await mySql.query(sql, instanceId);
   return rows.map(row => row.alertTypeId);
 }
 
 function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
-  const mySql = getDbConnection();
   const sql = 'select * from alert_type where typeId=?';
   return mySql.query(sql, typeId);
 }
 
 async function getData(instanceId: number): Promise<Object> {
-  const mySql = getDbConnection();
   const sql = 'select dataKey, dataValue from instance_data where instanceId=?';
   const rows = await mySql.query(sql, instanceId);
   return rows.reduce((data, row) => {
@@ -84,7 +79,6 @@ async function getInstanceDataHandler(
   res: express$Response
 ): Promise<void> {
   const {instanceId} = req.params;
-  const mySql = getDbConnection();
   const sql = 'select * from instance_data where instanceId=?';
   try {
     const instanceDatas = await mySql.query(sql, instanceId);
@@ -100,7 +94,6 @@ async function getInstanceRootIdHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const mySql = getDbConnection();
   try {
     const sql = 'select id from instance where name = "root"';
     const [row] = await mySql.query(sql);
@@ -112,7 +105,6 @@ async function getInstanceRootIdHandler(
 }
 
 async function getInstanceTypeId(instanceId: number): Promise<number> {
-  const mySql = getDbConnection();
   const sql = 'select typeId from instance where id=?';
   const [row] = await mySql.query(sql, instanceId);
   return row ? Number(row.typeId) : 0;
@@ -122,7 +114,6 @@ async function getParentId(parentName: string): Promise<number> {
   let id = pathToIdMap[parentName];
   if (id) return id;
 
-  const mySql = getDbConnection();
   const sql = 'select id from instance where name=?';
   const [row] = await mySql.query(sql, parentName);
   if (!row) return 0; // not found
@@ -143,7 +134,6 @@ async function getInstanceId(path: string): Promise<number> {
   id = await getParentId(subpath);
   if (id === 0) return 0; // not found
 
-  const mySql = getDbConnection();
 
   for (const part of parts) {
     const parentId = id;
@@ -163,6 +153,8 @@ async function getInstanceId(path: string): Promise<number> {
 }
 
 function instanceService(app: express$Application): void {
+  mySql = getDbConnection();
+
   const URL_PREFIX = '/instances/';
   app.get(URL_PREFIX + 'root', getInstanceRootIdHandler);
   app.get(URL_PREFIX + ':instanceId/data', getInstanceDataHandler);
@@ -175,7 +167,6 @@ async function inUseHandler(
   res: express$Response
 ): Promise<void> {
   const {instanceId} = req.params;
-  const mySql = getDbConnection();
   const sql = 'select id from instance where parentId = ?';
   try {
     const referIds = await mySql.query(sql, instanceId);
@@ -234,7 +225,6 @@ async function saveInstanceData(
   instanceId: number,
   data: Object
 ): Promise<void> {
-  const mySql = getDbConnection();
   const promises = Object.keys(data).map(key => {
     const obj = {
       instanceId,
@@ -258,7 +248,6 @@ async function saveProperty(
   };
 
   // Get the id of the existing instance_data row if any.
-  const mySql = getDbConnection();
   const sql = 'select id from instance_data where instanceId=? and dataKey=?';
   const [row] = await mySql.query(sql, instanceId, property);
   // $FlowFixMe - allow adding id

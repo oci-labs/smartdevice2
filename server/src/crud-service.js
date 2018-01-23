@@ -6,8 +6,14 @@ import {errorHandler} from './util/error-util';
 const NOT_FOUND = 404;
 const OK = 200;
 
+let mySql;
+
+function ensureMySql() {
+  if (!mySql) mySql = getDbConnection();
+}
+
 export function deleteAll(tableName: string): Promise<void> {
-  const mySql = getDbConnection();
+  ensureMySql();
   return mySql.deleteAll(tableName);
 }
 
@@ -15,18 +21,18 @@ export async function deleteById(
   tableName: string,
   id: number
 ): Promise<number> {
-  const mySql = getDbConnection();
+  ensureMySql();
   const {affectedRows} = await mySql.deleteById(tableName, id);
   return affectedRows;
 }
 
 export function getAll(tableName: string): Promise<Object[]> {
-  const mySql = getDbConnection();
+  ensureMySql();
   return mySql.getAll(tableName);
 }
 
 export function getById(tableName: string, id: number): Promise<Object> {
-  const mySql = getDbConnection();
+  ensureMySql();
   return mySql.getById(tableName, id);
 }
 
@@ -35,7 +41,7 @@ export async function patch(
   id: number,
   changes: Object
 ): Promise<Object> {
-  const mySql = getDbConnection();
+  ensureMySql();
   const type = await mySql.getById(tableName, id);
   const newType = {...type, ...changes};
   await mySql.updateById(tableName, id, newType);
@@ -43,12 +49,12 @@ export async function patch(
 }
 
 export function post(tableName: string, data: Object): Promise<number> {
-  const mySql = getDbConnection();
+  ensureMySql();
   return mySql.insert(tableName, data);
 }
 
 export function query(tableName: string, where: string): Promise<Object[]> {
-  const mySql = getDbConnection();
+  ensureMySql();
   //TODO: Should we be concerned about SQL injection here?
   const sql = `select * from ${tableName} where ${where}`;
   return mySql.query(sql);

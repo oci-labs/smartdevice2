@@ -8,12 +8,13 @@ import {errorHandler} from './util/error-util';
 const NOT_FOUND = 404;
 const OK = 200;
 
+let mySql;
+
 async function deleteByIdHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
   const {id, kind} = req.params;
-  const mySql = getDbConnection();
   try {
     // Cascading deletes in database take care of
     // deleting all descendant types.
@@ -30,7 +31,6 @@ async function createHandler(
   res: express$Response
 ): Promise<void> {
   const {kind} = req.params;
-  const mySql = getDbConnection();
   try {
     const obj = JSON.parse(req.body);
     const rows = await mySql.insert(kind, obj);
@@ -46,7 +46,6 @@ async function getAllHandler(
   res: express$Response
 ): Promise<void> {
   const {kind} = req.params;
-  const mySql = getDbConnection();
   try {
     const rows = await mySql.getAll(kind);
     res.send(JSON.stringify(rows));
@@ -61,7 +60,6 @@ async function getByIdHandler(
   res: express$Response
 ): Promise<void> {
   const {id, kind} = req.params;
-  const mySql = getDbConnection();
   try {
     const type = await mySql.getById(kind, id);
     res.status(type ? OK : NOT_FOUND).send(JSON.stringify(type));
@@ -77,7 +75,6 @@ async function patchHandler(
 ): Promise<void> {
   const {id, kind} = req.params;
   const changes = req.body;
-  const mySql = getDbConnection();
   try {
     const type = await mySql.getById(kind, id);
     const newType = {...type, ...changes};
@@ -90,8 +87,9 @@ async function patchHandler(
 }
 
 function treeService(app: express$Application): void {
-  const URL_PREFIX = '/tree/:kind';
+  mySql = getDbConnection();
 
+  const URL_PREFIX = '/tree/:kind';
   app.delete(URL_PREFIX + '/:id', deleteByIdHandler);
   app.get(URL_PREFIX, getAllHandler);
   app.get(URL_PREFIX + '/:id', getByIdHandler);

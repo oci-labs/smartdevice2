@@ -11,12 +11,13 @@ import {
 import {BUILTIN_TYPES} from './types';
 import {errorHandler} from './util/error-util';
 
+let mySql;
+
 async function getTypeAlertsHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
   const {typeId} = req.params;
-  const mySql = getDbConnection();
   const sql = 'select * from alert_type where typeId = ?';
   try {
     const conditions = await mySql.query(sql, typeId);
@@ -33,7 +34,6 @@ export async function getTypeDataHandler(
   res: express$Response
 ): Promise<void> {
   const {typeId} = req.params;
-  const mySql = getDbConnection();
   const sql = 'select * from type_data where typeId = ?';
   try {
     const typeDatas = await mySql.query(sql, typeId);
@@ -49,7 +49,6 @@ async function getTypeNamesHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const mySql = getDbConnection();
   try {
     const enumNames = await mySql.query('select name from enum');
     const names = [
@@ -68,7 +67,6 @@ async function getTypeRootIdHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const mySql = getDbConnection();
   try {
     const sql = 'select id from type where name = "root"';
     const [row] = await mySql.query(sql);
@@ -84,7 +82,6 @@ async function getTypesUsingEnumHandler(
   res: express$Response
 ): Promise<void> {
   const {enumId} = req.params;
-  const mySql = getDbConnection();
   const sql = 'select t.name ' +
     'from type t, type_data td ' +
     'where td.enumId = ? and t.id = td.typeId';
@@ -103,7 +100,6 @@ async function inUseHandler(
   res: express$Response
 ): Promise<void> {
   const {typeId} = req.params;
-  const mySql = getDbConnection();
   const sql = 'select id from type where parentId = ?';
   try {
     let referIds = await mySql.query(sql, typeId);
@@ -158,7 +154,6 @@ async function setServerHandler(
   }
   args.unshift(sql);
 
-  const mySql = getDbConnection();
   try {
     await mySql.query(...args);
     res.send();
@@ -169,6 +164,8 @@ async function setServerHandler(
 }
 
 export function typeService(app: express$Application): void {
+  mySql = getDbConnection();
+
   const URL_PREFIX = '/types/';
   app.get(URL_PREFIX + 'enums/used-by/:enumId', getTypesUsingEnumHandler);
   app.get(URL_PREFIX + 'names', getTypeNamesHandler);

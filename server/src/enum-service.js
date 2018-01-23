@@ -7,14 +7,16 @@ import {errorHandler} from './util/error-util';
 
 import type {EnumType} from './types';
 
+let mySql;
+
 function enumService(app: express$Application): void {
+  mySql = getDbConnection();
   const URL_PREFIX = '/enums';
   app.get(URL_PREFIX, getEnumsHandler);
   app.get(URL_PREFIX + '/:enumId', getEnumValuesHandler);
 }
 
 async function getEnums(): Promise<EnumType[]> {
-  const mySql = getDbConnection();
   const enums = await mySql.query('select * from enum');
 
   // Build the memberMap for each enum.
@@ -49,7 +51,6 @@ async function getEnumValuesHandler(
   res: express$Response
 ): Promise<void> {
   const {enumId} = req.params;
-  const mySql = getDbConnection();
   const sql = 'select * from enum_value where enumId = ?';
   try {
     const enumValues = await mySql.query(sql, enumId);
