@@ -1,6 +1,6 @@
 // @flow
 
-import {mySql} from './database';
+import {getDbConnection} from './database';
 import {errorHandler} from './util/error-util';
 
 //const inTest = process.env.NODE_ENV === 'test';
@@ -13,6 +13,7 @@ async function deleteByIdHandler(
   res: express$Response
 ): Promise<void> {
   const {id, kind} = req.params;
+  const mySql = getDbConnection();
   try {
     // Cascading deletes in database take care of
     // deleting all descendant types.
@@ -29,6 +30,7 @@ async function createHandler(
   res: express$Response
 ): Promise<void> {
   const {kind} = req.params;
+  const mySql = getDbConnection();
   try {
     const obj = JSON.parse(req.body);
     const rows = await mySql.insert(kind, obj);
@@ -44,6 +46,7 @@ async function getAllHandler(
   res: express$Response
 ): Promise<void> {
   const {kind} = req.params;
+  const mySql = getDbConnection();
   try {
     const rows = await mySql.getAll(kind);
     res.send(JSON.stringify(rows));
@@ -58,6 +61,7 @@ async function getByIdHandler(
   res: express$Response
 ): Promise<void> {
   const {id, kind} = req.params;
+  const mySql = getDbConnection();
   try {
     const type = await mySql.getById(kind, id);
     res.status(type ? OK : NOT_FOUND).send(JSON.stringify(type));
@@ -73,6 +77,7 @@ async function patchHandler(
 ): Promise<void> {
   const {id, kind} = req.params;
   const changes = req.body;
+  const mySql = getDbConnection();
   try {
     const type = await mySql.getById(kind, id);
     const newType = {...type, ...changes};

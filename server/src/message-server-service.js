@@ -1,6 +1,6 @@
 // @flow
 
-import {mySql} from './database';
+import {getDbConnection} from './database';
 import {connect, disconnect} from './mqtt-service';
 import {errorHandler} from './util/error-util';
 
@@ -9,6 +9,7 @@ async function addServerHandler(
   res: express$Response
 ): Promise<void> {
   const server = req.body;
+  const mySql = getDbConnection();
 
   try {
     const id = await mySql.insert('message_server', server);
@@ -26,6 +27,7 @@ async function deleteServerHandler(
   res: express$Response
 ): Promise<void> {
   const {serverId} = req.params;
+  const mySql = getDbConnection();
 
   try {
     const server = await mySql.getById('message_server', serverId);

@@ -1,6 +1,6 @@
 // @flow
 
-import {mySql} from './database';
+import {getDbConnection} from './database';
 import {errorHandler} from './util/error-util';
 
 import type {AlertType} from './types';
@@ -13,6 +13,7 @@ function alertService(app: express$Application): void {
 }
 
 async function getAllAlerts(): Promise<AlertType[]> {
+  const mySql = getDbConnection();
   const sql =
     'select a.id, a.instanceId, t.name, t.sticky, a.timestamp ' +
     'from alert a, alert_type t ' +
@@ -49,6 +50,7 @@ async function getByInstanceHandler(
 }
 
 async function getChildInstanceIds(instanceId: number): Promise<number[]> {
+  const mySql = getDbConnection();
   const sql = 'select id from instance where parentId=?';
   const rows = await mySql.query(sql, instanceId);
   return rows.map(row => row.id);
@@ -58,6 +60,7 @@ async function getInstanceAlerts(
   instanceId: number,
   includeDescendants: boolean
 ): Promise<AlertType[]> {
+  const mySql = getDbConnection();
   const sql =
     'select a.id, a.instanceId, t.name, t.sticky, a.timestamp ' +
     'from alert a, alert_type t ' +

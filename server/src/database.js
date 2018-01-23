@@ -11,5 +11,3 @@ const dbConfig = {
 
 export const getDbConnection = () => new MySqlConnection(dbConfig);
 
-export const mySql = getDbConnection();
-

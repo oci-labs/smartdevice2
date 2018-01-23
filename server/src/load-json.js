@@ -4,13 +4,14 @@
 import fs from 'fs';
 import jsonValidator from 'json-dup-key-validator';
 
-import {mySql} from './database';
+import {getDbConnection} from './database';
 import {deleteAll, getAll, post} from './crud-service';
 import {getEnums} from './enum-service';
 import {BUILTIN_TYPES, type EnumType} from './types';
 import {errorHandler} from './util/error-util';
 
 const enumNames = [];
+const mySql = getDbConnection();
 
 async function getEnumId(enumName): Promise<number> {
   const enums: EnumType[] = await getEnums();

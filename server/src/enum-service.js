@@ -2,7 +2,7 @@
 
 import sortBy from 'lodash/sortBy';
 
-import {mySql} from './database';
+import {getDbConnection} from './database';
 import {errorHandler} from './util/error-util';
 
 import type {EnumType} from './types';
@@ -14,6 +14,7 @@ function enumService(app: express$Application): void {
 }
 
 async function getEnums(): Promise<EnumType[]> {
+  const mySql = getDbConnection();
   const enums = await mySql.query('select * from enum');
 
   // Build the memberMap for each enum.
@@ -48,6 +49,7 @@ async function getEnumValuesHandler(
   res: express$Response
 ): Promise<void> {
   const {enumId} = req.params;
+  const mySql = getDbConnection();
   const sql = 'select * from enum_value where enumId = ?';
   try {
     const enumValues = await mySql.query(sql, enumId);
