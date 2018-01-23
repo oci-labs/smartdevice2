@@ -2,47 +2,82 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Input} from 'redux-easy';
-
 import Button from '../share/button';
-import {hideModal} from '../share/sd-modal';
-import {getJson} from '../util/rest-util';
+import {hideModal, showModal} from '../share/sd-modal';
+import {postJson} from '../util/rest-util';
 
 import type {StateType} from '../types';
 
 import './import-export.css';
 
-type PropsType = {
-  jsonPath: string
+type PropsType = {};
+type MyStateType = {
+  file: ?File
 };
 
-class ImportExport extends Component<PropsType> {
+class ImportExport extends Component<PropsType, MyStateType> {
+  state: MyStateType = {file: null};
 
-  cancel = () => hideModal();
+  clear = () => {
+    this.setState({file: null});
+    hideModal();
+  };
 
   export = () => {
     alert('JSON export is not implemented yet.');
-    hideModal();
+    this.clear();
   };
 
-  import = async () => {
-    const url = 'load/' + this.props.jsonPath;
-    console.log('import-export.js import: url =', url);
-    await getJson(url);
-    hideModal();
+  import = () => {
+    const {file} = this.state;
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = event => {
+      const json = event.target.result;
+
+      try {
+        postJson('load', JSON.parse(json));
+      } catch (e) {
+        showModal({
+          error: true,
+          title: 'JSON Upload Error',
+          message: e.message
+        });
+      }
+
+      this.clear();
+    };
+
+    reader.readAsText(file);
   };
+
+  // eslint-disable-next-line prefer-destructuring
+  loadFile = event => this.setState({file: event.target.files[0]});
 
   render() {
-    const {jsonPath} = this.props;
-    const disabled = !jsonPath;
+    const disabled = !this.state.file;
     return (
       <section className="import-export">
-        <label>JSON Path</label>
-        <Input path="ui.jsonPath" />
+        <label>JSON File</label>
+        {/*
+        <Input
+          path="ui.jsonPath"
+          type="file"
+          accept=".json"
+          onChange={this.loadFile}
+        />
+        */}
+        <input type="file" onChange={this.loadFile} />
         <div>
-          <Button onClick={this.import} disabled={disabled}>Import</Button>
-          <Button onClick={this.export} disabled={disabled}>Export</Button>
-          <Button onClick={this.cancel}>Cancel</Button>
+          <Button onClick={this.import} disabled={disabled}>
+            Import
+          </Button>
+          <Button onClick={this.export} disabled={disabled}>
+            Export
+          </Button>
+          <Button onClick={this.clear}>Cancel</Button>
         </div>
       </section>
     );

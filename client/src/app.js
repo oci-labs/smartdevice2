@@ -54,7 +54,7 @@ class App extends Component<PropsType> {
           <h1 className="app-title">
             Open Edge Device Management
             <Button
-              className="import-export"
+              className="import-export-btn"
               icon="cog"
               onClick={() => this.importExport()}
               tooltip="import/export"

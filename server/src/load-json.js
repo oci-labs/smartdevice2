@@ -43,9 +43,8 @@ async function loadHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
-  const {jsonPath} = req.params;
   try {
-    await processFile(jsonPath);
+    await processObject(req.body);
     res.send();
   } catch (e) {
     // istanbul ignore next
@@ -73,7 +72,7 @@ async function loadInstance(parentId, name, typeDescriptor) {
 }
 
 export function loadService(app: express$Application): void {
-  app.get('/load/:jsonPath', loadHandler);
+  app.post('/load', loadHandler);
 }
 
 async function loadType(parentId, name, valueMap) {
@@ -167,16 +166,20 @@ async function processFile(jsonPath) {
     // Check for duplicate keys.
     jsonValidator.parse(json);
 
-    const {enums, instances, types} = JSON.parse(json);
-
-    await processEnums(enums);
-    await processTypes(types);
-    await processInstances(instances);
-    console.log('finished');
-    mySql.disconnect(); // allows process to exit
+    await processObject(JSON.parse(json));
   } catch (e) {
     console.error(e.message);
   }
+}
+
+async function processObject(obj: Object) {
+  const {enums, instances, types} = obj;
+
+  await processEnums(enums);
+  await processTypes(types);
+  await processInstances(instances);
+  console.log('finished');
+  mySql.disconnect(); // allows process to exit
 }
 
 function validKind(kind) {

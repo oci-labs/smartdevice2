@@ -58,6 +58,10 @@ input[type=checkbox] {
     color: $delete-color;
   }
 
+  .import-export-btn:focus {
+    outline: none;
+  }
+
   // Right side
   .instance-detail, .type-alerts {
     background-color: $bg-color3;
