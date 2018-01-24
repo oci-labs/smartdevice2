@@ -8,7 +8,7 @@ import {errorHandler} from './util/error-util';
 
 import type {AlertType, AlertTypeType, PrimitiveType} from './types';
 
-const PATH_DELIMITER = '.';
+export const PATH_DELIMITER = '.';
 const pathToIdMap = {};
 
 let mySql;
@@ -46,6 +46,10 @@ function deleteInstanceData(instanceId: number): Promise<void> {
   return mySql.query(sql, instanceId);
 }
 
+function ensureMySql() {
+  if (!mySql) mySql = getDbConnection();
+}
+
 function getAlerts(instanceId: number): Promise<AlertType[]> {
   const sql =
     'select a.id, a.instanceId, t.name, a.timestamp ' +
@@ -74,7 +78,14 @@ async function getData(instanceId: number): Promise<Object> {
   }, {});
 }
 
-async function getInstanceDataHandler(
+export async function getInstanceChildren(parentId: number): Promise<Object[]> {
+  ensureMySql();
+  const sql = 'select * from instance where parentId = ?';
+  const instances = await mySql.query(sql, parentId);
+  return sortBy(instances, ['name']);
+}
+
+export async function getInstanceDataHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -90,14 +101,19 @@ async function getInstanceDataHandler(
   }
 }
 
-async function getInstanceRootIdHandler(
+async function getInstanceRootId(): Promise<number> {
+  ensureMySql();
+  const sql = 'select id from instance where name = "root"';
+  const [row] = await mySql.query(sql);
+  return row ? row.id : 0;
+}
+
+export async function getInstanceRootIdHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
   try {
-    const sql = 'select id from instance where name = "root"';
-    const [row] = await mySql.query(sql);
-    res.send(String(row ? row.id : 0));
+    res.send(String(await getInstanceRootId()));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
@@ -110,7 +126,7 @@ async function getInstanceTypeId(instanceId: number): Promise<number> {
   return row ? Number(row.typeId) : 0;
 }
 
-async function getParentId(parentName: string): Promise<number> {
+export async function getParentId(parentName: string): Promise<number> {
   let id = pathToIdMap[parentName];
   if (id) return id;
 
@@ -122,7 +138,7 @@ async function getParentId(parentName: string): Promise<number> {
   return id;
 }
 
-async function getInstanceId(path: string): Promise<number> {
+export async function getInstanceId(path: string): Promise<number> {
   // If we have seen this path before, returns its id.
   let id = pathToIdMap[path];
   if (id) return id;
@@ -152,7 +168,15 @@ async function getInstanceId(path: string): Promise<number> {
   return id;
 }
 
-function instanceService(app: express$Application): void {
+export async function getTopInstances() {
+  const rootId = await getInstanceRootId();
+  ensureMySql();
+  const sql = 'select * from instance where parentId = ?';
+  const instances = await mySql.query(sql, rootId);
+  return instances;
+}
+
+export function instanceService(app: express$Application): void {
   mySql = getDbConnection();
 
   const URL_PREFIX = '/instances/';
@@ -199,7 +223,7 @@ function isTriggered(expression: string, instanceData: Object): boolean {
  * Changes the property values for a given instance
  * and returns the current alerts for that instance.
  */
-async function postInstanceDataHandler(
+export async function postInstanceDataHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -292,7 +316,7 @@ async function updateAlerts(
  * Updates and instance property and returns a boolean
  * indicating whether any alertyts changed.
  */
-async function updateProperty(
+export async function updateProperty(
   instanceId: number,
   property: string,
   value: PrimitiveType
@@ -301,14 +325,3 @@ async function updateProperty(
   const data = await getData(instanceId);
   return updateAlerts(instanceId, data);
 }
-
-module.exports = {
-  PATH_DELIMITER,
-  getInstanceDataHandler,
-  getInstanceId,
-  getInstanceRootIdHandler,
-  getParentId,
-  instanceService,
-  postInstanceDataHandler,
-  updateProperty
-};

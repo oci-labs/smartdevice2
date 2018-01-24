@@ -68,7 +68,7 @@
             },
             {
               "name": "too dim",
-              "condition": "ambient < 70",
+              "condition": "ambient < 30",
               "sticky": false
             }
           ]
@@ -80,8 +80,12 @@
     "thejoveexpress": {
       "type": "train",
       "children": {
-        "engine": "engine",
-        "lights": "lights"
+        "engine": {
+          "type": "engine"
+        },
+        "lights": {
+          "type": "lights"
+        }
       }
     }
   }

@@ -65,12 +65,9 @@ export function importService(app: express$Application): void {
   app.post('/import', importHandler);
 }
 
-async function loadInstance(parentId, name, typeDescriptor) {
-  if (typeof typeDescriptor === 'string') {
-    const typeId = await getTypeId(typeDescriptor);
-    await post('instance', {name, parentId, typeId});
-  } else if (typeof typeDescriptor === 'object') {
-    const {children, type} = typeDescriptor;
+async function loadInstance(parentId, name, descriptor) {
+  if (typeof descriptor === 'object') {
+    const {children = {}, type} = descriptor;
     const typeId = await getTypeId(type);
     const id = await post('instance', {name, parentId, typeId});
 
@@ -80,17 +77,17 @@ async function loadInstance(parentId, name, typeDescriptor) {
     }
     console.info('imported instance', name);
   } else {
-    throw new Error('invalid instance type: ' + typeDescriptor);
+    throw new Error('invalid instance type: ' + descriptor);
   }
 }
 
-async function loadType(parentId, name, typeDataMap) {
+async function loadType(parentId, name, dataMap) {
   const {
     alerts = [],
     children = {},
     messageServerId,
     properties = {}
-  } = typeDataMap;
+  } = dataMap;
 
   const typeId = await post('type', {name, parentId, messageServerId});
 

@@ -27,7 +27,7 @@ const serverMap = {}; // keys are server ids
 
 let lastChange, mySql, ws;
 
-function connect(server: MessageServerType, typeId: number = 0) {
+export function connect(server: MessageServerType, typeId: number = 0) {
   const {id} = server;
   serverMap[id] = server;
 
@@ -63,7 +63,7 @@ function connect(server: MessageServerType, typeId: number = 0) {
   }
 }
 
-function disconnect(server: MessageServerType) {
+export function disconnect(server: MessageServerType) {
   const url = `mqtt://${server.host}:${server.port}`;
   const client = mqtt.connect(url);
   if (client) {
@@ -288,7 +288,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
   }
 }
 
-async function mqttService() {
+export async function mqttService() {
   mySql = getDbConnection();
 
   try {
@@ -317,7 +317,7 @@ function requestFeedback(client, parts: string[]): void {
   client.publish(feedbackTopic);
 }
 
-async function subscribe(serverId: number, typeId: number) {
+export async function subscribe(serverId: number, typeId: number) {
   const client = clientMap[serverId];
   if (!client) {
     console.error('no client for server id', serverId);
@@ -331,13 +331,13 @@ async function subscribe(serverId: number, typeId: number) {
   }
 }
 
-async function unsubscribeFromServer(serverId: number): Promise<void> {
+export async function unsubscribeFromServer(serverId: number): Promise<void> {
   const types = await getTopLevelTypesForServer(serverId);
   const promises = types.map(type => unsubscribeFromType(serverId, type.id));
   await Promise.all(promises);
 }
 
-async function unsubscribeFromType(
+export async function unsubscribeFromType(
   serverId: number,
   typeId: number
 ): Promise<void> {
@@ -351,7 +351,7 @@ async function unsubscribeFromType(
   }
 }
 
-function websocketSetup() {
+export function webSocketSetup() {
   const wsServer = new WebSocket.Server({port: 1337});
   console.info('waiting for WebSocket connection');
   wsServer.on('connection', webSocket => {
@@ -376,14 +376,3 @@ function websocketSetup() {
     });
   });
 }
-
-websocketSetup();
-
-module.exports = {
-  connect,
-  disconnect,
-  mqttService,
-  subscribe,
-  unsubscribeFromServer,
-  unsubscribeFromType
-};

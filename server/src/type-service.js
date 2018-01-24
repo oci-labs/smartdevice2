@@ -13,20 +13,58 @@ import {errorHandler} from './util/error-util';
 
 let mySql;
 
+function ensureMySql() {
+  if (!mySql) mySql = getDbConnection();
+}
+
+export async function getTopTypes() {
+  const rootId = await getTypeRootId();
+  ensureMySql();
+  const sql = 'select * from type where parentId = ?';
+  const types = await mySql.query(sql, rootId);
+  return types;
+}
+
+export async function getTypeAlerts(typeId: number): Promise<Object[]> {
+  ensureMySql();
+  const sql = 'select * from alert_type where typeId = ?';
+  const alertTypes = await mySql.query(sql, typeId);
+  return sortBy(alertTypes, ['name']);
+}
+
 async function getTypeAlertsHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
   const {typeId} = req.params;
-  const sql = 'select * from alert_type where typeId = ?';
   try {
-    const conditions = await mySql.query(sql, typeId);
-    const sorted = sortBy(conditions, ['name']);
-    res.send(sorted);
+    res.send(await getTypeAlerts(Number(typeId)));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
   }
+}
+
+export async function getTypeChildren(parentId: number): Promise<Object[]> {
+  ensureMySql();
+  const sql = 'select * from type where parentId = ?';
+  const types = await mySql.query(sql, parentId);
+  return sortBy(types, ['name']);
+}
+
+export async function getTypeName(typeId: number): Promise<string> {
+  ensureMySql();
+  const sql = 'select name from type where id = ?';
+  const [row] = await mySql.query(sql, typeId);
+  if (!row) throw new Error('invalid type id ' + typeId);
+  return row.name;
+}
+
+export async function getTypeProperties(typeId: number): Promise<Object[]> {
+  ensureMySql();
+  const sql = 'select * from type_data where typeId = ?';
+  const properties = await mySql.query(sql, typeId);
+  return sortBy(properties, ['name']);
 }
 
 export async function getTypeDataHandler(
@@ -34,11 +72,8 @@ export async function getTypeDataHandler(
   res: express$Response
 ): Promise<void> {
   const {typeId} = req.params;
-  const sql = 'select * from type_data where typeId = ?';
   try {
-    const typeDatas = await mySql.query(sql, typeId);
-    const sorted = sortBy(typeDatas, ['name']);
-    res.send(sorted);
+    res.send(await getTypeProperties(Number(typeId)));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
@@ -63,14 +98,20 @@ async function getTypeNamesHandler(
   }
 }
 
+async function getTypeRootId(): Promise<number> {
+  ensureMySql();
+  const sql = 'select id from type where name = "root"';
+  const [row] = await mySql.query(sql);
+  return row ? row.id : 0;
+}
+
 async function getTypeRootIdHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
   try {
-    const sql = 'select id from type where name = "root"';
-    const [row] = await mySql.query(sql);
-    res.send(String(row ? row.id : 0));
+    const id = await getTypeRootId();
+    res.send(String(id));
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);

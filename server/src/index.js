@@ -12,7 +12,7 @@ import {enumService} from './enum-service';
 import {instanceService} from './instance-service';
 import {importService} from './json-import';
 import {messageServerService} from './message-server-service';
-import {mqttService} from './mqtt-service';
+import {mqttService, webSocketSetup} from './mqtt-service';
 import {treeService} from './tree-service';
 import {typeService} from './type-service';
 
@@ -63,6 +63,8 @@ importService(app);
 // For more details, browse https://github.com/expressjs/morgan.
 app.use(morgan('dev'));
 app.use(/^\/$/, healthCheck());
+
+webSocketSetup();
 
 const HOST = 'localhost';
 const PORT = 3001; //process.argv.pop();
