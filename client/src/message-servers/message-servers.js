@@ -87,13 +87,17 @@ class MessageServers extends Component<PropsType> {
   };
 
   loadMessageServers = async () => {
-    const json = await getJson('message_server');
-    const servers = ((json: any): MessageServerType[]);
-    const messageServerMap = servers.reduce((map, server) => {
-      map[server.id] = server;
-      return map;
-    }, {});
-    dispatchSet('messageServerMap', messageServerMap);
+    try {
+      const json = await getJson('message_server');
+      const servers = ((json: any): MessageServerType[]);
+      const messageServerMap = servers.reduce((map, server) => {
+        map[server.id] = server;
+        return map;
+      }, {});
+      dispatchSet('messageServerMap', messageServerMap);
+    } catch (e) {
+      console.error('failed to load message servers');
+    }
   };
 
   serverNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {

@@ -4,14 +4,17 @@ import {dispatch} from 'redux-easy';
 
 import {reloadAlerts} from './instance-detail/instance-detail';
 
-export function websocketSetup() {
-  const connection = new WebSocket('ws://127.0.0.1:1337');
+function configure(connection) {
+  connection.onclose = () => {
+    console.info('got WebSocket close');
+    // Try to get a new connection in 5 seconds.
+    setTimeout(connect, 5000);
+  };
 
-  connection.onopen = () =>
-    console.info('got WebSocket connection');
-
+  /*
   connection.onerror = error =>
     console.error('WebSocket error:', error);
+  */
 
   connection.onmessage = message => {
     if (global.importInProgress) return;
@@ -30,4 +33,14 @@ export function websocketSetup() {
       console.info('unsupported WebSocket message:', data);
     }
   };
+
+  connection.onopen = () =>
+    console.info('got WebSocket connection');
 }
+
+function connect() {
+  const connection = new WebSocket('ws://127.0.0.1:1337');
+  configure(connection);
+}
+
+export const websocketSetup = connect;
