@@ -37,10 +37,10 @@ async function loadEnum(name, valueMap) {
   });
   await Promise.all(promises);
 
-  console.log('loaded enum', name);
+  console.log('imported enum', name);
 }
 
-async function loadHandler(
+async function importHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -51,6 +51,10 @@ async function loadHandler(
     // istanbul ignore next
     errorHandler(res, e);
   }
+}
+
+export function importService(app: express$Application): void {
+  app.post('/import', importHandler);
 }
 
 async function loadInstance(parentId, name, typeDescriptor) {
@@ -66,14 +70,10 @@ async function loadInstance(parentId, name, typeDescriptor) {
     for (const name of childNames) {
       await loadInstance(id, name, children[name]);
     }
-    console.log('loaded instance', name);
+    console.log('imported instance', name);
   } else {
     throw new Error('invalid instance type: ' + typeDescriptor);
   }
-}
-
-export function loadService(app: express$Application): void {
-  app.post('/load', loadHandler);
 }
 
 async function loadType(parentId, name, valueMap) {
@@ -107,7 +107,7 @@ async function loadType(parentId, name, valueMap) {
     await loadType(typeId, name, childType);
   }
 
-  console.log('loaded type', name);
+  console.log('imported type', name);
 }
 
 async function processEnums(enums) {

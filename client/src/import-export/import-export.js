@@ -40,7 +40,7 @@ class ImportExport extends Component<PropsType, MyStateType> {
       const json = event.target.result;
 
       try {
-        postJson('load', JSON.parse(json));
+        postJson('import', JSON.parse(json));
 
         // Clear enough state from Redux
         // to force it to be reloaded
@@ -52,7 +52,7 @@ class ImportExport extends Component<PropsType, MyStateType> {
       } catch (e) {
         showModal({
           error: true,
-          title: 'JSON Upload Error',
+          title: 'JSON Import Error',
           message: e.message
         });
       }
@@ -71,14 +71,6 @@ class ImportExport extends Component<PropsType, MyStateType> {
     return (
       <section className="import-export">
         <label>JSON File</label>
-        {/*
-        <Input
-          path="ui.jsonPath"
-          type="file"
-          accept=".json"
-          onChange={this.loadFile}
-        />
-        */}
         <input type="file" onChange={this.loadFile} />
         <div>
           <Button onClick={this.import} disabled={disabled}>

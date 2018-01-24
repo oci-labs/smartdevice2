@@ -10,7 +10,7 @@ import {alertService} from './alert-service';
 import crudService from './crud-service';
 import {enumService} from './enum-service';
 import {instanceService} from './instance-service';
-import {loadService} from './load-json';
+import {importService} from './json-import';
 import {messageServerService} from './message-server-service';
 import {mqttService} from './mqtt-service';
 import {treeService} from './tree-service';
@@ -56,7 +56,7 @@ crudService(app, 'subscription');
 crudService(app, 'type');
 crudService(app, 'type_data');
 crudService(app, 'user');
-loadService(app);
+importService(app);
 
 // Logging
 // The provided options are combined, common, dev, short, and tiny.
