@@ -110,6 +110,8 @@ async function getTopicType(topic: string): Promise<string> {
 
   const parts = topic.split('/');
   const lastPart = parts[parts.length - 1];
+  if (lastPart === 'control') return '';
+
   if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
   const property = parts.pop();
 
@@ -211,6 +213,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
 
   try {
     const type = await getTopicType(topic);
+    if (!type) return;
 
     //console.log('message length =', message.length);
     const parts = topic.split('/');

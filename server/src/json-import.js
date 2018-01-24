@@ -38,7 +38,7 @@ async function loadEnum(name, valueMap) {
   });
   await Promise.all(promises);
 
-  console.log('imported enum', name);
+  console.info('imported enum', name);
 }
 
 async function importHandler(
@@ -78,27 +78,25 @@ async function loadInstance(parentId, name, typeDescriptor) {
     for (const name of childNames) {
       await loadInstance(id, name, children[name]);
     }
-    console.log('imported instance', name);
+    console.info('imported instance', name);
   } else {
     throw new Error('invalid instance type: ' + typeDescriptor);
   }
 }
 
-async function loadType(parentId, name, valueMap) {
-  const keys = Object.keys(valueMap);
-  const propertyNames = keys.filter(key => {
-    const value = valueMap[key];
-    return typeof value === 'string';
-  });
-  const childNames = keys.filter(key => {
-    const value = valueMap[key];
-    return typeof value === 'object';
-  });
+async function loadType(parentId, name, typeDataMap) {
+  const {
+    alerts = [],
+    children = {},
+    messageServerId,
+    properties = {}
+  } = typeDataMap;
 
-  const typeId = await post('type', {name, parentId});
+  const typeId = await post('type', {name, parentId, messageServerId});
 
+  const propertyNames = Object.keys(properties);
   for (const name of propertyNames) {
-    const kind = valueMap[name];
+    const kind = properties[name];
     if (!validKind(kind)) {
       throw new Error(`invalid kind "${kind}"`);
     }
@@ -110,12 +108,25 @@ async function loadType(parentId, name, valueMap) {
     await post('type_data', data);
   }
 
+  const childNames = Object.keys(children);
   for (const name of childNames) {
-    const childType = valueMap[name];
+    const childType = children[name];
     await loadType(typeId, name, childType);
   }
 
-  console.log('imported type', name);
+  for (const alert of alerts) {
+    const {name, condition, sticky} = alert;
+    const data = {
+      typeId,
+      name,
+      expression: condition,
+      sticky
+    };
+    await post('alert_type', data);
+    console.info('imported alert', name);
+  }
+
+  console.info('imported type', name);
 }
 
 async function processEnums(enums) {
@@ -169,7 +180,7 @@ async function processFile(jsonPath) {
     return;
   }
 
-  console.log('loading', jsonPath);
+  console.info('importing', jsonPath);
   const json = fs.readFileSync(jsonPath, {encoding: 'utf8'});
   try {
     // Check for duplicate keys.
@@ -182,18 +193,31 @@ async function processFile(jsonPath) {
 }
 
 async function processObject(obj: Object) {
-  const {enums, instances, types} = obj;
+  const {enums, instances, messageServers, types} = obj;
 
+  await processMessageServers(messageServers);
   await processEnums(enums);
   await processTypes(types);
   await processInstances(instances);
-  console.log('finished');
+  console.info('import finished');
   mySql.disconnect(); // allows process to exit
 }
 
+async function processMessageServers(messageServers) {
+  if (!messageServers) return;
+
+  // Clear the tables that will be loaded.
+  await deleteAll('type'); // holds foreign keys to message_server
+  await deleteAll('message_server');
+
+  for (const messageServer of messageServers) {
+    await post('message_server', messageServer);
+    console.info('imported message server', messageServer.host);
+  }
+}
+
 function validKind(kind) {
-  return BUILTIN_TYPES.includes(kind) ||
-    enumNames.includes(kind);
+  return BUILTIN_TYPES.includes(kind) || enumNames.includes(kind);
 }
 
 if (require.main === module) {

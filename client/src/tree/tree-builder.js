@@ -41,8 +41,7 @@ function haveNodeMap(kind: TreeType): boolean {
   return Object.keys(nodeMap).length > 1;
 }
 
-const haveRootId = (kind: TreeType): boolean =>
-  Boolean(getRootId(kind));
+const haveRootId = (kind: TreeType): boolean => Boolean(getRootId(kind));
 
 class TreeBuilder extends Component<PropsType> {
   componentDidMount() {

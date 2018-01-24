@@ -1,4 +1,7 @@
 {
+  "messageServers": [
+    {"id": 1, "host": "localhost", "port": 1883}
+  ],
   "enums": {
     "EngineState": {
       "reverse": -1,
@@ -13,32 +16,63 @@
   },
   "types": {
     "site": {
-      "department": {
-        "machine": {
-          "compressor": {
-            "pressure": "number",
-            "temperature": "number"
-          },
-          "valve": {
-            "cycleCount": "number",
-            "pressure": "number"
+      "children": {
+        "department": {
+          "children": {
+            "machine": {
+              "children": {
+                "compressor": {
+                  "properties": {
+                    "pressure": "number",
+                    "temperature": "number"
+                  }
+                },
+                "valve": {
+                  "properties": {
+                    "cycleCount": "number",
+                    "pressure": "number"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "train": {
-      "fault": "boolean",
-      "lifecycle": "boolean",
-      "engine": {
-        "calibration": "percent",
-        "power": "percent",
-        "state": "EngineState"
+      "messageServerId": 1,
+      "properties": {
+        "fault": "boolean",
+        "lifecycle": "boolean"
       },
-      "lights": {
-        "ambient": "percent",
-        "calibration": "percent",
-        "override": "LightCommand",
-        "power": "boolean"
+      "children": {
+        "engine": {
+          "properties": {
+            "calibration": "percent",
+            "power": "percent",
+            "state": "EngineState"
+          }
+        },
+        "lights": {
+          "properties": {
+            "ambient": "percent",
+            "calibration": "percent",
+            "override": "LightCommand",
+            "power": "boolean"
+          },
+          "alerts": [
+            {
+              "name": "too bright",
+              "condition": "ambient > 70",
+              "sticky": false
+            },
+            {
+              "name": "too dim",
+              "condition": "ambient < 70",
+              "sticky": false
+            }
+          ]
+        }
       }
     }
   },

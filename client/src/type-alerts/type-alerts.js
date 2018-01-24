@@ -6,8 +6,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
-import MessageServerSelect
-  from '../message-server-select/message-server-select';
+import MessageServerSelect from '../message-server-select/message-server-select';
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
 import {isSafeCode, spaceHandler} from '../util/input-util';
@@ -33,7 +32,8 @@ type MyStateType = {
   alertTypes: AlertTypeType[]
 };
 
-const ALERT_NAME_RE = /^[A-Za-z]\w*$/;
+const ALERT_NAME_RE = /^[A-Za-z][\w ]*$/;
+const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
 class TypeAlerts extends Component<PropsType, MyStateType> {
   added: boolean;
@@ -132,7 +132,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     const {typeProps, ui: {newAlertExpression}} = this.props;
     const expressionNames = newAlertExpression
       .split(' ')
-      .filter(word => ALERT_NAME_RE.test(word));
+      .filter(word => PROPERTY_NAME_RE.test(word));
     const propNames = typeProps.map(typeProp => typeProp.name);
     return expressionNames.filter(n => !propNames.includes(n));
   };

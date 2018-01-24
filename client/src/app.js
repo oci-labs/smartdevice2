@@ -42,8 +42,6 @@ class App extends Component<PropsType> {
   importExport = () => {
     const renderFn = () => <ImportExport />;
     showModal({title: 'Import/Export JSON', renderFn});
-
-    console.log('app.js importExport: entered');
   };
 
   render() {
