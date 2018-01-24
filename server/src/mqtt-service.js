@@ -201,7 +201,7 @@ async function saveProperty(
     // Notify web client that new alerts may be available.
     if (alertsChanged) ws.send('reload alerts');
   } else {
-    console.error('refresh browser to establish WebSocket connection');
+    console.error('no WebSocket connection to browser');
   }
 }
 
@@ -355,11 +355,11 @@ function websocketSetup() {
   const wsServer = new WebSocket.Server({port: 1337});
   console.info('waiting for WebSocket connection');
   wsServer.on('connection', webSocket => {
-    console.info('got WebSocket connection');
+    console.info('got WebSocket connection to browser');
     ws = webSocket;
 
     ws.on('close', () => {
-      console.info('WebSocket connection closed');
+      console.info('WebSocket connection to browser closed');
       ws = null;
     });
 

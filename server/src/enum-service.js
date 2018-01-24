@@ -9,14 +9,19 @@ import type {EnumType} from './types';
 
 let mySql;
 
-function enumService(app: express$Application): void {
+function ensureMySql() {
+  if (!mySql) mySql = getDbConnection();
+}
+
+export function enumService(app: express$Application): void {
   mySql = getDbConnection();
   const URL_PREFIX = '/enums';
   app.get(URL_PREFIX, getEnumsHandler);
   app.get(URL_PREFIX + '/:enumId', getEnumValuesHandler);
 }
 
-async function getEnums(): Promise<EnumType[]> {
+export async function getEnums(): Promise<EnumType[]> {
+  ensureMySql();
   const enums = await mySql.query('select * from enum');
 
   // Build the memberMap for each enum.
@@ -34,7 +39,7 @@ async function getEnums(): Promise<EnumType[]> {
   return sortBy(enums, ['name']);
 }
 
-async function getEnumsHandler(
+export async function getEnumsHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
@@ -46,11 +51,12 @@ async function getEnumsHandler(
   }
 }
 
-async function getEnumValuesHandler(
+export async function getEnumValuesHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
   const {enumId} = req.params;
+  ensureMySql();
   const sql = 'select * from enum_value where enumId = ?';
   try {
     const enumValues = await mySql.query(sql, enumId);
@@ -61,10 +67,3 @@ async function getEnumValuesHandler(
     errorHandler(res, e);
   }
 }
-
-module.exports = {
-  enumService,
-  getEnums,
-  getEnumsHandler,
-  getEnumValuesHandler
-};

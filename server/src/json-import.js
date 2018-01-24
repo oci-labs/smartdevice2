@@ -182,13 +182,18 @@ async function processFile(jsonPath) {
 
   console.info('importing', jsonPath);
   const json = fs.readFileSync(jsonPath, {encoding: 'utf8'});
+  let status = 0;
   try {
     // Check for duplicate keys.
     jsonValidator.parse(json);
 
     await processObject(JSON.parse(json));
   } catch (e) {
-    console.error(e.message);
+    console.trace(e);
+    status = 1;
+  } finally {
+    // eslint-disable-next-line no-process-exit
+    process.exit(status);
   }
 }
 
@@ -200,7 +205,7 @@ async function processObject(obj: Object) {
   await processTypes(types);
   await processInstances(instances);
   console.info('import finished');
-  mySql.disconnect(); // allows process to exit
+  mySql.disconnect();
 }
 
 async function processMessageServers(messageServers) {
