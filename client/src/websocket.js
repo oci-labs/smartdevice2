@@ -14,6 +14,8 @@ export function websocketSetup() {
     console.error('WebSocket error:', error);
 
   connection.onmessage = message => {
+    if (global.importInProgress) return;
+
     const {data} = message;
     if (data === 'reload alerts') {
       reloadAlerts();

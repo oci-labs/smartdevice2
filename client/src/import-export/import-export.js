@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
@@ -34,6 +34,8 @@ class ImportExport extends Component<PropsType, MyStateType> {
     const {file} = this.state;
     if (!file) return;
 
+    global.importInProgress = true;
+
     const reader = new FileReader();
 
     reader.onload = event => {
@@ -45,16 +47,15 @@ class ImportExport extends Component<PropsType, MyStateType> {
         // Clear enough state from Redux
         // to force it to be reloaded
         // using the new data in the database.
-        dispatchSet('instanceRootId', 0);
-        dispatchSet('instanceNodeMap', {});
-        dispatchSet('typeRootId', 0);
-        dispatchSet('typeNodeMap', {});
+        dispatch('clear');
       } catch (e) {
         showModal({
           error: true,
           title: 'JSON Import Error',
           message: e.message
         });
+      } finally {
+        global.importInProgress = true;
       }
 
       this.clear();

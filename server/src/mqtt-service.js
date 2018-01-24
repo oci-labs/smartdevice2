@@ -204,6 +204,8 @@ async function saveProperty(
 }
 
 async function handleMessage(client, topic: string, message: Buffer) {
+  if (global.importInProgress) return;
+
   //const ignore = topic === 'thejoveexpress/lights/ambient/feedback';
   //if (ignore) return;
 

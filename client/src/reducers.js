@@ -123,6 +123,14 @@ addReducer(
   }
 );
 
+addReducer('clear', (state: StateType) => ({
+  ...state,
+  instanceRootId: 0,
+  instanceNodeMap: {},
+  typeRootId: 0,
+  typeNodeMap: {}
+}));
+
 addReducer('deleteAlert', (state: StateType, alertId: number) => {
   const {alerts} = state;
   const newAlerts = alerts.filter(alert => alert.id !== alertId);

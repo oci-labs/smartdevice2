@@ -8,6 +8,7 @@ import {getDbConnection} from './database';
 import {deleteAll, getAll, post} from './crud-service';
 import {getEnums} from './enum-service';
 import {BUILTIN_TYPES, type EnumType} from './types';
+import {sleep} from './util/async-util';
 import {errorHandler} from './util/error-util';
 
 const enumNames = [];
@@ -44,12 +45,19 @@ async function importHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
+  global.importInProgress = true;
+
+  // Wait for current messages to complete processing.
+  sleep(2000);
+
   try {
     await processObject(req.body);
     res.send();
   } catch (e) {
     // istanbul ignore next
     errorHandler(res, e);
+  } finally {
+    global.importInProgress = false;
   }
 }
 
