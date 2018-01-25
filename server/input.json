@@ -1,14 +1,15 @@
 {
   "messageServers": [
-    {"id": 1, "host": "localhost", "port": 1883}
+    {"id": 1, "host": "localhost", "port": 1883},
+    {"id": 2, "host": "thejoveexpress.local", "port": 1883}
   ],
   "enums": {
-    "EngineState": {
+    "Direction": {
       "reverse": -1,
       "idle": 0,
       "forward": 1
     },
-    "LightCommand": {
+    "LightOverride": {
       "off": 0,
       "on": 1,
       "auto": 2
@@ -45,19 +46,26 @@
         "fault": "boolean",
         "lifecycle": "boolean"
       },
+      "alerts": [
+        {
+          "name": "faulted",
+          "condition": "fault",
+          "sticky": true
+        }
+      ],
       "children": {
         "engine": {
           "properties": {
             "calibration": "percent",
             "power": "percent",
-            "state": "EngineState"
+            "state": "Direction"
           }
         },
         "lights": {
           "properties": {
             "ambient": "percent",
             "calibration": "percent",
-            "override": "LightCommand",
+            "override": "LightOverride",
             "power": "boolean"
           },
           "alerts": [
