@@ -6,6 +6,7 @@ import fs from 'fs';
 import {getEnums} from './enum-service';
 import {getInstanceChildren, getTopInstances} from './instance-service';
 import {getServers} from './message-server-service';
+import {errorHandler} from './util/error-util';
 import {
   getTopTypes,
   getTypeAlerts,
@@ -15,18 +16,40 @@ import {
 } from './type-service';
 import {values} from './util/flow-util';
 
+async function exportHandler(
+  req: express$Request,
+  res: express$Response
+): Promise<void> {
+  try {
+    const json = await exportToJson();
+    res.set('Content-Type', 'application/json');
+    res.set('Content-Disposition', 'attachment; filename="oe-dev-mgmt.json"');
+    res.send(json);
+  } catch (e) {
+    // istanbul ignore next
+    errorHandler(res, e);
+  }
+}
+
+export function exportService(app: express$Application): void {
+  app.get('/export', exportHandler);
+}
+
 async function exportToFile(filePath: string) {
+  const json = await exportToJson();
+  fs.writeFileSync(filePath, json);
+
+  // eslint-disable-next-line no-process-exit
+  process.exit(0);
+}
+
+async function exportToJson() {
   const obj = {};
   await processMessageServers(obj);
   await processEnums(obj);
   await processTypes(obj);
   await processInstances(obj);
-
-  const json = JSON.stringify(obj, null, 2);
-  fs.writeFileSync(filePath, json);
-
-  // eslint-disable-next-line no-process-exit
-  process.exit(0);
+  return JSON.stringify(obj, null, 2);
 }
 
 async function getInstance(instance: Object) {

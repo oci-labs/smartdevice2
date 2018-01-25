@@ -10,6 +10,7 @@ import {alertService} from './alert-service';
 import crudService from './crud-service';
 import {enumService} from './enum-service';
 import {instanceService} from './instance-service';
+import {exportService} from './json-export';
 import {importService} from './json-import';
 import {messageServerService} from './message-server-service';
 import {mqttService, webSocketSetup} from './mqtt-service';
@@ -56,6 +57,7 @@ crudService(app, 'subscription');
 crudService(app, 'type');
 crudService(app, 'type_data');
 crudService(app, 'user');
+exportService(app);
 importService(app);
 
 // Logging

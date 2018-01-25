@@ -6,7 +6,7 @@ import {dispatch} from 'redux-easy';
 
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
-import {postJson} from '../util/rest-util';
+import {getUrlPrefix, postJson} from '../util/rest-util';
 
 import type {StateType} from '../types';
 
@@ -23,11 +23,6 @@ class ImportExport extends Component<PropsType, MyStateType> {
   clear = () => {
     this.setState({file: null});
     hideModal();
-  };
-
-  export = () => {
-    alert('JSON export is not implemented yet.');
-    this.clear();
   };
 
   import = () => {
@@ -71,15 +66,17 @@ class ImportExport extends Component<PropsType, MyStateType> {
     const disabled = !this.state.file;
     return (
       <section className="import-export">
-        <label>JSON File</label>
-        <input type="file" onChange={this.loadFile} />
         <div>
+          <label>JSON File</label>
+          <input type="file" onChange={this.loadFile} />
           <Button onClick={this.import} disabled={disabled}>
             Import
           </Button>
-          <Button onClick={this.export} disabled={disabled}>
-            Export
-          </Button>
+        </div>
+        <div>
+          <a href={getUrlPrefix() + 'export'}>
+            <Button>Export</Button>
+          </a>
           <Button onClick={this.clear}>Cancel</Button>
         </div>
       </section>

@@ -9,7 +9,7 @@ type PropsType = {
   children?: Node,
   disabled?: boolean,
   icon?: string,
-  onClick: Function,
+  onClick?: Function,
   tooltip?: string
 };
 
