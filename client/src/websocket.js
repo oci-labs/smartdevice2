@@ -37,7 +37,8 @@ function configure(connection) {
 }
 
 function connect() {
-  const connection = new WebSocket('ws://127.0.0.1:1337');
+  const {hostname} = window.location;
+  const connection = new WebSocket(`ws://${hostname}:1337`);
   configure(connection);
 }
 

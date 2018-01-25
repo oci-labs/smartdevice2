@@ -54,9 +54,14 @@ sudo apt-get install mosquitto
 * open a terminal window
 * `java -jar TheJoveExpress.jar`
 
-## Outstanding Issues
-* Add "MQTT Servers" tab to enter hosts.
-  In the future we may need to specify
-  port, clientId, cleanSession, keepAlive, and lastWill.
-* In TypeDetails, allow selection of an MQTT server
-  only for top-level instances.
+## Building on Raspberry Pi
+* cd Train/Device
+* cd client
+* npm install
+* npm run deploy
+* cd ../server
+* npm install
+* npm run build
+* npm start
+* from another machine on the same WiFi,
+  browse http://trainstation.local:3001

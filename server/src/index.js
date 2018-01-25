@@ -70,6 +70,6 @@ app.use(/^\/$/, healthCheck());
 
 webSocketSetup();
 
-const HOST = 'localhost';
+const HOST = '0.0.0.0';
 const PORT = 3001; //process.argv.pop();
 app.listen(PORT, HOST, () => console.info('listening on', PORT));
