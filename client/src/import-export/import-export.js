@@ -29,8 +29,6 @@ class ImportExport extends Component<PropsType, MyStateType> {
     const {file} = this.state;
     if (!file) return;
 
-    global.importInProgress = true;
-
     const reader = new FileReader();
 
     reader.onload = event => {
@@ -49,8 +47,6 @@ class ImportExport extends Component<PropsType, MyStateType> {
           title: 'JSON Import Error',
           message: e.message
         });
-      } finally {
-        global.importInProgress = true;
       }
 
       this.clear();
