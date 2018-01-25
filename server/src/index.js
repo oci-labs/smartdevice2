@@ -19,6 +19,8 @@ import {typeService} from './type-service';
 
 const app = express();
 
+app.use('/', express.static('public'));
+
 // Parse JSON request bodGies to JavaScript objects.
 app.use(bodyParser.json());
 

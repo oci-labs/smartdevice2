@@ -4,6 +4,7 @@ coverage
 flow-typed
 node_modules
 reports
+server/public
 dev-certs
 tmp
 
