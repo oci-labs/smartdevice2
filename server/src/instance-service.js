@@ -9,9 +9,13 @@ import {errorHandler} from './util/error-util';
 import type {AlertType, AlertTypeType, PrimitiveType} from './types';
 
 export const PATH_DELIMITER = '.';
-const pathToIdMap = {};
+let pathToIdMap = {};
 
 let mySql;
+
+export function clearPathToIdMap() {
+  pathToIdMap = {};
+}
 
 async function createAlerts(
   instanceId: number,

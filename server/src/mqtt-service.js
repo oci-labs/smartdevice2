@@ -182,6 +182,8 @@ async function saveProperty(
   property: string,
   value: PrimitiveType
 ): Promise<void> {
+  if (global.importInProgress) return;
+
   const instanceId = await getInstanceId(path);
   if (instanceId === 0) {
     console.error('no instance found for', path);
@@ -278,7 +280,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
     if (value !== undefined) {
       console.log(topic, '=', value);
       const path = parts.join(PATH_DELIMITER);
-      saveProperty(path, property, value);
+      await saveProperty(path, property, value);
     } else {
       console.error('unsupported topic', topic);
     }

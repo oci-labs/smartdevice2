@@ -7,6 +7,7 @@ import jsonValidator from 'json-dup-key-validator';
 import {getDbConnection} from './database';
 import {deleteAll, getAll, post} from './crud-service';
 import {getEnums} from './enum-service';
+import {clearPathToIdMap} from './instance-service';
 import {BUILTIN_TYPES, type EnumType} from './types';
 import {sleep} from './util/async-util';
 import {errorHandler} from './util/error-util';
@@ -45,6 +46,7 @@ async function importHandler(
   req: express$Request,
   res: express$Response
 ): Promise<void> {
+  clearPathToIdMap();
   global.importInProgress = true;
 
   // Wait for current messages to complete processing.
