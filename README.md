@@ -57,14 +57,18 @@ sudo apt-get install mosquitto
 * `java -jar TheJoveExpress.jar`
 
 ## Building on Raspberry Pi
-* cd Train/Device
+* ssh pi@trainstation.local
+* cd Mark/smartdevice2
+
 * cd client
 * npm install
 * npm run deploy
+
 * cd ../server
-* npm run dbsetup-pi
 * npm install
+* npm run dbsetup-pi
 * npm run build
 * npm start
 * from another machine on the same WiFi,
   browse http://trainstation.local:3001
+  (may need to use IP address of the Pi)
