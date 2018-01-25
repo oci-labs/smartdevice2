@@ -8,6 +8,7 @@
     "cover": "CI=true npm test -- --coverage",
     "cover-open": "open coverage/lcov-report/index.html",
     "dbi": "mysql --user root",
+    "dbi-pi": "sudo mysql",
     "dbsetup": "mysql --user root < ./ddl.sql",
     "dbsetup-pi": "sudo mysql < ./ddl.sql",
     "dbstart": "mysql.server start",
