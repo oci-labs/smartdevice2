@@ -232,11 +232,13 @@ async function handleMessage(client, topic: string, message: Buffer) {
     switch (type) {
       case 'boolean':
         value = message.readInt8(0);
+        // If we get a lifecycle message with a value of true ...
         if (
           property === 'lifecycle' &&
           lastPart === 'feedback' &&
           value === 1
         ) {
+          // Request messages to get the current state of everything.
           requestFeedback(client, parts);
         }
         break;
