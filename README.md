@@ -22,6 +22,8 @@ sudo apt-get install git && git clone https://github.com/audstanley/NodeJs-Raspb
   this can be done by running `brew install mysql`.
   On a RaspberryPi,
   sudo apt-get install mysql-server
+  sudo apt-get install mysql-client
+  This installs the server and client.
 
 ## MQTT Setup
 
@@ -60,6 +62,7 @@ sudo apt-get install mosquitto
 * npm install
 * npm run deploy
 * cd ../server
+* npm run dbsetup-pi
 * npm install
 * npm run build
 * npm start

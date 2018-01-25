@@ -6,7 +6,7 @@
     "build": "npm run build-css && react-scripts build",
     "build-css": "node-sass src/ -o src/",
     "ci-test": "npm-run-all build-css cover",
-    "copy-to-server": "cp -r build ../server/public",
+    "copy-to-server": "rm -rf ../server/public; cp -r build ../server/public",
     "cover": "CI=true npm test -- --coverage",
     "cover-open": "open coverage/lcov-report/index.html",
     "deploy": "npm-run-all build copy-to-server",
