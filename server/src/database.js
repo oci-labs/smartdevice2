@@ -6,7 +6,8 @@ const dbConfig = {
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'smartdevice'
+  database: 'smartdevice',
+  insecureAuth: true
 };
 
 export const getDbConnection = () => new MySqlConnection(dbConfig);
