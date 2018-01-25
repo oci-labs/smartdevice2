@@ -1,7 +1,15 @@
 {
   "messageServers": [
-    {"id": 1, "host": "localhost", "port": 1883},
-    {"id": 2, "host": "thejoveexpress.local", "port": 1883}
+    {
+      "id": 1,
+      "host": "localhost",
+      "port": 1883
+    },
+    {
+      "id": 2,
+      "host": "thejoveexpress.local",
+      "port": 1883
+    }
   ],
   "enums": {
     "Direction": {
@@ -41,19 +49,19 @@
       }
     },
     "train": {
-      "messageServerId": 1,
-      "properties": {
-        "fault": "boolean",
-        "lifecycle": "boolean"
-      },
       "alerts": [
         {
           "name": "faulted",
           "condition": "fault",
-          "sticky": true
+          "sticky": 1
         }
       ],
       "children": {
+        "billboard": {
+          "properties": {
+            "text": "text"
+          }
+        },
         "engine": {
           "properties": {
             "calibration": "percent",
@@ -62,25 +70,30 @@
           }
         },
         "lights": {
+          "alerts": [
+            {
+              "name": "too bright",
+              "condition": "ambient > 70",
+              "sticky": 0
+            },
+            {
+              "name": "too dim",
+              "condition": "ambient < 30",
+              "sticky": 0
+            }
+          ],
           "properties": {
             "ambient": "percent",
             "calibration": "percent",
             "override": "LightOverride",
             "power": "boolean"
-          },
-          "alerts": [
-            {
-              "name": "too bright",
-              "condition": "ambient > 70",
-              "sticky": false
-            },
-            {
-              "name": "too dim",
-              "condition": "ambient < 30",
-              "sticky": false
-            }
-          ]
+          }
         }
+      },
+      "messageServerId": 1,
+      "properties": {
+        "fault": "boolean",
+        "lifecycle": "boolean"
       }
     }
   },
@@ -88,6 +101,9 @@
     "thejoveexpress": {
       "type": "train",
       "children": {
+        "billboard": {
+          "type": "billboard"
+        },
         "engine": {
           "type": "engine"
         },
