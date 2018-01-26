@@ -51,12 +51,15 @@ class App extends Component<PropsType> {
         <header>
           <img className="logo" alt="OCI logo" src="images/oci-logo.svg" />
           <div className="title">Devo</div>
-          <Button
-            className="import-export-btn"
-            icon="cog"
-            onClick={() => this.importExport()}
-            tooltip="import/export"
-          />
+          <div className="right">
+            {/* <span className="fa fa-2x fa-heartbeat" /> */}
+            <Button
+              className="import-export-btn fa-2x"
+              icon="cog"
+              onClick={() => this.importExport()}
+              tooltip="import/export"
+            />
+          </div>
         </header>
         <section id="body">
           <LeftNav />
