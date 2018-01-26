@@ -1,3 +1,5 @@
+@import '../share.scss';
+
 .sd-modal {
   $spacing: 20px;
 
@@ -51,7 +53,7 @@
   }
 
   header {
-    background-color: lightyellow;
+    background-color: $oci-orange;
     border-bottom: solid lightgray 1px;
     padding: $spacing;
   }
