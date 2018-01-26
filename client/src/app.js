@@ -50,7 +50,7 @@ class App extends Component<PropsType> {
       <div className="app">
         <header className="app-header">
           <h1 className="app-title">
-            Open Edge Device Management
+            Devo
             <Button
               className="import-export-btn"
               icon="cog"
