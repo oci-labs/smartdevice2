@@ -57,6 +57,11 @@
         }
       ],
       "children": {
+        "billboard": {
+          "properties": {
+            "text": "text"
+          }
+        },
         "engine": {
           "properties": {
             "calibration": "percent",
@@ -85,7 +90,7 @@
           }
         }
       },
-      "messageServerId": 1,
+      "messageServerId": 2,
       "properties": {
         "fault": "boolean",
         "lifecycle": "boolean"
@@ -96,6 +101,9 @@
     "thejoveexpress": {
       "type": "train",
       "children": {
+        "billboard": {
+          "type": "billboard"
+        },
         "engine": {
           "type": "engine"
         },
