@@ -63,17 +63,15 @@ class ImportExport extends Component<PropsType, MyStateType> {
     return (
       <section className="import-export">
         <div>
-          <label>JSON File</label>
+          <a href={getUrlPrefix() + 'export'}>
+            <Button onClick={this.clear}>Export</Button>
+          </a>
+        </div>
+        <div>
           <input type="file" onChange={this.loadFile} />
           <Button onClick={this.import} disabled={disabled}>
             Import
           </Button>
-        </div>
-        <div>
-          <a href={getUrlPrefix() + 'export'}>
-            <Button onClick={this.clear}>Export</Button>
-          </a>
-          <Button onClick={this.clear}>Cancel</Button>
         </div>
       </section>
     );
