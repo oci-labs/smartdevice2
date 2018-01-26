@@ -68,7 +68,7 @@ class Alert extends Component<PropsType> {
       >
         <div className="line1">
           {typeName} {instance.name} ({instanceId})
-          <div className="delete" onClick={this.deleteAlert}>
+          <div className="close" onClick={this.deleteAlert}>
             &#10005;
           </div>
         </div>
