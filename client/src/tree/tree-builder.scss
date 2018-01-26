@@ -11,11 +11,14 @@
     margin-left: 0 !important; //TODO: Why need !important?
   }
 
-  .fa-expand, .fa-pencil {
-    color: white !important;
-  }
-
   label {
     color: white;
+  }
+
+  > .tree-node {
+    .delete {
+      color: red;
+    }
+
   }
 }

@@ -3,7 +3,7 @@
 import sortBy from 'lodash/sortBy';
 import upperFirst from 'lodash/upperFirst';
 import React from 'react';
-import {dispatch, dispatchSet, getState} from 'redux-easy';
+import {dispatch, dispatchSet, getPathValue, getState} from 'redux-easy';
 
 import {postJson} from '../util/rest-util';
 import Button from '../share/button';
@@ -109,15 +109,23 @@ async function reallyAddNode(
 ): Promise<void> {
   const parentId = parent.id;
 
+  const newTopType = kind === 'type' && parent.name === 'root';
+
   try {
     // Add new node to database.
     const node: Object = {name, parentId};
+    let lastUsed;
+    if (newTopType) {
+      lastUsed = getPathValue('ui.lastUsedMessageServerId');
+      if (lastUsed) node.messageServerId = lastUsed;
+    }
     if (kind === 'instance') node.typeId = typeId;
     const res = await postJson(kind, node);
     const id = Number(await res.text());
 
     // Add new node to Redux state.
     const payload: AddNodePayloadType = {id, kind, name, parentId, typeId};
+    if (newTopType && lastUsed) payload.messageServerId = lastUsed;
     dispatch('addNode', payload);
 
     // Clear the node name input.

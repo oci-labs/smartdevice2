@@ -3,7 +3,7 @@
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatch, dispatchSet} from 'redux-easy';
 
 import {getJson, putJson} from '../util/rest-util';
 
@@ -58,6 +58,7 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
     const newTypeNode: NodeType = {...typeNode, messageServerId};
     const payload: NodePayloadType = {kind: 'type', node: newTypeNode};
     dispatch('saveNode', payload);
+    dispatchSet('ui.lastUsedMessageServerId', messageServerId);
   };
 
   async loadMessageServers() {
@@ -67,6 +68,9 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
     const servers = ((json: any): MessageServerType[]);
     const sortedServers = sortBy(servers, ['host']);
     this.setState({messageServers: sortedServers});
+
+    const [firstServer] = servers;
+    dispatchSet('ui.lastUsedMessageServerId', firstServer ? firstServer.id : 0);
   }
 
   render() {

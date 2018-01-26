@@ -8,6 +8,7 @@ export type ActionType = {
 export type AddNodePayloadType = {
   id: number,
   kind: TreeType,
+  messageServerId?: number,
   name: string,
   parentId: number,
   typeId?: number
@@ -178,6 +179,7 @@ export type UiType = {
   editingNode: ?NodeType, // within type or instance tree
   instanceName: string,
   jsonPath: string,
+  lastUsedMessageServerId: number,
   modal: ModalType,
   newAlertExpression: string,
   newAlertName: string,

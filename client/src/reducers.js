@@ -86,7 +86,7 @@ addReducer(
 addReducer(
   'addNode',
   (state: StateType, payload: AddNodePayloadType): StateType => {
-    const {id, kind, name, parentId, typeId} = payload;
+    const {id, kind, messageServerId, name, parentId, typeId} = payload;
     const nodeMap = state[kind + 'NodeMap'];
 
     if (!validNewName(nodeMap, parentId, name)) return state;
@@ -96,8 +96,10 @@ addReducer(
 
     // Create the new node.
     const newNode: NodeType = {
+      ...payload,
       id,
       children: [],
+      messageServerId,
       name,
       parentId,
       typeId
