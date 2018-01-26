@@ -51,7 +51,7 @@ class TreeBuilder extends Component<PropsType> {
   componentWillReceiveProps(nextProps: PropsType) {
     const currentKind = this.props.kind;
     const newKind = nextProps.kind;
-    if (newKind !== currentKind) this.load(newKind);
+    if (global.reloading || newKind !== currentKind) this.load(newKind);
   }
 
   // Loads nodes from database.
@@ -67,6 +67,8 @@ class TreeBuilder extends Component<PropsType> {
     const nodes = ((json: any): NodeType[]);
     const payload: SetNodesPayloadType = {kind, nodes};
     dispatch('setNodes', payload);
+
+    global.reloading = false;
   };
 
   toggleExpandAll = () => {

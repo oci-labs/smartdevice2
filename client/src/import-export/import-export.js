@@ -31,16 +31,18 @@ class ImportExport extends Component<PropsType, MyStateType> {
 
     const reader = new FileReader();
 
-    reader.onload = event => {
+    reader.onload = async event => {
       const json = event.target.result;
 
       try {
-        postJson('import', JSON.parse(json));
+        await postJson('import', JSON.parse(json));
 
         // Clear enough state from Redux
         // to force it to be reloaded
         // using the new data in the database.
         dispatch('clear');
+
+        global.reloading = true;
       } catch (e) {
         showModal({
           error: true,

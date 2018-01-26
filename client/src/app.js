@@ -2,7 +2,6 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
 
 import ImportExport from './import-export/import-export';
 import InstanceDetail from './instance-detail/instance-detail';
@@ -34,11 +33,6 @@ const rightMap = {
 };
 
 class App extends Component<PropsType> {
-  componentWillMount() {
-    // Start on "Servers" tab in left nav on refresh.
-    dispatchSet('ui.treeType', '');
-  }
-
   importExport = () => {
     const renderFn = () => <ImportExport />;
     showModal({title: 'Import/Export JSON Schema', renderFn});

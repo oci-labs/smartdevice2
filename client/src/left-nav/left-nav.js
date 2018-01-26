@@ -53,12 +53,11 @@ class LeftNav extends Component<PropsType> {
   };
 
   render() {
-    //const {treeType} = this.props.ui;
-    //const isType = treeType === 'type';
-    //const tabIndex = isType ? 1 : 2;
+    const {treeType} = this.props.ui;
+    const tabIndex = treeType === 'type' ? 1 : treeType === 'instance' ? 2 : 0;
     return (
       <section className="left-nav">
-        <Tabs onSelect={this.handleTabSelect}>
+        <Tabs onSelect={this.handleTabSelect} selectedIndex={tabIndex}>
           <TabList>
             <Tab>Servers</Tab>
             <Tab>Type</Tab>
