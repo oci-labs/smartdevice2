@@ -69,6 +69,8 @@ class TreeBuilder extends Component<PropsType> {
     dispatch('setNodes', payload);
 
     global.reloading = false;
+
+    this.toggleExpandAll();
   };
 
   toggleExpandAll = () => {
