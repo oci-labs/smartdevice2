@@ -42,23 +42,23 @@ export function connect(server: MessageServerType, typeId: number = 0) {
     clientMap[id] = client;
 
     client.on('connect', () => {
-      console.info('connected to MQTT server at', url);
+      console.info(`MQTT server ${url} connected.`);
       subscribe(id, typeId);
     });
 
     client.on('message', handleMessage.bind(null, client));
 
     client.on('close', () => {
-      console.info('MQTT server connection was closed.');
+      console.info(`MQTT server ${url} connection closed.`);
     });
     client.on('error', err => {
-      console.error('MQTT server error:', err);
+      console.error(`MQTT server ${url} error:`, err);
     });
     client.on('offline', () => {
-      console.info('MQTT server is offline.');
+      console.info(`MQTT server ${url} is offline.`);
     });
     client.on('reconnect', () => {
-      console.info('MQTT server reconnect started.');
+      console.info(`MQTT server ${url} reconnect started.`);
     });
   }
 }
