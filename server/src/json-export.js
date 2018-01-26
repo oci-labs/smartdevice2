@@ -70,7 +70,7 @@ async function getType(type: Object) {
   const alerts = _alerts.map(a => ({
     name: a.name,
     condition: a.expression,
-    sticky: a.sticky
+    sticky: a.sticky ? true : false
   }));
 
   const {messageServerId} = type;

@@ -53,15 +53,10 @@
         {
           "name": "faulted",
           "condition": "fault",
-          "sticky": 1
+          "sticky": true
         }
       ],
       "children": {
-        "billboard": {
-          "properties": {
-            "text": "text"
-          }
-        },
         "engine": {
           "properties": {
             "calibration": "percent",
@@ -74,12 +69,12 @@
             {
               "name": "too bright",
               "condition": "ambient > 70",
-              "sticky": 0
+              "sticky": false
             },
             {
               "name": "too dim",
               "condition": "ambient < 30",
-              "sticky": 0
+              "sticky": false
             }
           ],
           "properties": {
@@ -101,9 +96,6 @@
     "thejoveexpress": {
       "type": "train",
       "children": {
-        "billboard": {
-          "type": "billboard"
-        },
         "engine": {
           "type": "engine"
         },

@@ -71,7 +71,7 @@ class ImportExport extends Component<PropsType, MyStateType> {
         </div>
         <div>
           <a href={getUrlPrefix() + 'export'}>
-            <Button>Export</Button>
+            <Button onClick={this.clear}>Export</Button>
           </a>
           <Button onClick={this.clear}>Cancel</Button>
         </div>
