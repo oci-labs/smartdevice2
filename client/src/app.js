@@ -48,16 +48,15 @@ class App extends Component<PropsType> {
     const {treeType} = this.props;
     return (
       <div className="app">
-        <header className="app-header">
-          <h1 className="app-title">
-            Devo
-            <Button
-              className="import-export-btn"
-              icon="cog"
-              onClick={() => this.importExport()}
-              tooltip="import/export"
-            />
-          </h1>
+        <header>
+          <img className="logo" src="images/oci-logo.svg" />
+          <div className="title">Devo</div>
+          <Button
+            className="import-export-btn"
+            icon="cog"
+            onClick={() => this.importExport()}
+            tooltip="import/export"
+          />
         </header>
         <section id="body">
           <LeftNav />
