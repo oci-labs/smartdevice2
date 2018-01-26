@@ -44,7 +44,7 @@ input[type=checkbox] {
   }
 
   #body {
-    background-color: $bg-color2;
+    background-color: $oci-light-blue;
     display: flex;
     flex-grow: 1;
 
@@ -73,7 +73,7 @@ input[type=checkbox] {
 
   // Right side
   .instance-detail, .type-alerts {
-    background-color: $bg-color3;
+    background-color: $oci-orange;
     text-align: left;
   }
 
@@ -93,7 +93,7 @@ input[type=checkbox] {
   }
 
   .left-nav {
-    background-color: $bg-color1;
+    background-color: $oci-blue;
     width: 300px;
   }
 

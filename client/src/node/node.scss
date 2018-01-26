@@ -13,7 +13,7 @@ $size: $radius * 2 - $borderSize * 2;
   .circle {
     align-items: center;
     background-color: white;
-    border: solid $bg-color3 $borderSize;
+    border: solid $oci-orange $borderSize;
     border-radius: $radius;
     display: flex;
     height: $size;
@@ -39,7 +39,7 @@ $size: $radius * 2 - $borderSize * 2;
 
   &.selected {
     .circle {
-      border-color: green;
+      border-color: lightgreen;
     }
   }
 }

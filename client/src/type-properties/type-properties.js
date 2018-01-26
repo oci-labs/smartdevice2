@@ -185,7 +185,7 @@ class TypeProperties extends Component<PropsType> {
     if (!typeNode) {
       return (
         <section className="type-properties">
-          Select a type in the left nav.
+          <h3>Select a type in the left nav.</h3>
         </section>
       );
     }

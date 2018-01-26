@@ -54,7 +54,7 @@ class ParentInstances extends Component<PropsType> {
     if (!instanceNode) {
       return (
         <section className="instance-hierarchy">
-          Select an instance in the left nav.
+          <h3>Select an instance in the left nav.</h3>
         </section>
       );
     }

@@ -3,7 +3,7 @@
 .tree-node {
   &.selected {
     & > .tree-node-name {
-      background-color: $selected-bg-color;
+      border-bottom: solid $selected-color 2px;
     }
   }
 
@@ -13,6 +13,7 @@
   }
 
   .expand {
+    color: white;
     display: inline-block;
     width: 15px;
   }
@@ -22,7 +23,7 @@
   }
 
   .subscribed {
-    color: green;
+    color: lightgreen;
   }
 
   .tree-node {
@@ -30,6 +31,7 @@
   }
 
   .tree-node-name {
+    color: white;
     display: inline-block;
   }
 }

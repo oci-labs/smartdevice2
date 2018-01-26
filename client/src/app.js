@@ -49,7 +49,7 @@ class App extends Component<PropsType> {
     return (
       <div className="app">
         <header>
-          <img className="logo" src="images/oci-logo.svg" />
+          <img className="logo" alt="OCI logo" src="images/oci-logo.svg" />
           <div className="title">Devo</div>
           <Button
             className="import-export-btn"

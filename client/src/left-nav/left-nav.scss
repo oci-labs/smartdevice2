@@ -1,6 +1,18 @@
 .left-nav {
+  h3 {
+    color: white;
+  }
+
   .react-tabs {
     text-align: left;
+
+    .react-tabs__tab {
+      color: white;
+    }
+
+    .react-tabs__tab--selected {
+      color: black;
+    }
   }
 
   .tree-builder {
