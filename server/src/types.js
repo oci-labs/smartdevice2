@@ -4,13 +4,15 @@ export type AlertType = {
   id: number,
   instanceId: number,
   name: string,
-  timestamp: number
+  timestamp: number,
+  typeId: number
 };
 
 export type AlertTypeType = {
   name: string,
   expression: string,
   id: number,
+  sticky: boolean,
   typeId: number
 };
 

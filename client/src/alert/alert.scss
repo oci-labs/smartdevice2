@@ -1,6 +1,7 @@
 .alert {
   $red: #BA2316;
   background-color: $red;
+  border: solid $red 2px;
   border-radius: 5px;
   color: white;
   font-size: 10px;
@@ -12,4 +13,9 @@
     cursor: pointer;
     float: right;
   }
+
+  &.sticky {
+    border-color: black;
+  }
 }
+

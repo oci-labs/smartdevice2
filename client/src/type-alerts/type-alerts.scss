@@ -1,6 +1,10 @@
 @import '../share.scss';
 
 .type-alerts {
+  .button.fa-plus {
+    color: $add-color;
+  }
+
   .message-server {
     margin-bottom: 20px;
   }

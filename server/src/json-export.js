@@ -23,7 +23,7 @@ async function exportHandler(
   try {
     const json = await exportToJson();
     res.set('Content-Type', 'application/json');
-    res.set('Content-Disposition', 'attachment; filename="oe-dev-mgmt.json"');
+    res.set('Content-Disposition', 'attachment; filename="devo.json"');
     res.send(json);
   } catch (e) {
     // istanbul ignore next
@@ -70,7 +70,7 @@ async function getType(type: Object) {
   const alerts = _alerts.map(a => ({
     name: a.name,
     condition: a.expression,
-    sticky: a.sticky ? true : false
+    sticky: Boolean(a.sticky)
   }));
 
   const {messageServerId} = type;

@@ -27,8 +27,8 @@ async function createAlerts(
     const data = {
       alertTypeId: alertType.id,
       description: '',
-      dynamic: true,
       instanceId,
+      sticky: alertType.sticky,
       timestamp
     };
     return mySql.insert('alert', data);
@@ -36,12 +36,12 @@ async function createAlerts(
   await Promise.all(promises);
 }
 
-function deleteDynamicAlerts(instanceId: number): Promise<void> {
+function deleteNonStickyAlerts(instanceId: number): Promise<void> {
   const sql =
     'delete a.* from alert as a ' +
     'left join alert_type as t ' +
     'on a.alertTypeId = t.id ' +
-    'where a.instanceId=? and a.dynamic=true and t.sticky=false';
+    'where a.instanceId=? and a.sticky=false and t.sticky=false';
   return mySql.query(sql, instanceId);
 }
 
@@ -68,9 +68,10 @@ async function getAlertTypeIds(instanceId: number): Promise<number[]> {
   return rows.map(row => row.alertTypeId);
 }
 
-function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
+async function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
   const sql = 'select * from alert_type where typeId=?';
-  return mySql.query(sql, typeId);
+  const rows = await mySql.query(sql, typeId);
+  return ((rows: any): AlertTypeType[]);
 }
 
 async function getData(instanceId: number): Promise<Object> {
@@ -153,7 +154,6 @@ export async function getInstanceId(path: string): Promise<number> {
   let subpath = parts.shift();
   id = await getParentId(subpath);
   if (id === 0) return 0; // not found
-
 
   for (const part of parts) {
     const parentId = id;
@@ -295,10 +295,10 @@ async function updateAlerts(
   const oldAlertTypeIds = await getAlertTypeIds(instanceId);
 
   // Get all the alert types defined for the type of this instance.
-  const typeId = await getInstanceTypeId(instanceId);
-  const alertTypes = await getAlertTypes(typeId);
+  const typeId: number = await getInstanceTypeId(instanceId);
+  const alertTypes: AlertTypeType[] = await getAlertTypes(typeId);
 
-  // Determine which alerts are triggered by the new data.
+  // Determine which alert types are triggered by the new data.
   const triggered = alertTypes.filter(alertType =>
     isTriggered(alertType.expression, data)
   );
@@ -307,13 +307,47 @@ async function updateAlerts(
 
   const haveNew = !isEqual(newAlertTypeIds, oldAlertTypeIds);
   if (haveNew) {
-    await deleteDynamicAlerts(instanceId);
+    await deleteNonStickyAlerts(instanceId);
+
+    await updateDuplicateStickyAlerts(instanceId, triggered);
 
     // Create all the new alerts that were triggered.
     await createAlerts(instanceId, triggered);
   }
 
   return haveNew;
+}
+
+async function updateDuplicateStickyAlerts(
+  instanceId: number,
+  triggeredAlertTypes: AlertTypeType[]
+): Promise<void> {
+  // Get the triggered alert types that are sticky.
+  const stickyAlertTypes = triggeredAlertTypes.filter(alert => alert.sticky);
+
+  // Get all the current sticky alerts.
+  const sql =
+    'select id, alertTypeId from alert where instanceId = ? and sticky = true';
+  const existingStickyAlerts = await mySql.query(sql, instanceId);
+
+  for (const stickyAlertType of stickyAlertTypes) {
+    const existingAlert = existingStickyAlerts.find(
+      alert => alert.alertTypeId === stickyAlertType.id
+    );
+
+    if (existingAlert) {
+      // Update the timestamp for this alert in the database.
+      const changes = {timestamp: Date.now()};
+      // eslint-disable-next-line no-await-in-loop
+      await mySql.updateById('alert', existingAlert.id, changes);
+
+      // Remove this alert type from the triggeredAlertTypes.
+      const index = triggeredAlertTypes.findIndex(
+        alert => alert === stickyAlertType
+      );
+      delete triggeredAlertTypes[index];
+    }
+  }
 }
 
 /**

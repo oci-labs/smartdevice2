@@ -97,8 +97,8 @@ create table alert (
   id int auto_increment primary key,
   alertTypeId int not null,
   description text not null,
-  dynamic boolean not null,
   instanceId int,
+  sticky boolean not null,
   timestamp bigint,
   foreign key (alertTypeId)
     references alert_type (id)

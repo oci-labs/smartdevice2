@@ -60,9 +60,12 @@ class Alert extends Component<PropsType> {
       if (typeNode) typeName = typeNode.name;
     }
 
+    const classes = ['alert'];
+    if (alert.sticky) classes.push('sticky');
+
     return (
       <div
-        className="alert"
+        className={classes.join(' ')}
         key={alert.id}
         onDoubleClick={this.handleDoubleClick}
       >

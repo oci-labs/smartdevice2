@@ -14,8 +14,8 @@
   "enums": {
     "Direction": {
       "reverse": -1,
-      "idle": 0,
-      "forward": 1
+      "forward": 1,
+      "idle": 0
     },
     "LightOverride": {
       "off": 0,
@@ -72,6 +72,11 @@
         "lights": {
           "alerts": [
             {
+              "name": "lights off",
+              "condition": "!power",
+              "sticky": true
+            },
+            {
               "name": "too bright",
               "condition": "ambient > 70",
               "sticky": false
@@ -90,7 +95,7 @@
           }
         }
       },
-      "messageServerId": 2,
+      "messageServerId": 1,
       "properties": {
         "fault": "boolean",
         "lifecycle": "boolean"
