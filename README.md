@@ -60,6 +60,8 @@ sudo apt-get install mosquitto
 * ssh pi@trainstation.local
 * cd Mark/smartdevice2
 
+* git pull (to get latest version of code)
+
 * cd client
 * npm install
 * npm run deploy
@@ -71,4 +73,20 @@ sudo apt-get install mosquitto
 * npm start
 * from another machine on the same WiFi,
   browse http://trainstation.local:3001
-  (may need to use IP address of the Pi)
+  (may need to use IP address of the Pi
+   which can be obtained by running ifconfig
+   and noting the wlan0...inet value)
+
+* to interactively examime the database on Pi
+  - enter "npm run dbi-pi"
+  - enter "use smartdevice"
+  - enter any SQL queries
+
+* fix for "Error: ER_NOT_SUPPORTED_AUTH_MODE: Client does not
+  support authentication protocol requested by server"
+  - enter "npm run dbi-pi"
+  - enter "use mysql"
+  - enter "update user set authentication_string=password(''), plugin='mysql_native_password' where user='root';"
+  - enter "flush privileges"
+  - enter "exit"
+  - start server again
