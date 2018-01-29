@@ -17,6 +17,16 @@ export function clearPathToIdMap() {
   pathToIdMap = {};
 }
 
+function convertValue(kind: string, value: string): PrimitiveType {
+  switch (kind) {
+    case 'boolean': return Boolean(Number(value));
+    case 'number': return Number(value);
+    case 'percent': return Number(value);
+    case 'text': return value;
+    default: return Number(value); // assume enum
+  }
+}
+
 async function createAlerts(
   instanceId: number,
   alertTypes: AlertTypeType[]
@@ -75,10 +85,17 @@ async function getAlertTypes(typeId: number): Promise<AlertTypeType[]> {
 }
 
 async function getData(instanceId: number): Promise<Object> {
-  const sql = 'select dataKey, dataValue from instance_data where instanceId=?';
+  const sql =
+    'select id.dataKey, id.dataValue, td.kind, td.enumId ' +
+    'from instance i, instance_data id, type_data td ' +
+    'where i.id = ? ' +
+    'and id.instanceId = i.id ' +
+    'and i.typeId = td.typeId ' +
+    'and id.dataKey = td.name';
   const rows = await mySql.query(sql, instanceId);
   return rows.reduce((data, row) => {
-    data[row.dataKey] = row.dataValue;
+    const {dataKey, dataValue, kind} = row;
+    data[dataKey] = convertValue(kind, dataValue);
     return data;
   }, {});
 }
@@ -281,7 +298,7 @@ async function saveProperty(
   // $FlowFixMe - allow adding id
   if (row) obj.id = row.id;
 
-  mySql.upsert('instance_data', obj);
+  await mySql.upsert('instance_data', obj);
 }
 
 /**

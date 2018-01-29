@@ -6,7 +6,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
-import MessageServerSelect from '../message-server-select/message-server-select';
+import MessageServerSelect
+  from '../message-server-select/message-server-select';
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
 import {isSafeCode, spaceHandler} from '../util/input-util';
@@ -134,6 +135,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
       .split(' ')
       .filter(word => PROPERTY_NAME_RE.test(word));
     const propNames = typeProps.map(typeProp => typeProp.name);
+    propNames.push('true', 'false');
     return expressionNames.filter(n => !propNames.includes(n));
   };
 

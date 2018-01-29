@@ -233,7 +233,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
     let value;
     switch (type) {
       case 'boolean':
-        value = message.readInt8(0);
+        value = Boolean(message.readInt8(0));
         // If we get a lifecycle message with a value of true ...
         if (
           property === 'lifecycle' &&
