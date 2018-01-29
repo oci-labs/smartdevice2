@@ -2,11 +2,14 @@
 
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
+import uniq from 'lodash/uniq';
 
 import {getDbConnection} from './database';
+import {getEnumsForType} from './enum-service';
 import {errorHandler} from './util/error-util';
+import {values} from './util/flow-util';
 
-import type {AlertType, AlertTypeType, PrimitiveType} from './types';
+import type {AlertType, AlertTypeType, EnumType, PrimitiveType} from './types';
 
 export const PATH_DELIMITER = '.';
 let pathToIdMap = {};
@@ -19,11 +22,15 @@ export function clearPathToIdMap() {
 
 function convertValue(kind: string, value: string): PrimitiveType {
   switch (kind) {
-    case 'boolean': return Boolean(Number(value));
-    case 'number': return Number(value);
-    case 'percent': return Number(value);
-    case 'text': return value;
-    default: return Number(value); // assume enum
+    case 'boolean':
+      return Boolean(Number(value));
+    case 'number':
+    case 'percent':
+      return Number(value);
+    case 'text':
+      return value;
+    default:
+      return Number(value); // assume enum
   }
 }
 
@@ -197,6 +204,14 @@ export async function getTopInstances() {
   return instances;
 }
 
+function getUniqueNames(expression: string): string[] {
+  const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
+  const names = expression
+    .split(' ')
+    .filter(word => PROPERTY_NAME_RE.test(word));
+  return uniq(names);
+}
+
 export function instanceService(app: express$Application): void {
   mySql = getDbConnection();
 
@@ -222,11 +237,45 @@ async function inUseHandler(
   }
 }
 
-function isTriggered(expression: string, instanceData: Object): boolean {
-  const assignments = Object.entries(instanceData).map(
-    ([key, value]) => `const ${key} = ${String(value)};`
-  );
-  const code = assignments.join(' ') + ' ' + expression;
+function isTriggered(
+  expression: string,
+  instanceData: Object,
+  enumsUsed: EnumType[]
+): boolean {
+  const assigns = {};
+
+  // Get assignments for all enum members used by this expression.
+  for (const anEnum of enumsUsed) {
+    const members = values(anEnum.memberMap);
+    for (const {name, value} of members) {
+      assigns[name] = value;
+    }
+  }
+
+  // Get assignments for all the instance data.
+  for (const [name, value] of Object.entries(instanceData)) {
+    assigns[name] = value;
+  }
+
+  // Get all the variables in the expression
+  // for which we know the value.
+  const variables = getUniqueNames(expression)
+    .filter(name => assigns[name] !== undefined)
+    .sort();
+
+  // Create assignment statements for those variables.
+  const assignments =
+    variables.length === 0
+      ? ''
+      : 'const ' +
+        variables.map(name => `${name} = ${String(assigns[name])}`).join(', ') +
+        '; ';
+
+  // Build a string of JavaScript code to execute
+  // to detemine if the alert with this expression
+  // is triggered.
+  const code = assignments + expression;
+
   try {
     // eslint-disable-next-line no-eval
     const triggered = eval(code);
@@ -314,10 +363,11 @@ async function updateAlerts(
   // Get all the alert types defined for the type of this instance.
   const typeId: number = await getInstanceTypeId(instanceId);
   const alertTypes: AlertTypeType[] = await getAlertTypes(typeId);
+  const enumsUsed = await getEnumsForType(typeId);
 
   // Determine which alert types are triggered by the new data.
   const triggered = alertTypes.filter(alertType =>
-    isTriggered(alertType.expression, data)
+    isTriggered(alertType.expression, data, enumsUsed)
   );
 
   const newAlertTypeIds = triggered.map(t => t.id);

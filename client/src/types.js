@@ -130,6 +130,7 @@ export type PropertyKindType =
   'boolean' | 'number' | 'percent' | 'text';
 
 export type PropertyType = {
+  enumId: number,
   id: number,
   name: string,
   kind: PropertyKindType

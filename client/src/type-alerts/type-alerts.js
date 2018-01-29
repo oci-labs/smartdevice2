@@ -10,11 +10,13 @@ import MessageServerSelect
   from '../message-server-select/message-server-select';
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
+import {values} from '../util/flow-util';
 import {isSafeCode, spaceHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {
   AlertTypeType,
+  EnumMapType,
   NodeType,
   PropertyType,
   StateType,
@@ -24,6 +26,7 @@ import type {
 import './type-alerts.css';
 
 type PropsType = {
+  enumMap: EnumMapType,
   typeNode: NodeType,
   typeProps: PropertyType[],
   ui: UiType
@@ -130,13 +133,30 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   };
 
   getBadNames = () => {
-    const {typeProps, ui: {newAlertExpression}} = this.props;
+    const {enumMap, typeProps, ui: {newAlertExpression}} = this.props;
+
+    // Allow boolean constants.
+    const validNames = new Set(['true', 'false']);
+
+    typeProps.forEach(typeProp => {
+      // Allow property names.
+      validNames.add(typeProp.name);
+
+      // Allow enum member names.
+      const {enumId} = typeProp;
+      if (enumId) {
+        const anEnum = enumMap[enumId];
+        const enumMemberNames =
+          values(anEnum.memberMap).map(value => value.name);
+        enumMemberNames.forEach(name => validNames.add(name));
+      }
+    });
+
     const expressionNames = newAlertExpression
       .split(' ')
       .filter(word => PROPERTY_NAME_RE.test(word));
-    const propNames = typeProps.map(typeProp => typeProp.name);
-    propNames.push('true', 'false');
-    return expressionNames.filter(n => !propNames.includes(n));
+
+    return expressionNames.filter(n => !validNames.has(n));
   };
 
   isValidName = () => {
@@ -255,10 +275,10 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {typeNodeMap, ui} = state;
+  const {enumMap, typeNodeMap, ui} = state;
   const {selectedTypeNodeId, typeProps} = ui;
   const typeNode = typeNodeMap[selectedTypeNodeId];
-  return {typeNode, typeProps, ui};
+  return {enumMap, typeNode, typeProps, ui};
 };
 
 export default connect(mapState)(TypeAlerts);

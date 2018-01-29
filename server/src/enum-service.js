@@ -5,7 +5,7 @@ import sortBy from 'lodash/sortBy';
 import {getDbConnection} from './database';
 import {errorHandler} from './util/error-util';
 
-import type {EnumType} from './types';
+import type {EnumMemberMapType, EnumType} from './types';
 
 let mySql;
 
@@ -20,23 +20,43 @@ export function enumService(app: express$Application): void {
   app.get(URL_PREFIX + '/:enumId', getEnumValuesHandler);
 }
 
+async function getEnumMemberMap(enumId: number): Promise<EnumMemberMapType> {
+  const sql = 'select * from enum_member where enumId = ?';
+  const members = await mySql.query(sql, enumId);
+  return members.reduce((map, enumMember) => {
+    map[enumMember.id] = enumMember;
+    return map;
+  }, {});
+}
+
 export async function getEnums(): Promise<EnumType[]> {
   ensureMySql();
   const enums = await mySql.query('select * from enum');
 
   // Build the memberMap for each enum.
-  const sql = 'select * from enum_member where enumId = ?';
-  const promises = enums.map(anEnum => mySql.query(sql, anEnum.id));
-  const enumMembersArr = await Promise.all(promises);
-  enums.forEach((anEnum, index) => {
-    const enumMembers = enumMembersArr[index];
-    anEnum.memberMap = enumMembers.reduce((map, enumMember) => {
-      map[enumMember.id] = enumMember;
-      return map;
-    }, {});
-  });
+  const promises = enums.map(anEnum => getEnumMemberMap(anEnum.id));
+  const memberMaps = await Promise.all(promises);
+  enums.forEach((anEnum, index) =>
+    anEnum.memberMap = memberMaps[index]);
 
   return sortBy(enums, ['name']);
+}
+
+export async function getEnumsForType(typeId: number): Promise<EnumType[]> {
+  ensureMySql();
+  const sql =
+    'select e.id ' +
+    'from enum e, type_data td ' +
+    'where td.typeId = ? and td.enumId = e.id';
+  const enums = await mySql.query(sql, typeId);
+
+  // Build the memberMap for each of these enums.
+  const promises = enums.map(anEnum => getEnumMemberMap(anEnum.id));
+  const memberMaps = await Promise.all(promises);
+  enums.forEach((anEnum, index) =>
+    anEnum.memberMap = memberMaps[index]);
+
+  return enums;
 }
 
 export async function getEnumsHandler(

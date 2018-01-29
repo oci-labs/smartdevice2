@@ -148,6 +148,10 @@ async function getTopicType(topic: string): Promise<string> {
       } else {
         type = row.kind;
       }
+    } else { // no row found
+      console.error('mqtt-service.js getTopicType:',
+        'no type_data record found for', property,
+        'with typeId =', typeId);
     }
   }
 
@@ -287,7 +291,6 @@ async function handleMessage(client, topic: string, message: Buffer) {
   } catch (e) {
     console.error('\nREST server error:', e.message);
     console.error('REST server error: topic =', topic);
-    console.error('REST server error: message length =', message.length);
     //process.exit(1); //TODO: only for debugging
   }
 }
