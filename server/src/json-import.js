@@ -191,6 +191,8 @@ async function processFile(jsonPath) {
     console.trace(e);
     status = 1;
   } finally {
+    mySql.disconnect();
+
     // eslint-disable-next-line no-process-exit
     process.exit(status);
   }
@@ -204,7 +206,6 @@ async function processObject(obj: Object) {
   await processTypes(types);
   await processInstances(instances);
   console.info('import finished');
-  mySql.disconnect();
 }
 
 async function processMessageServers(messageServers) {

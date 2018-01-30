@@ -43,35 +43,34 @@ function haveNodeMap(kind: TreeType): boolean {
 
 const haveRootId = (kind: TreeType): boolean => Boolean(getRootId(kind));
 
-class TreeBuilder extends Component<PropsType> {
-  componentDidMount() {
-    this.load(this.props.kind);
+export async function loadTree(kind: TreeType) {
+  if (!haveRootId(kind)) {
+    const rootId = Number(await getText(`${kind}s/root`));
+    dispatchSet(kind + 'RootId', rootId);
   }
 
-  componentWillReceiveProps(nextProps: PropsType) {
+  if (haveNodeMap(kind)) return;
+
+  const json = await getJson(kind);
+  const nodes = ((json: any): NodeType[]);
+  const payload: SetNodesPayloadType = {kind, nodes};
+  dispatch('setNodes', payload);
+}
+
+class TreeBuilder extends Component<PropsType> {
+  async componentDidMount() {
+    await loadTree(this.props.kind);
+    this.toggleExpandAll();
+  }
+
+  async componentWillReceiveProps(nextProps: PropsType) {
     const currentKind = this.props.kind;
     const newKind = nextProps.kind;
-    if (global.reloading || newKind !== currentKind) this.load(newKind);
-  }
-
-  // Loads nodes from database.
-  load = async (kind: TreeType) => {
-    if (!haveRootId(kind)) {
-      const rootId = Number(await getText(`${kind}s/root`));
-      dispatchSet(kind + 'RootId', rootId);
+    if (newKind !== currentKind) {
+      await loadTree(newKind);
+      this.toggleExpandAll();
     }
-
-    if (haveNodeMap(kind)) return;
-
-    const json = await getJson(kind);
-    const nodes = ((json: any): NodeType[]);
-    const payload: SetNodesPayloadType = {kind, nodes};
-    dispatch('setNodes', payload);
-
-    global.reloading = false;
-
-    this.toggleExpandAll();
-  };
+  }
 
   toggleExpandAll = () => {
     const {kind} = this.props;

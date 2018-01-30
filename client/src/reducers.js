@@ -125,6 +125,8 @@ addReducer(
   }
 );
 
+// Clears enough state to cause UI to rerender.
+// This is useful after a JSON file import.
 addReducer('clear', (state: StateType) => ({
   ...state,
   instanceRootId: 0,

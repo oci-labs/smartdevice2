@@ -27,8 +27,21 @@ type PropsType = {
 
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
+export async function loadMessageServers() {
+  try {
+    const json = await getJson('message_server');
+    const servers = ((json: any): MessageServerType[]);
+    const messageServerMap = servers.reduce((map, server) => {
+      map[server.id] = server;
+      return map;
+    }, {});
+    dispatchSet('messageServerMap', messageServerMap);
+  } catch (e) {
+    console.error('failed to load message servers');
+  }
+}
+
 class MessageServers extends Component<PropsType> {
-  added: boolean;
 
   addServer = async () => {
     const {messageServerMap, ui: {newServerHost, newServerPort}} = this.props;
@@ -54,13 +67,12 @@ class MessageServers extends Component<PropsType> {
       [server.id]: server
     };
 
-    this.added = true;
     dispatchSet('ui.newServerHost', '');
     dispatchSet('messageServerMap', newMap);
   };
 
   componentWillMount() {
-    this.loadMessageServers();
+    loadMessageServers();
   }
 
   deleteServer = async (server: MessageServerType) => {
@@ -84,20 +96,6 @@ class MessageServers extends Component<PropsType> {
     return (
       PROPERTY_NAME_RE.test(newPropName) && !propNames.includes(newPropName)
     );
-  };
-
-  loadMessageServers = async () => {
-    try {
-      const json = await getJson('message_server');
-      const servers = ((json: any): MessageServerType[]);
-      const messageServerMap = servers.reduce((map, server) => {
-        map[server.id] = server;
-        return map;
-      }, {});
-      dispatchSet('messageServerMap', messageServerMap);
-    } catch (e) {
-      console.error('failed to load message servers');
-    }
   };
 
   serverNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {

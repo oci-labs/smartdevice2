@@ -4,8 +4,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch} from 'redux-easy';
 
+import {loadMessageServers} from '../message-servers/message-servers';
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
+import {loadTree} from '../tree/tree-builder';
 import {getUrlPrefix, postJson} from '../util/rest-util';
 
 import type {StateType} from '../types';
@@ -42,7 +44,9 @@ class ImportExport extends Component<PropsType, MyStateType> {
         // using the new data in the database.
         dispatch('clear');
 
-        global.reloading = true;
+        loadMessageServers();
+        loadTree('type');
+        loadTree('instance');
       } catch (e) {
         showModal({
           error: true,
