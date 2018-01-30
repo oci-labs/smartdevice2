@@ -94,21 +94,38 @@ sudo apt-get install mosquitto
 
 ## Running with Docker
 
+* Docker tips
+  - to verify that an image exists
+    * docker images | grep {image-name}
+  - to verify that a container exists and get its id
+    * docker ps | grep {container-name}
+  - to view logs of a container
+    * docker logs {container-name}
+  - to get a shell in a container
+    * docker exec -it {container-name} bash
+      - if you get an error saying that "bash" isn't found,
+        try "sh" instead
+  - to stop a container
+    * docker stop {container-name}
+  - to remove a stopped container
+    * docker rm {container-name}
+  - to remove an image
+    * docker rmi -f {image-name}
+
 * MySQL
   - build Docker image for MySQL
     * docker build -f DockerfileDb -t oci/devodb .
       - image name is oci/devodb
-  - verify that the image was created
-    * docker images | grep devodb
   - run image inside a new Docker container
-    * docker run --name devodb -e MYSQL_ROOT_PASSWORD={password} -e MYSQL_DATABASE=smartdevice -p 3306:3306 -d oci/devodb
+    * docker run --name devodb \
+      -e MYSQL_ROOT_PASSWORD={password} \
+      -e MYSQL_DATABASE=smartdevice \
+      -p 3306:3306 -d oci/devodb
       - container name is devodb
       - outputs the container id
       - creates the "smartdevice" database
       - initializes database using ddl.sql
         which is copied into the image in DockerFileDb
-  - verify that the container is running
-    * docker ps | grep devodb
   - interactively examine the database
     * docker exec -it devodb mysql -uroot -p{password}
     * show databases;
@@ -116,11 +133,6 @@ sudo apt-get install mosquitto
     * show tables;
     * describe {table-name};
     * exit
-  - view logs
-    * docker logs devodb
-  - to stop the container, enter "docker stop devodb"
-  - to remove the container, enter "docker rm devodb"
-  - to remove the image, enter "docker rmi -f oci/devodb"
 
 * Client (web UI)
   - deploy client code to server
@@ -133,12 +145,16 @@ sudo apt-get install mosquitto
   - build Docker image
     * cd to top project directory
     * docker build -t oci/devo .
+      - image name is oci/devo
   - run image inside a new Docker container
-    * docker run -p3001:3001 -d oci/devo
-    * outputs the container id
+    * docker run --name devo --link devodb:mysql -p3001:3001 -d oci/devo
+      - container name is devo
+      - outputs the container id
+      - to see the ip address and host name assigned to devodb,
+        * docker exec -it devo sh
+        * cat /etc/hosts | grep mysql
+        * example output: 172.17.0.2 mysql b11f93a270a6 devodb
+          - first item is IP address
+          - third item is host name
   - run the web app
     * browse http://localhost:3001
-  - get the container id
-    * docker ps | grep oci/devo
-  - view logs
-    * docker logs {container-id}
