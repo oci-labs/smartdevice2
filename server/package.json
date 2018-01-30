@@ -49,6 +49,7 @@
     "morgan": "^1.9.0",
     "mqtt": "^2.15.1",
     "mysql-easier": "^1.4.1",
+    "object-mapper": "^5.0.0",
     "ws": "^4.0.0"
   },
   "devDependencies": {
