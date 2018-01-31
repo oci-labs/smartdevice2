@@ -41,7 +41,7 @@ class Header extends Component<PropsType> {
             className="refresh-btn fa-2x"
             icon="refresh"
             onClick={() => this.refresh()}
-            tooltip="import/export"
+            tooltip="request latest data"
           />
           <Button
             className="import-export-btn fa-2x"
