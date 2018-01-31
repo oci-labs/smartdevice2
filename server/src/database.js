@@ -1,16 +1,23 @@
 // @flow
 
 import MySqlConnection from 'mysql-easier';
+import objectMapper from 'object-mapper';
 
-const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'smartdevice',
-  insecureAuth: true
+// Get database configuration from a JSON file.
+let config = require('../config.json');
+
+// ALlow values to be overridden by environment variables.
+// This specifies how environment variable names
+// map to nested configuration properties.
+const envConfigMap = {
+  DB_HOST: 'db.host',
+  DB_PORT: 'db.port',
+  DB_USER: 'db.user',
+  DB_PASSWORD: 'db.password'
 };
+config = objectMapper(process.env, config, envConfigMap);
 
-export const getDbConnection = () => new MySqlConnection(dbConfig);
+export const getDbConnection = () => new MySqlConnection(config.db);
 
 export function getTimestamp(date: Date = new Date()): string {
   const year = date.getFullYear();

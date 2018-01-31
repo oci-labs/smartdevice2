@@ -25,7 +25,7 @@ const SPECIAL_SUFFIXES = ['control', 'feedback'];
 const clientMap = {}; // keys are server ids
 const serverMap = {}; // keys are server ids
 
-let lastChange, mySql, ws;
+let lastChange, mqttConnected = false, mySql, ws;
 
 export function connect(server: MessageServerType, typeId: number = 0) {
   const {id} = server;
@@ -43,6 +43,8 @@ export function connect(server: MessageServerType, typeId: number = 0) {
 
     client.on('connect', () => {
       console.info(`MQTT server ${url} connected.`);
+      mqttConnected = true;
+      wsSend('MQTT connected');
       subscribe(id, typeId);
     });
 
@@ -50,6 +52,8 @@ export function connect(server: MessageServerType, typeId: number = 0) {
 
     client.on('close', () => {
       console.info(`MQTT server ${url} connection closed.`);
+      if (mqttConnected) wsSend('MQTT closed');
+      mqttConnected = false;
     });
     client.on('error', err => {
       console.error(`MQTT server ${url} error:`, err);
@@ -162,16 +166,6 @@ async function getTopicType(topic: string): Promise<string> {
   return type;
 }
 
-async function getTypeTopics(typeId: number): Promise<string[]> {
-  try {
-    const instances = await getInstances(typeId);
-    return instances.map(instance => instance.name + '/#');
-  } catch (e) {
-    logError(e.message);
-    return [];
-  }
-}
-
 function getTopLevelTypesForServer(serverId: number) {
   const sql =
     'select * from type t1, type t2 ' +
@@ -181,33 +175,13 @@ function getTopLevelTypesForServer(serverId: number) {
   return mySql.query(sql, serverId);
 }
 
-async function saveProperty(
-  path: string,
-  property: string,
-  value: PrimitiveType
-): Promise<void> {
-  if (global.importInProgress) return;
-
-  const instanceId = await getInstanceId(path);
-  if (instanceId === 0) {
-    console.error('no instance found for', path);
-    return;
-  }
-
-  const alertsChanged = await updateProperty(instanceId, property, value);
-
-  if (ws) {
-    // Notify web client about property change.
-    const change = {instanceId, property, value};
-    if (!isEqual(change, lastChange)) {
-      lastChange = change;
-      ws.send(JSON.stringify(change));
-    }
-
-    // Notify web client that new alerts may be available.
-    if (alertsChanged) ws.send('reload alerts');
-  } else {
-    console.error('no WebSocket connection to browser');
+async function getTypeTopics(typeId: number): Promise<string[]> {
+  try {
+    const instances = await getInstances(typeId);
+    return instances.map(instance => instance.name + '/#');
+  } catch (e) {
+    logError(e.message);
+    return [];
   }
 }
 
@@ -324,6 +298,36 @@ function requestFeedback(client, parts: string[]): void {
   client.publish(feedbackTopic);
 }
 
+async function saveProperty(
+  path: string,
+  property: string,
+  value: PrimitiveType
+): Promise<void> {
+  if (global.importInProgress) return;
+
+  const instanceId = await getInstanceId(path);
+  if (instanceId === 0) {
+    console.error('no instance found for', path);
+    return;
+  }
+
+  const alertsChanged = await updateProperty(instanceId, property, value);
+
+  if (ws) {
+    // Notify web client about property change.
+    const change = {instanceId, property, value};
+    if (!isEqual(change, lastChange)) {
+      lastChange = change;
+      ws.send(JSON.stringify(change));
+    }
+
+    // Notify web client that new alerts may be available.
+    if (alertsChanged) ws.send('reload alerts');
+  } else {
+    console.error('no WebSocket connection to browser');
+  }
+}
+
 export async function subscribe(serverId: number, typeId: number) {
   const client = clientMap[serverId];
   if (!client) {
@@ -382,4 +386,8 @@ export function webSocketSetup() {
       //console.log('mqtt-service.js: published feedback request');
     });
   });
+}
+
+function wsSend(message: string): void {
+  if (ws) ws.send(message);
 }
