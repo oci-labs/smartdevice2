@@ -178,19 +178,21 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   * browse http://localhost:3001
 
 ### Docker Compose
-- manages multiple Docker containers
+- manages multiple Docker-based services
 - described in a YAML file named `docker-compose.yml`
 - to build an image for each service,
   `docker-compose build`
 - to run these services in a container,
   `docker-compose up`
+  * before running this, stop any locally running servers
+    for this project
+  * when this completes, browse http://localhost:3001
   * to stop all these containers, press ctrl-c
-- to combine building and running in one command,
-  `docker-compose up --build`
 - to do the same but in the background,
   `docker-compose up -d`
   * to stop all these containers,
     `docker-compose stop`
     - what does `docker-compose down` do?
+- to combine building and running in one command,
+  `docker-compose up --build`
 - creates a virtual network where the virtual host names match the service names
-  * ex. http://devo:3001
