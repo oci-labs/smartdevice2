@@ -1,4 +1,5 @@
 // @flow
+/* eslint-disable no-await-in-loop */
 
 // Before running this,
 // 1) start Mosquitto broker (or verify that it is running)
@@ -16,7 +17,6 @@ import {
   updateProperty
 } from './instance-service';
 import {logError} from './util/error-util';
-import {values} from './util/flow-util';
 
 import type {NodeType, MessageServerType, PrimitiveType} from './types';
 
@@ -78,14 +78,6 @@ export function disconnect(server: MessageServerType) {
   }
 }
 
-function getAllTopLevelTypes() {
-  const sql =
-    'select t1.id, t1.name, t1.messageServerId ' +
-    'from type t1, type t2 ' +
-    'where t1.parentId = t2.id and t2.name = "root"';
-  return mySql.query(sql);
-}
-
 function getInstances(typeId: number) {
   const sql = 'select name from instance where typeId=?';
   return mySql.query(sql, typeId);
@@ -115,10 +107,13 @@ async function getTopicType(topic: string): Promise<string> {
 
   const parts = topic.split('/');
   const lastPart = parts[parts.length - 1];
+
+  // "control" messages are train-specific.
   if (lastPart === 'control') return '';
 
   if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
   const property = parts.pop();
+  if (parts.length === 0) return '';
 
   let parentId = 0;
   let row;
@@ -130,7 +125,6 @@ async function getTopicType(topic: string): Promise<string> {
       sql += ' and parentId = ?';
       args = [parentId];
     }
-    // eslint-disable-next-line no-await-in-loop
     [row] = await mySql.query(sql, part, ...args);
     if (!row) return '';
     parentId = row.id;
@@ -160,11 +154,17 @@ async function getTopicType(topic: string): Promise<string> {
     }
   }
 
-  if (!type) {
-    console.error('failed to get type of topic', topic);
-  }
+  if (!type) console.error('topic', topic, 'has no type');
 
   return type;
+}
+
+function getTopLevelTypes() {
+  const sql =
+    'select t1.id, t1.name, t1.messageServerId ' +
+    'from type t1, type t2 ' +
+    'where t1.parentId = t2.id and t2.name = "root"';
+  return mySql.query(sql);
 }
 
 function getTopLevelTypesForServer(serverId: number) {
@@ -213,14 +213,15 @@ async function handleMessage(client, topic: string, message: Buffer) {
     switch (type) {
       case 'boolean':
         value = Boolean(message.readInt8(0));
-        // If we get a lifecycle message with a value of true ...
+        // If we get a lifecycle message with a value of true
+        // (train-specific) ...
         if (
           property === 'lifecycle' &&
           lastPart === 'feedback' &&
           value === 1
         ) {
           // Request messages to get the current state of everything.
-          requestFeedback(client, parts);
+          client.publish(parts[0] + '/feedback');
         }
         break;
 
@@ -274,10 +275,9 @@ export async function mqttService(app: express$Application): Promise<void> {
   mySql = getDbConnection();
 
   try {
-    const topLevelTypes = await getAllTopLevelTypes();
+    const topLevelTypes = await getTopLevelTypes();
 
     for (const type of topLevelTypes) {
-      // eslint-disable-next-line no-await-in-loop
       const server = await getMessageServer(type);
 
       if (server) {
@@ -293,24 +293,29 @@ export async function mqttService(app: express$Application): Promise<void> {
   }
 
   // Request feedback from all current clients.
+  // This is train-specific.
   const URL_PREFIX = '/mqtt/feedback';
-  app.post(URL_PREFIX, (
+  app.post(URL_PREFIX, async (
     req: express$Request,
     res: express$Response
   ) => {
-    console.info('mqtt-service: requesting feedback');
-    const clients = values(clientMap);
-    for (const client of clients) {
-      client.publish('lifecycle/feedback');
-    }
+    await requestFeedback();
     res.send();
   });
 }
 
-function requestFeedback(client, parts: string[]): void {
-  const feedbackTopic = parts.join('/') + '/feedback';
-  console.info('publishing', feedbackTopic);
-  client.publish(feedbackTopic);
+async function requestFeedback() {
+  const topLevelTypes = await getTopLevelTypes();
+
+  for (const {id, messageServerId} of topLevelTypes) {
+    const client = clientMap[messageServerId];
+    const instances = await getInstances(id);
+    for (const instance of instances) {
+      const msg = instance.name + '/feedback';
+      console.info('mqtt-service.js: publishing', msg);
+      client.publish(msg);
+    }
+  }
 }
 
 async function saveProperty(
@@ -395,11 +400,7 @@ export function webSocketSetup() {
       }
     });
 
-    Object.values(clientMap).forEach(client => {
-      // $FlowFixMe - doesn't know about client methods
-      client.publish('thejoveexpress/feedback');
-      //console.log('mqtt-service.js: published feedback request');
-    });
+    requestFeedback();
   });
 }
 

@@ -22,6 +22,8 @@ export function getAlertCount(
   instanceNodeMap: NodeMapType,
   alerts: AlertType[]
 ): number {
+  if (!node) return 0;
+
   const {children, id} = node;
 
   // Get the number of alerts for this node.
