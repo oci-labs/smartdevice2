@@ -44,7 +44,7 @@ alertService(app);
 enumService(app);
 instanceService(app);
 messageServerService(app);
-mqttService();
+mqttService(app);
 treeService(app);
 typeService(app);
 crudService(app, 'alert');

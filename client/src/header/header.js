@@ -6,6 +6,7 @@ import {connect} from 'react-redux';
 import Button from '../share/button';
 import ImportExport from '../import-export/import-export';
 import {showModal} from '../share/sd-modal';
+import {post} from '../util/rest-util';
 
 import type {StateType} from '../types';
 
@@ -21,9 +22,7 @@ class Header extends Component<PropsType> {
     showModal({title: 'Import/Export JSON Schema', renderFn});
   };
 
-  refresh = () => {
-    alert('Refresh is not implemented yet.');
-  };
+  refresh = () => post('mqtt/feedback');
 
   render() {
     const {mqttConnected} = this.props;

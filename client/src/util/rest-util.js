@@ -59,6 +59,14 @@ export async function patchJson(
   return res;
 }
 
+export async function post(urlSuffix: string): Promise<Object> {
+  const url = getUrlPrefix() + urlSuffix;
+  const options = {method: 'POST'};
+  const res = await fetch(url, options);
+  if (!res.ok) handleError(res.statusText);
+  return res;
+}
+
 export async function postJson(
   urlSuffix: string,
   bodyObj: Object

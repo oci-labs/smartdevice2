@@ -16,6 +16,7 @@ import {
   updateProperty
 } from './instance-service';
 import {logError} from './util/error-util';
+import {values} from './util/flow-util';
 
 import type {NodeType, MessageServerType, PrimitiveType} from './types';
 
@@ -269,7 +270,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
   }
 }
 
-export async function mqttService() {
+export async function mqttService(app: express$Application): Promise<void> {
   mySql = getDbConnection();
 
   try {
@@ -290,6 +291,20 @@ export async function mqttService() {
   } catch (e) {
     logError(e.message);
   }
+
+  // Request feedback from all current clients.
+  const URL_PREFIX = '/mqtt/feedback';
+  app.post(URL_PREFIX, (
+    req: express$Request,
+    res: express$Response
+  ) => {
+    console.info('mqtt-service: requesting feedback');
+    const clients = values(clientMap);
+    for (const client of clients) {
+      client.publish('lifecycle/feedback');
+    }
+    res.send();
+  });
 }
 
 function requestFeedback(client, parts: string[]): void {
