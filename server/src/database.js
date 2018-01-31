@@ -16,6 +16,7 @@ const envConfigMap = {
   DB_PASSWORD: 'db.password'
 };
 config = objectMapper(process.env, config, envConfigMap);
+console.log('database.js: config.db =', config.db);
 
 export const getDbConnection = () => new MySqlConnection(config.db);
 

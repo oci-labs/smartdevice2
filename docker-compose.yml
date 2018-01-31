@@ -1,0 +1,20 @@
+version: '3' # version of Docker Compose file format
+services:
+  database:
+    build: database # needed?
+    container_name: smartdevice2_database
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    ports:
+      - 3306:3306 # MySQL port
+  devo:
+    build: . # needed?
+    container_name: smartdevice2_devo
+    ports:
+      - 1337:1337 # WebSocket port
+      - 3001:3001 # HTTP port
+    depends_on:
+      - database
+    environment:
+      - DB_HOST=smartdevice2_database # container name
+      - DB_PORT=3306

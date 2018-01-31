@@ -2,7 +2,7 @@ FROM node:alpine
 
 WORKDIR /usr/src/app
 
-COPY .babelrc .eslintrc.json .prettierrc server/package.json server/package-lock.json server/.flowconfig ./
+COPY .babelrc .eslintrc.json .prettierrc server/config.json server/package.json server/package-lock.json server/.flowconfig ./
 COPY server/public ./public
 COPY server/src ./src
 

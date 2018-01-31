@@ -105,6 +105,14 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 
 ### Docker tips
 
+- images run in containers
+- to build an image, use the `docker build` command
+  * see examples below
+  * the instructions for how to build an image
+    are typically placed in a file named `Dockerfile`
+- to run an existing image in a new container,
+  use the `docker run` command
+  * see examples below
 - to verify that an image exists
   * `docker images | grep {image-name}`
 - to verify that a container exists and get its id
@@ -137,7 +145,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
     - initializes database using ddl.sql
       which is copied into the image in DockerFileDb
 - interactively examine the database
-  * `docker exec -it devodb mysql -uroot -p{password}`
+  * `docker exec -it devodb mysql -uroot [-p{password}]`
   * `show databases;`
   * `use smartdevice`
   * `show tables;`
@@ -168,3 +176,21 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
         - third item is host name
 - run the web app
   * browse http://localhost:3001
+
+### Docker Compose
+- manages multiple Docker containers
+- described in a YAML file named `docker-compose.yml`
+- to build an image for each service,
+  `docker-compose build`
+- to run these services in a container,
+  `docker-compose up`
+  * to stop all these containers, press ctrl-c
+- to combine building and running in one command,
+  `docker-compose up --build`
+- to do the same but in the background,
+  `docker-compose up -d`
+  * to stop all these containers,
+    `docker-compose stop`
+    - what does `docker-compose down` do?
+- creates a virtual network where the virtual host names match the service names
+  * ex. http://devo:3001
