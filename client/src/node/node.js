@@ -17,39 +17,42 @@ type PropsType = {
   node?: NodeType
 };
 
+export function getAlertCount(
+  node: NodeType,
+  instanceNodeMap: NodeMapType,
+  alerts: AlertType[]
+): number {
+  const {children, id} = node;
+
+  // Get the number of alerts for this node.
+  const alertCount = alerts
+    ? alerts.filter(alert => alert.instanceId === id).length
+    : 0;
+
+  // Get the number of alerts for
+  // all the children of this node.
+  const childrenAlertCount = children.reduce((sum, id) => {
+    const child = instanceNodeMap[id];
+    return sum + getAlertCount(child, instanceNodeMap, alerts);
+  }, 0);
+
+  return alertCount + childrenAlertCount;
+}
+
 class Node extends Component<PropsType> {
-  getAlertCount = (node: NodeType): number => {
-    const {children, id} = node;
-    const {alerts, instanceNodeMap} = this.props;
-
-    // Get the number of alerts for this node.
-    const alertCount = alerts
-      ? alerts.filter(alert => alert.instanceId === id).length
-      : 0;
-
-    // Get the number of alerts for
-    // all the children of this node.
-    const childrenAlertCount = children.reduce((sum, id) => {
-      const child = instanceNodeMap[id];
-      return sum + this.getAlertCount(child);
-    }, 0);
-
-    return alertCount + childrenAlertCount;
-  };
-
   select = () => {
     const {node} = this.props;
     if (node) dispatch('setSelectedChildNodeId', node.id);
   };
 
   render() {
-    const {isSelected, node} = this.props;
+    const {alerts, instanceNodeMap, isSelected, node} = this.props;
     if (!node) return null;
 
     let className = 'node';
     if (isSelected) className += ' selected';
 
-    const alertCount = this.getAlertCount(node);
+    const alertCount = getAlertCount(node, instanceNodeMap, alerts);
 
     return (
       <div className={className} onClick={this.select}>

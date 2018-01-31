@@ -1,7 +1,8 @@
+@import '../share.scss';
+
 .alert {
-  $red: #BA2316;
-  background-color: $red;
-  border: solid $red 2px;
+  background-color: $alert-red;
+  border: solid $alert-red 2px;
   border-radius: 5px;
   color: white;
   font-size: 10px;

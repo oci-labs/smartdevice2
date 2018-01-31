@@ -1,18 +1,29 @@
 // @flow
 
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import {dispatch, dispatchSet} from 'redux-easy';
 
 import {addNode} from './tree-util';
+import {getAlertCount} from '../node/node';
 import Button from '../share/button';
 import {showConfirm} from '../share/sd-modal';
 import {deleteResource, getJson, patchJson} from '../util/rest-util';
 
 import './tree-node.css';
 
-import type {NodeMapType, NodePayloadType, NodeType, TreeType} from '../types';
+import type {
+  AlertType,
+  NodeMapType,
+  NodePayloadType,
+  NodeType,
+  StateType,
+  TreeType
+} from '../types';
 
 type PropsType = {
+  alerts: AlertType[],
+  instanceNodeMap: NodeMapType,
   editedName: string,
   editingNode: ?NodeType,
   kind: TreeType,
@@ -119,7 +130,9 @@ class TreeNode extends Component<PropsType> {
 
   render = () => {
     const {
+      alerts,
       editedName,
+      instanceNodeMap,
       kind,
       level,
       newNodeName,
@@ -138,6 +151,10 @@ class TreeNode extends Component<PropsType> {
     const classes = ['tree-node', `tree-level-${level}`];
     if (node.id === selectedNodeId) classes.push('selected');
 
+    const nameClasses = ['tree-node-name'];
+    const alertCount = getAlertCount(node, instanceNodeMap, alerts);
+    if (alertCount) nameClasses.push('have-alerts');
+
     return (
       <div className={classes.join(' ')}>
         <div
@@ -155,7 +172,7 @@ class TreeNode extends Component<PropsType> {
             value={editedName}
           />
         ) : (
-          <div className="tree-node-name" onClick={this.selectNode}>
+          <div className={nameClasses.join(' ')} onClick={this.selectNode}>
             {/*onDoubleClick={this.toggleEdit}*/}
             {node.name}
           </div>
@@ -193,4 +210,10 @@ class TreeNode extends Component<PropsType> {
   };
 }
 
-export default TreeNode;
+const mapState = (state: StateType): PropsType => {
+  const {alerts, instanceNodeMap} = state;
+  // $FlowFixMe - allow a subset of props
+  return {alerts, instanceNodeMap};
+};
+
+export default connect(mapState)(TreeNode);
