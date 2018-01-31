@@ -47,13 +47,13 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
     if (newTypeSelected) this.loadMessageServers();
   }
 
-  handleServerChange = (event: SyntheticInputEvent<HTMLSelectElement>) => {
+  handleServerChange = async (event: SyntheticInputEvent<HTMLSelectElement>) => {
     const {typeNode} = this.props;
     if (!typeNode) return;
 
     const messageServerId = Number(event.target.value);
     const url = `types/${typeNode.id}/server/${messageServerId}`;
-    putJson(url);
+    await putJson(url);
 
     const newTypeNode: NodeType = {...typeNode, messageServerId};
     const payload: NodePayloadType = {kind: 'type', node: newTypeNode};

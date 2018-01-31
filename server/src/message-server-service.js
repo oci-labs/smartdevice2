@@ -1,7 +1,7 @@
 // @flow
 
 import {getDbConnection} from './database';
-import {connect, disconnect} from './mqtt-service';
+import {disconnect} from './mqtt-service';
 import {errorHandler} from './util/error-util';
 
 const TABLE = 'message_server';
@@ -21,8 +21,6 @@ export async function addServerHandler(
 
   try {
     const id = await mySql.insert(TABLE, server);
-    server.id = id;
-    connect(server);
     res.send(String(id));
   } catch (e) {
     // istanbul ignore next

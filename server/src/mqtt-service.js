@@ -18,7 +18,7 @@ import {
 } from './instance-service';
 import {logError} from './util/error-util';
 
-import type {NodeType, MessageServerType, PrimitiveType} from './types';
+import type {MessageServerType, PrimitiveType} from './types';
 
 const ENUM_PREFIX = 'enum:';
 const SPECIAL_SUFFIXES = ['control', 'feedback'];
@@ -28,7 +28,23 @@ const serverMap = {}; // keys are server ids
 
 let lastChange, mqttConnected = false, mySql, ws;
 
-export function connect(server: MessageServerType, typeId: number = 0) {
+export async function connect(server: MessageServerType) {
+  const topLevelTypes = await getTopLevelTypes();
+
+  for (const type of topLevelTypes) {
+    const typeServer = await getMessageServer(type.messageServerId);
+    if (typeServer) {
+      if (typeServer.id === server.id) {
+        connectToType(server, type.id);
+      }
+    } else {
+      console.error(
+        `The type "${type.name}" has no associated message server.`);
+    }
+  }
+}
+
+export function connectToType(server: MessageServerType, typeId: number) {
   const {id} = server;
   serverMap[id] = server;
 
@@ -69,11 +85,11 @@ export function connect(server: MessageServerType, typeId: number = 0) {
 }
 
 export function disconnect(server: MessageServerType) {
-  const url = `mqtt://${server.host}:${server.port}`;
-  const client = mqtt.connect(url);
+  const client = clientMap[server.id];
   if (client) {
     delete clientMap[server.id];
     client.end();
+    const url = `mqtt://${server.host}:${server.port}`;
     console.info('disconnected from', url);
   }
 }
@@ -83,17 +99,18 @@ function getInstances(typeId: number) {
   return mySql.query(sql, typeId);
 }
 
-async function getMessageServer(type: NodeType) {
-  const {messageServerId} = type;
-  if (!messageServerId) return;
-
-  try {
-    const sql = 'select * from message_server where id=?';
-    const [server] = await mySql.query(sql, messageServerId);
-    return server;
-  } catch (e) {
-    logError(e.message);
+async function getMessageServer(serverId: number) {
+  if (!serverMap[serverId]) {
+    try {
+      const sql = 'select * from message_server where id=?';
+      const [server] = await mySql.query(sql, serverId);
+      serverMap[serverId] = server;
+    } catch (e) {
+      logError(e.message);
+    }
   }
+
+  return serverMap[serverId];
 }
 
 async function getServerIdForType(typeId: number): Promise<number> {
@@ -278,10 +295,10 @@ export async function mqttService(app: express$Application): Promise<void> {
     const topLevelTypes = await getTopLevelTypes();
 
     for (const type of topLevelTypes) {
-      const server = await getMessageServer(type);
+      const server = await getMessageServer(type.messageServerId);
 
       if (server) {
-        connect(server, type.id);
+        connectToType(server, type.id);
       } else {
         console.error(
           `The type "${type.name}" has no associated message server!`
@@ -309,11 +326,13 @@ async function requestFeedback() {
 
   for (const {id, messageServerId} of topLevelTypes) {
     const client = clientMap[messageServerId];
-    const instances = await getInstances(id);
-    for (const instance of instances) {
-      const msg = instance.name + '/feedback';
-      console.info('mqtt-service.js: publishing', msg);
-      client.publish(msg);
+    if (client) {
+      const instances = await getInstances(id);
+      for (const instance of instances) {
+        const msg = instance.name + '/feedback';
+        console.info('mqtt-service.js: publishing', msg);
+        client.publish(msg);
+      }
     }
   }
 }
@@ -352,6 +371,8 @@ export async function subscribe(serverId: number, typeId: number) {
   const client = clientMap[serverId];
   if (!client) {
     console.error('no client for server id', serverId);
+    const server = await getMessageServer(serverId);
+    connect(server);
     return;
   }
 
