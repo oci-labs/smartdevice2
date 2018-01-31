@@ -391,4 +391,3 @@ export function webSocketSetup() {
 function wsSend(message: string): void {
   if (ws) ws.send(message);
 }
-
