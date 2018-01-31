@@ -17,6 +17,7 @@ import type {StateType, TreeType} from './types';
 import './app.css';
 
 type PropsType = {
+  mqttConnected: boolean,
   treeType: TreeType
 };
 
@@ -39,14 +40,19 @@ class App extends Component<PropsType> {
   };
 
   render() {
-    const {treeType} = this.props;
+    const {mqttConnected, treeType} = this.props;
+    const heartIcon = mqttConnected ? 'heartbeat' : 'heart-o';
+    const messageBrokerStatus = mqttConnected ? 'connected' : 'not running';
     return (
       <div className="app">
         <header>
           <img className="logo" alt="OCI logo" src="images/oci-logo.svg" />
           <div className="title">Devo</div>
           <div className="right">
-            {/* <span className="fa fa-2x fa-heartbeat" /> */}
+            <span
+              className={`fa fa-2x fa-${heartIcon}`}
+              title={`message broker is ${messageBrokerStatus}`}
+            />
             <Button
               className="import-export-btn fa-2x"
               icon="cog"
@@ -67,8 +73,9 @@ class App extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {treeType} = state.ui;
-  return {treeType};
+  const {mqttConnected, ui} = state;
+  const {treeType} = ui;
+  return {mqttConnected, treeType};
 };
 
 export default connect(mapState)(App);

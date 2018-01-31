@@ -1,6 +1,6 @@
 // @flow
 
-import {dispatch} from 'redux-easy';
+import {dispatch, dispatchSet} from 'redux-easy';
 
 import {reloadAlerts} from './instance-detail/instance-detail';
 
@@ -17,7 +17,14 @@ function configure(connection) {
   */
 
   connection.onmessage = message => {
-    const {data} = message;
+    const data = String(message.data);
+
+    if (data.startsWith('MQTT ')) {
+      const connected = data.endsWith('connected');
+      dispatchSet('mqttConnected', connected);
+      return;
+    }
+
     if (data === 'reload alerts') {
       reloadAlerts();
       return;

@@ -10,6 +10,7 @@ const state: StateType = {
   instanceNodeMap: {},
   instanceRootId: 0,
   messageServerMap: {},
+  mqttConnected: false,
   typeNodeMap: {},
   typeRootId: 0,
   ui: {
