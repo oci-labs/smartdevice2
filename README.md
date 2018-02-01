@@ -199,14 +199,14 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 - creates a virtual network where the virtual host names match the service names
 
 ## Deploying to the Google Cloud Platform (GCP)
-- this assumes Docker is installed
-- to go to the GCP Console
+- these steps assumes Docker is installed
+- to go to GCP Console
   * browse http://cloud.google.com
   * sign in to your OCI Google account
   * click "CONSOLE" in upper-right
   * select an existing project from dropdown near upper-left
 - install "Google Cloud SDK"
-  * browse https://cloud.google.com/sdk/
+  * follow steps at https://cloud.google.com/sdk/
   * if already installed, enter "gcloud components update"
     to get the latest version
 - install kubectl
@@ -217,57 +217,54 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
     - in Fish shell, set -x PROJECT_ID ocismartdevice
   * gcloud config set project $PROJECT_ID
   * gcloud config set compute/zone us-central1-b
+- create a container cluster (one-time)
+  * gcloud container clusters create {cluster-name} --num-nodes=3
+    - I used "ocismartdevice" for the cluster name
+    - takes a few minutes to complete
+  * another way is to use the web console
+    - from the Console hamburger menu select
+      Kubernetes Engine ... Kubernetes clusters
+    - press "Create cluster" button
+    - enter a name (ex. ocismartdevice)
+    - can accept all the other defaults
+    - press "Create" button
+    - takes a few minutes to complete
 - the remaining steps can be executed by running the "gcpdeploy" scripts
   in the top directory (for the web/REST server)
   and the database directory (for MySQL)
-- push Docker images to the GCP "Container Registry"
-  * gcloud docker -- push gcr.io/{gcp-project-name}/{image-name}
-  * examples
-    - gcloud docker -- push gcr.io/ocismartdevice/devo-database
-    - gcloud docker -- push gcr.io/ocismartdevice/devo-server
-  * to see content of GCP Container Registry
-    - browse https://cloud.google.com
-    - make sure the correct account is selected
-      from the account dropdown in upper-right
-    - click "CONSOLE" in upper-right
-    - select a project from the dropdown near upper-left
-    - select "Container Registry" from hamburger menu
-- create a container cluster
-  * if a container cluster already exists
-    - gcloud container clusters get-credentials {cluster-name}
-  * if a container cluster needs to be created
-    - gcloud container clusters create {cluster-name} --num-nodes=3
-      * takes a few minutes to complete
-      * I used "ocismartdevice" for the cluster name
-    - another way is to use the web console
-      * from the Console hamburger menu select
-        Kubernetes Engine ... Kubernetes clusters
-      * press "Create cluster" button
-      * enter a name (ex. smartdevice2)
-      * can accept all the other defaults
-      * press "Create" button
-      * takes a few minutes to complete
-    * see list of running instances by entering
-      gcloud compute instances list
-- create a deployment cluster (pod)
-  * kubectl run {pod-base-name} --image={tagged-image-name} --port={some-port}
-    - examples
-      kubectl run devo-database --image=gcr.io/${PROJECT_ID}/devo-database --port=3306
-      kubectl run devo --image=gcr.io/{$PROJECT_ID}/devo-server --port=3000
+  * read these scripts to understand the steps involved
+- the web app and database are ready to run
+  when both services have an EXTERNAL-IP
+  * enter "kubectl get services" repeatedly until they do
+- to connect to the database from a terminal
+  * mysql -uroot -h{database-external-ip}
+  * use smartdevice
+  * show tables;
+  * enter any SQL commands
+- to see content of GCP Container Registry
+  * browse https://cloud.google.com
+  * make sure the correct account is selected
+    from the account dropdown in upper-right
+  * click "CONSOLE" in upper-right
+  * select a project from the dropdown near upper-left
+  * select "Container Registry" from hamburger menu
+- to see list of running instances
+  * gcloud compute instances list
 - to see list of existing pods
   * kubectl get pods
   * STATUS will be "ContainerCreating" initially
     and will change to "Running" if successful
 - to see detail about a given pod
   * kubectl describe pods {pod-name}
+    - omit pod-name to see all
 - to see logs for a given pod
   * kubectl logs {pod-name}
 - to delete a pod, delete the corresponding deployment
   * kubectl delete deployment {pod-name}
-- expose container to internet which creates a service
-  * kubectl expose deployment devo-server --type=LoadBalancer --port 3306
 - to see list of existing services
+  (created by "kubectl expose" in the gcpdeploy scripts)
   * kubectl get services
-- to see detail about a given pod
+- to see detail about a given service
   * kubectl describe services {service-name}
+    - omit service-name to see all
   * browse the IP address labelled "LoadBalancer Ingress" with the port in "Port"
