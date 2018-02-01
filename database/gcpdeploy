@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo building Docker image
+docker build -t gcr.io/ocismartdevice/devo-database .
+
+echo pushing image to Google Cloud Container Registry
+gcloud docker -- push gcr.io/ocismartdevice/devo-database
+
+echo deleting previous pod
+kubectl delete deployment devo-database
+
+echo creating pod
+kubectl run devo-database --image=gcr.io/ocismartdevice/devo-database --port=3306
+
+echo deleting previous service
+kubectl delete service devo-database
+
+echo creating service
+kubectl expose deployment devo-database --type=LoadBalancer --port 3306 --target-port 3306
+
+echo see EXTERNAL-IP below
+kubectl get service
