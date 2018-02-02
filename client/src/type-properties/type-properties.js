@@ -6,6 +6,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
+import Dial from '../dial/dial';
 import Button from '../share/button';
 import Enums from '../enums/enums';
 import {showModal} from '../share/sd-modal';
@@ -186,6 +187,22 @@ class TypeProperties extends Component<PropsType> {
       return (
         <section className="type-properties">
           <h3>Select a type in the left nav.</h3>
+          <Dial
+            iconUrl="images/idle.png"
+            max={100}
+            min={-100}
+            tickMajor={20}
+            tickMinor={2}
+            title="Power"
+            value={0} />
+          <Dial
+            iconUrl="images/light-off.png"
+            max={256}
+            min={0}
+            tickMajor={32}
+            tickMinor={8}
+            title="Lighting"
+            value={0} />
         </section>
       );
     }
