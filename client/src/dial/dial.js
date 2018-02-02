@@ -9,6 +9,7 @@ import './dial.css';
 
 type RingType = {
   color: string,
+  iconUrl?: string,
   min: number,
   max: number,
   name: string
@@ -17,7 +18,6 @@ type RingType = {
 type PropsType = {
   max: number,
   min: number,
-  iconUrl?: string,
   rings: RingType[],
   tickMajor: number,
   tickMinor: number,
@@ -110,6 +110,19 @@ class Dial extends Component<PropsType> {
     );
   };
 
+  getIcon = () => {
+    const {rings, value} = this.props;
+    const ring = rings.find(ring => ring.min <= value && value <= ring.max);
+    return ring ? (
+      <image
+        href={ring.iconUrl}
+        height={ICON_SIZE}
+        x={CENTER.x - ICON_SIZE / 2}
+        y={CENTER.y - RADIUS * 0.58}
+      />
+    ) : null;
+  }
+
   tickMarks = () => {
     const {max, min, tickMajor, tickMinor} = this.props;
     const {anglePerValue} = this;
@@ -137,17 +150,8 @@ class Dial extends Component<PropsType> {
     MIN_ANGLE + (value - this.props.min) * this.anglePerValue;
 
   render() {
-    const {iconUrl, max, min, rings, title, value} = this.props;
+    const {max, min, rings, title, value} = this.props;
     this.anglePerValue = (MAX_ANGLE - MIN_ANGLE) / (max - min);
-
-    const icon = iconUrl ? (
-      <image
-        href={iconUrl}
-        height={ICON_SIZE}
-        x={CENTER.x - ICON_SIZE / 2}
-        y={CENTER.y - RADIUS * 0.58}
-      />
-    ) : null;
 
     const dialRings = rings.map(ring => {
       const startAngle = this.valueToAngle(ring.max);
@@ -181,7 +185,7 @@ class Dial extends Component<PropsType> {
           text: title
         })}
         {this.tickMarks()}
-        {icon}
+        {this.getIcon()}
         {this.dialNeedle(value)}
         {circle({center: CENTER, fill: CENTER_COLOR, radius: 8})}
       </svg>
