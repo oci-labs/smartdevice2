@@ -5,6 +5,8 @@ import {connect} from 'react-redux';
 import {Input} from 'redux-easy';
 import Dial from '../dial/dial';
 
+import './train-control.css';
+
 import type {StateType, TrainControlType} from '../types';
 
 type PropsType = {
@@ -89,22 +91,26 @@ class TrainControl extends Component<PropsType> {
         <div className="power">
           {this.powerDial()}
           <Input path="trainControl.power" type="range" min="-100" max="100" />
+          <label>Power</label>
           <Input
             path="trainControl.idleCalibration"
             type="range"
             min="0"
             max="100"
           />
+          <label>Calibrate Idle</label>
         </div>
         <div className="light">
           {this.lightDial()}
           <Input path="trainControl.light" type="range" min="0" max="256" />
+          <label>Lights</label>
           <Input
             path="trainControl.lightCalibration"
             type="range"
             min="0"
             max="256"
           />
+          <label>Calibrate Ambient Light</label>
         </div>
       </div>
     );

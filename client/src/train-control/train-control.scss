@@ -1,0 +1,28 @@
+.train-control {
+  background-color: #737373;
+  display: inline-block;
+  padding: 20px;
+  width: auto;
+
+  input[type=range] {
+    display: block;
+    margin-top: 10px;
+    width: 190px;
+  }
+
+  label {
+    display: block;
+    font-style: italic;
+    font-weight: normal !important;
+    text-align: center;
+  }
+
+  .light {
+    display: inline-block;
+  }
+
+  .power {
+    display: inline-block;
+    margin-right: 20px;
+  }
+}
