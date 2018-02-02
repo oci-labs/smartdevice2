@@ -181,28 +181,36 @@ class TypeProperties extends Component<PropsType> {
     </tr>
   );
 
+  lightDial = () => {
+    return <Dial
+      iconUrl="images/light-off.png"
+      max={256}
+      min={0}
+      tickMajor={32}
+      tickMinor={8}
+      title="Lighting"
+      value={0} />;
+  };
+
+  powerDial = () => {
+    return <Dial
+      iconUrl="images/idle.png"
+      max={100}
+      min={-100}
+      tickMajor={20}
+      tickMinor={2}
+      title="Power"
+      value={0} />;
+  };
+
   render() {
     const {typeNode, ui: {typeProps}} = this.props;
     if (!typeNode) {
       return (
         <section className="type-properties">
           <h3>Select a type in the left nav.</h3>
-          <Dial
-            iconUrl="images/idle.png"
-            max={100}
-            min={-100}
-            tickMajor={20}
-            tickMinor={2}
-            title="Power"
-            value={0} />
-          <Dial
-            iconUrl="images/light-off.png"
-            max={256}
-            min={0}
-            tickMajor={32}
-            tickMinor={8}
-            title="Lighting"
-            value={0} />
+          {this.powerDial()}
+          {this.lightDial()}
         </section>
       );
     }

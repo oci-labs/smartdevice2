@@ -3,7 +3,7 @@
 // $FlowFixMe - Flow doesn't know about Fragment yet.
 import React, {Component, Fragment} from 'react';
 
-import {circle, fatArc, polarToCartesian, rect, text} from '../util/svg-util';
+import {circle, fatArc, polarToCartesian, text} from '../util/svg-util';
 
 import './dial.css';
 
@@ -20,19 +20,19 @@ type PropsType = {
 const BG_COLOR = '#536071';
 const CENTER_COLOR = '#ABABAB';
 const FORWARD_COLOR = '#00FF02';
-const HEIGHT = 300;
 const ICON_SIZE = 32;
 const IDLE_COLOR = '#FFFF02';
 const MAX_ANGLE = -60;
 const MIN_ANGLE = 240;
 const NEEDLE_LEFT_COLOR = '#B00A13';
-const NEEDLE_LENGTH_PERCENT = 0.7;
+const NEEDLE_LENGTH_PERCENT = 0.69;
 const NEEDLE_RIGHT_COLOR = '#FC131E';
 const RADIUS = 100;
 const RING_WIDTH = 12;
 const REVERSE_COLOR = '#F00';
-const WIDTH = 400;
-const CENTER = {x: WIDTH / 2, y: HEIGHT / 2};
+
+const SIZE = RADIUS * 2 + 6;
+const CENTER = {x: SIZE / 2, y: SIZE / 2};
 
 function dialArc(label, color, start, end) {
   return fatArc({
@@ -47,7 +47,6 @@ function dialArc(label, color, start, end) {
 }
 
 function tick(value, angle, isMajor) {
-  console.log('dial.js tick: value =', value, 'angle =', angle);
   const r1 = RADIUS * 0.86;
   const r2 = RADIUS * (isMajor ? 0.78 : 0.83);
   const r3 = RADIUS * 0.7;
@@ -61,8 +60,9 @@ function tick(value, angle, isMajor) {
     ? text({text: String(value), center: p3, dy: 3, fill: 'white', fontSize: 8})
     : null;
 
+  //TODO: Why do Fragments require keys when they are stripped out?
   return (
-    <Fragment>
+    <Fragment key={`${isMajor ? 'major' : 'minor'}-fragment-${angle}`}>
       <path
         key={`${isMajor ? 'major' : 'minor'}-tick-${angle}`}
         d={d}
@@ -149,7 +149,7 @@ class Dial extends Component<PropsType> {
     ) : null;
 
     return (
-      <svg width={WIDTH} height={HEIGHT}>
+      <svg width={SIZE} height={SIZE}>
         <defs>
           <radialGradient id="rg">
             <stop offset="75%" stopColor={BG_COLOR} />
@@ -157,7 +157,6 @@ class Dial extends Component<PropsType> {
           </radialGradient>
         </defs>
 
-        {rect({x: 0, y: 0, width: WIDTH, height: HEIGHT})}
         {circle({
           className: 'dialBackground',
           center: CENTER,
