@@ -152,6 +152,7 @@ export type StateType = {
   instanceRootId: number,
   messageServerMap: MessageServerMapType,
   mqttConnected: boolean,
+  trainControl: TrainControlType,
   typeNodeMap: NodeMapType,
   typeRootId: number,
   ui: UiType,
@@ -171,6 +172,13 @@ export type SystemType = {
   location: string,
   model: string,
   name: string
+};
+
+export type TrainControlType = {
+  idleCalibration: number,
+  light: number,
+  lightCalibration: number,
+  power: number
 };
 
 // These strings must correspond to the name of a database table.

@@ -121,7 +121,7 @@ class Dial extends Component<PropsType> {
         y={CENTER.y - RADIUS * 0.58}
       />
     ) : null;
-  }
+  };
 
   tickMarks = () => {
     const {max, min, tickMajor, tickMinor} = this.props;

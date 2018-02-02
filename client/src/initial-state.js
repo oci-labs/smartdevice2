@@ -11,6 +11,12 @@ const state: StateType = {
   instanceRootId: 0,
   messageServerMap: {},
   mqttConnected: false,
+  trainControl: {
+    idleCalibration: 18,
+    light: 0,
+    lightCalibration: 128,
+    power: 0
+  },
   typeNodeMap: {},
   typeRootId: 0,
   ui: {

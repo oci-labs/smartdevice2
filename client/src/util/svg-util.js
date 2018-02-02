@@ -150,12 +150,7 @@ export function fatArc(descriptor: FatArcDescriptorType) {
 
   return (
     <Fragment key={label}>
-      <path
-        d={d}
-        fill={fill}
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-      />
+      <path d={d} fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
       {labelText}
     </Fragment>
   );

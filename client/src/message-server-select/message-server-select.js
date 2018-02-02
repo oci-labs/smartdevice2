@@ -47,7 +47,9 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
     if (newTypeSelected) this.loadMessageServers();
   }
 
-  handleServerChange = async (event: SyntheticInputEvent<HTMLSelectElement>) => {
+  handleServerChange = async (
+    event: SyntheticInputEvent<HTMLSelectElement>
+  ) => {
     const {typeNode} = this.props;
     if (!typeNode) return;
 

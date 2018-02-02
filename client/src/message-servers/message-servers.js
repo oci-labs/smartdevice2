@@ -42,7 +42,6 @@ export async function loadMessageServers() {
 }
 
 class MessageServers extends Component<PropsType> {
-
   addServer = async () => {
     const {messageServerMap, ui: {newServerHost, newServerPort}} = this.props;
 

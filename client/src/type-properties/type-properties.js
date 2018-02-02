@@ -6,10 +6,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
-import Dial from '../dial/dial';
 import Button from '../share/button';
 import Enums from '../enums/enums';
 import {showModal} from '../share/sd-modal';
+import TrainControl from '../train-control/train-control';
 import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
@@ -181,81 +181,13 @@ class TypeProperties extends Component<PropsType> {
     </tr>
   );
 
-  lightDial = () => {
-    const rings = [
-      {
-        name: 'Light',
-        min: 128,
-        max: 256,
-        color: '#AAA',
-        iconUrl: 'images/light-off.png'
-      },
-      {
-        name: 'Dark',
-        min: 0,
-        max: 128,
-        color: '#555',
-        iconUrl: 'images/light-on.png'
-      }
-    ];
-    return (
-      <Dial
-        max={256}
-        min={0}
-        rings={rings}
-        tickMajor={32}
-        tickMinor={8}
-        title="Lighting"
-        value={0}
-      />
-    );
-  };
-
-  powerDial = () => {
-    const rings = [
-      {
-        name: 'Forward',
-        min: 17,
-        max: 100,
-        color: '#00FF02',
-        iconUrl: 'images/forward.png'
-      },
-      {
-        name: 'Idle',
-        min: -17,
-        max: 17,
-        color: '#FFFF02',
-        iconUrl: 'images/idle.png'
-      },
-      {
-        name: 'Reverse',
-        min: -100,
-        max: -17,
-        color: '#F00',
-        iconUrl: 'images/reverse.png'
-      }
-    ];
-    return (
-      <Dial
-        max={100}
-        min={-100}
-        rings={rings}
-        tickMajor={20}
-        tickMinor={2}
-        title="Power"
-        value={0}
-      />
-    );
-  };
-
   render() {
     const {typeNode, ui: {typeProps}} = this.props;
     if (!typeNode) {
       return (
         <section className="type-properties">
           <h3>Select a type in the left nav.</h3>
-          {this.powerDial()}
-          {this.lightDial()}
+          <TrainControl />
         </section>
       );
     }

@@ -6,8 +6,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
-import MessageServerSelect
-  from '../message-server-select/message-server-select';
+import MessageServerSelect from '../message-server-select/message-server-select';
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
 import {values} from '../util/flow-util';
@@ -146,8 +145,9 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
       const {enumId} = typeProp;
       if (enumId) {
         const anEnum = enumMap[enumId];
-        const enumMemberNames =
-          values(anEnum.memberMap).map(value => value.name);
+        const enumMemberNames = values(anEnum.memberMap).map(
+          value => value.name
+        );
         enumMemberNames.forEach(name => validNames.add(name));
       }
     });
