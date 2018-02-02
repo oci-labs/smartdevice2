@@ -13,10 +13,12 @@ type PropsType = {
 
 class TrainControl extends Component<PropsType> {
   lightDial = () => {
+    const {light, lightCalibration} = this.props.trainControl;
+
     const rings = [
       {
         name: 'Light',
-        min: 128,
+        min: lightCalibration,
         max: 256,
         color: '#AAA',
         iconUrl: 'images/light-off.png'
@@ -24,7 +26,7 @@ class TrainControl extends Component<PropsType> {
       {
         name: 'Dark',
         min: 0,
-        max: 128,
+        max: lightCalibration,
         color: '#555',
         iconUrl: 'images/light-on.png'
       }
@@ -37,31 +39,33 @@ class TrainControl extends Component<PropsType> {
         tickMajor={32}
         tickMinor={8}
         title="Lighting"
-        value={this.props.trainControl.light}
+        value={light}
       />
     );
   };
 
   powerDial = () => {
+    const {idleCalibration, power} = this.props.trainControl;
+
     const rings = [
       {
         name: 'Forward',
-        min: 17,
+        min: idleCalibration,
         max: 100,
         color: '#00FF02',
         iconUrl: 'images/forward.png'
       },
       {
         name: 'Idle',
-        min: -17,
-        max: 17,
+        min: -idleCalibration,
+        max: idleCalibration,
         color: '#FFFF02',
         iconUrl: 'images/idle.png'
       },
       {
         name: 'Reverse',
         min: -100,
-        max: -17,
+        max: -idleCalibration,
         color: '#F00',
         iconUrl: 'images/reverse.png'
       }
@@ -74,7 +78,7 @@ class TrainControl extends Component<PropsType> {
         tickMajor={20}
         tickMinor={2}
         title="Power"
-        value={this.props.trainControl.power}
+        value={power}
       />
     );
   };
