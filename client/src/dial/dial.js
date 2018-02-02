@@ -7,10 +7,18 @@ import {circle, fatArc, polarToCartesian, text} from '../util/svg-util';
 
 import './dial.css';
 
+type RingType = {
+  color: string,
+  min: number,
+  max: number,
+  name: string
+};
+
 type PropsType = {
   max: number,
   min: number,
   iconUrl?: string,
+  rings: RingType[],
   tickMajor: number,
   tickMinor: number,
   title: string,
@@ -19,9 +27,7 @@ type PropsType = {
 
 const BG_COLOR = '#536071';
 const CENTER_COLOR = '#ABABAB';
-const FORWARD_COLOR = '#00FF02';
 const ICON_SIZE = 32;
-const IDLE_COLOR = '#FFFF02';
 const MAX_ANGLE = -60;
 const MIN_ANGLE = 240;
 const NEEDLE_LEFT_COLOR = '#B00A13';
@@ -29,19 +35,18 @@ const NEEDLE_LENGTH_PERCENT = 0.69;
 const NEEDLE_RIGHT_COLOR = '#FC131E';
 const RADIUS = 100;
 const RING_WIDTH = 12;
-const REVERSE_COLOR = '#F00';
 
 const SIZE = RADIUS * 2 + 6;
 const CENTER = {x: SIZE / 2, y: SIZE / 2};
 
-function dialArc(label, color, start, end) {
+function dialArc(label, color, startAngle, endAngle) {
   return fatArc({
     center: CENTER,
     innerRadius: RADIUS - RING_WIDTH,
     label,
     outerRadius: RADIUS,
-    startAngle: start,
-    endAngle: end,
+    startAngle,
+    endAngle,
     fill: color
   });
 }
@@ -132,12 +137,8 @@ class Dial extends Component<PropsType> {
     MIN_ANGLE + (value - this.props.min) * this.anglePerValue;
 
   render() {
-    const {iconUrl, max, min, title, value} = this.props;
+    const {iconUrl, max, min, rings, title, value} = this.props;
     this.anglePerValue = (MAX_ANGLE - MIN_ANGLE) / (max - min);
-
-    const calibrationAngle = 40;
-    const idleMax = 90 - calibrationAngle / 2;
-    const idleMin = 90 + calibrationAngle / 2;
 
     const icon = iconUrl ? (
       <image
@@ -147,6 +148,12 @@ class Dial extends Component<PropsType> {
         y={CENTER.y - RADIUS * 0.58}
       />
     ) : null;
+
+    const dialRings = rings.map(ring => {
+      const startAngle = this.valueToAngle(ring.max);
+      const endAngle = this.valueToAngle(ring.min);
+      return dialArc(ring.name, ring.color, startAngle, endAngle);
+    });
 
     return (
       <svg width={SIZE} height={SIZE}>
@@ -165,9 +172,7 @@ class Dial extends Component<PropsType> {
           stroke: 'black',
           strokeWidth: 3
         })}
-        {dialArc('Forward', FORWARD_COLOR, MAX_ANGLE, idleMax)}
-        {dialArc('Idle', IDLE_COLOR, idleMax, idleMin)}
-        {dialArc('Reverse', REVERSE_COLOR, idleMin, MIN_ANGLE)}
+        {dialRings}
         {text({
           center: CENTER,
           dy: 28,

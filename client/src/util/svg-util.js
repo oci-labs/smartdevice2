@@ -125,16 +125,7 @@ export function fatArc(descriptor: FatArcDescriptorType) {
     stroke = 'none',
     strokeWidth = 1
   } = descriptor;
-  /*
-  const dStart = fatArcPath({
-    center,
-    innerRadius,
-    outerRadius,
-    startAngle,
-    endAngle: startAngle
-  });
-  */
-  const dEnd = fatArcPath({
+  const d = fatArcPath({
     center,
     innerRadius,
     outerRadius,
@@ -158,16 +149,9 @@ export function fatArc(descriptor: FatArcDescriptorType) {
   }
 
   return (
-    <Fragment>
-      {/*
-      <path id="p1" d={dStart} fill={fill}
-        stroke={stroke} strokeWidth={strokeWidth} />
-      <animate href="#p1" attributeName="d"
-        from={dStart} to={dEnd} dur="1s" fill="freeze" />
-      */}
+    <Fragment key={label}>
       <path
-        id="p1"
-        d={dEnd}
+        d={d}
         fill={fill}
         stroke={stroke}
         strokeWidth={strokeWidth}

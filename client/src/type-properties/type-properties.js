@@ -182,10 +182,15 @@ class TypeProperties extends Component<PropsType> {
   );
 
   lightDial = () => {
+    const rings = [
+      {name: 'Light', min: 128, max: 256, color: '#AAA'},
+      {name: 'Dark', min: 0, max: 128, color: '#555'}
+    ];
     return <Dial
       iconUrl="images/light-off.png"
       max={256}
       min={0}
+      rings={rings}
       tickMajor={32}
       tickMinor={8}
       title="Lighting"
@@ -193,10 +198,16 @@ class TypeProperties extends Component<PropsType> {
   };
 
   powerDial = () => {
+    const rings = [
+      {name: 'Forward', min: 17, max: 100, color: '#00FF02'},
+      {name: 'Idle', min: -17, max: 17, color: '#FFFF02'},
+      {name: 'Reverse', min: -100, max: -17, color: '#F00'},
+    ];
     return <Dial
       iconUrl="images/idle.png"
       max={100}
       min={-100}
+      rings={rings}
       tickMajor={20}
       tickMinor={2}
       title="Power"
