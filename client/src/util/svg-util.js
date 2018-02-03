@@ -10,7 +10,7 @@ export type PointType = {
   y: number
 };
 
-type ArcDescriptorType = {
+type ArcOptionsType = {
   center: PointType,
   clockwise?: boolean,
   endAngle: number,
@@ -20,7 +20,7 @@ type ArcDescriptorType = {
   strokeWidth?: number
 };
 
-type CircleDescriptorType = {
+type CircleOptionsType = {
   center: PointType,
   className?: string,
   fill?: string,
@@ -29,7 +29,7 @@ type CircleDescriptorType = {
   strokeWidth?: number
 };
 
-type FatArcDescriptorType = {
+type FatArcOptionsType = {
   center: PointType,
   clockwise?: boolean,
   endAngle: number,
@@ -42,7 +42,7 @@ type FatArcDescriptorType = {
   strokeWidth?: number
 };
 
-type RectDescriptorType = {
+type RectOptionsType = {
   fill?: string,
   height: number,
   stroke?: string,
@@ -52,8 +52,9 @@ type RectDescriptorType = {
   y: number
 };
 
-type TextDescriptorType = {
-  center: PointType,
+type TextOptionsType = {
+  center?: PointType,
+  className?: string,
   dx?: number,
   dy?: number,
   fill?: string,
@@ -64,7 +65,7 @@ type TextDescriptorType = {
   transform?: string
 };
 
-export function arcPath(descriptor: ArcDescriptorType) {
+export function arcPath(descriptor: ArcOptionsType) {
   const {stroke = 'red', strokeWidth = 1} = descriptor;
   const d = arc(descriptor);
   return (
@@ -73,7 +74,7 @@ export function arcPath(descriptor: ArcDescriptorType) {
 }
 
 // This assumes already positioned at start.x, start.y.
-export function arc(descriptor: ArcDescriptorType) {
+export function arc(descriptor: ArcOptionsType) {
   const {center, radius, startAngle, endAngle, clockwise = false} = descriptor;
   let start = polarToCartesian(center, radius, startAngle);
   let end = polarToCartesian(center, radius, endAngle);
@@ -91,7 +92,7 @@ export function arc(descriptor: ArcDescriptorType) {
   ].join(' ');
 }
 
-export function circle(descriptor: CircleDescriptorType) {
+export function circle(descriptor: CircleOptionsType) {
   const {
     center,
     className,
@@ -113,7 +114,7 @@ export function circle(descriptor: CircleDescriptorType) {
   );
 }
 
-export function fatArc(descriptor: FatArcDescriptorType) {
+export function fatArc(descriptor: FatArcOptionsType) {
   const {
     center,
     innerRadius,
@@ -156,7 +157,7 @@ export function fatArc(descriptor: FatArcDescriptorType) {
   );
 }
 
-export function fatArcPath(descriptor: FatArcDescriptorType) {
+export function fatArcPath(descriptor: FatArcOptionsType) {
   const {center, innerRadius, outerRadius, startAngle, endAngle} = descriptor;
   const innerStart = polarToCartesian(center, innerRadius, endAngle);
   const outerStart = polarToCartesian(center, outerRadius, startAngle);
@@ -198,7 +199,7 @@ export function polarToCartesian(
   };
 }
 
-export function rect(descriptor: RectDescriptorType) {
+export function rect(descriptor: RectOptionsType) {
   const {
     x,
     y,
@@ -221,9 +222,10 @@ export function rect(descriptor: RectDescriptorType) {
   );
 }
 
-export function text(descriptor: TextDescriptorType) {
+export function text(descriptor: TextOptionsType) {
   const {
     center,
+    className,
     dx = 0,
     dy = 0,
     fill = 'black',
@@ -233,8 +235,12 @@ export function text(descriptor: TextDescriptorType) {
     text = '',
     transform = ''
   } = descriptor;
+  console.log('svg-util.js text: className =', className);
+  const props = center ? {...center} : {};
+  console.log('svg-util.js text: props =', props);
   return (
     <text
+      className={className}
       dx={dx}
       dy={dy}
       fill={fill}
@@ -243,8 +249,7 @@ export function text(descriptor: TextDescriptorType) {
       stroke={stroke}
       textAnchor="middle"
       transform={transform}
-      x={center.x}
-      y={center.y}
+      {...props}
     >
       {text}
     </text>

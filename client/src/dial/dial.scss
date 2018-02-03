@@ -1,5 +1,52 @@
 .dial {
-  .dialBackground {
-    background-image: radial-gradient(closest-corner, yellow, red);
+  $radius: 100px;
+  $size: $radius * 2 + 6;
+  $center: $size / 2;
+  $icon-size: 32px;
+
+  #bg-gradient {
+    .stop1 {
+      stop-color: #536071;
+    }
+    .stop2 {
+      stop-color: #1C1B1C;
+    }
+  }
+
+  .dial-background {
+    fill: url(#bg-gradient);
+    stroke: black;
+    stroke-width: 3px;
+  }
+
+  .dial-button {
+    fill: #ABABAB;
+  }
+
+  .icon {
+    height: $icon-size;
+    x: $center - $icon-size / 2;
+    y: $center - $radius * 0.58;
+  }
+
+  .needle-left {
+    fill: #B00A13;
+  }
+
+  .needle-right {
+    fill: #FC131E;
+  }
+
+  .tick {
+    stroke: white;
+    stroke-width: 2;
+  }
+
+  .title {
+    fill: white;
+    font-size: 8px;
+    //x: $center; //TODO: Why doesn't this work?
+    //y: $center; //TODO: Why doesn't this work?
+    //dy: 28px; //TODO: Why doesn't this work?
   }
 }

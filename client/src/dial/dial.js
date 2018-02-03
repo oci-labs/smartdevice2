@@ -25,14 +25,9 @@ type PropsType = {
   value: number
 };
 
-const BG_COLOR = '#536071';
-const CENTER_COLOR = '#ABABAB';
-const ICON_SIZE = 32;
 const MAX_ANGLE = -60;
 const MIN_ANGLE = 240;
-const NEEDLE_LEFT_COLOR = '#B00A13';
 const NEEDLE_LENGTH_PERCENT = 0.69;
-const NEEDLE_RIGHT_COLOR = '#FC131E';
 const RADIUS = 100;
 const RING_WIDTH = 12;
 
@@ -55,7 +50,6 @@ function tick(value, angle, isMajor) {
   const r1 = RADIUS * 0.86;
   const r2 = RADIUS * (isMajor ? 0.78 : 0.83);
   const r3 = RADIUS * 0.7;
-  const strokeWidth = 2; //isMajor ? 2 : 1;
   const p1 = polarToCartesian(CENTER, r1, angle);
   const p2 = polarToCartesian(CENTER, r2, angle);
   const p3 = polarToCartesian(CENTER, r3, angle);
@@ -69,10 +63,9 @@ function tick(value, angle, isMajor) {
   return (
     <Fragment key={`${isMajor ? 'major' : 'minor'}-fragment-${angle}`}>
       <path
+        className="tick"
         key={`${isMajor ? 'major' : 'minor'}-tick-${angle}`}
         d={d}
-        stroke="white"
-        strokeWidth={strokeWidth}
       />
       {label}
     </Fragment>
@@ -104,8 +97,8 @@ class Dial extends Component<PropsType> {
     `;
     return (
       <Fragment>
-        <path d={leftNeedle} fill={NEEDLE_LEFT_COLOR} />;
-        <path d={rightNeedle} fill={NEEDLE_RIGHT_COLOR} />;
+        <path className="needle-left" d={leftNeedle} />;
+        <path className="needle-right" d={rightNeedle} />;
       </Fragment>
     );
   };
@@ -113,14 +106,7 @@ class Dial extends Component<PropsType> {
   getIcon = () => {
     const {rings, value} = this.props;
     const ring = rings.find(ring => ring.min <= value && value <= ring.max);
-    return ring ? (
-      <image
-        href={ring.iconUrl}
-        height={ICON_SIZE}
-        x={CENTER.x - ICON_SIZE / 2}
-        y={CENTER.y - RADIUS * 0.58}
-      />
-    ) : null;
+    return ring ? <image className="icon" href={ring.iconUrl} /> : null;
   };
 
   tickMarks = () => {
@@ -160,34 +146,34 @@ class Dial extends Component<PropsType> {
     });
 
     return (
-      <svg width={SIZE} height={SIZE}>
+      <svg className="dial" width={SIZE} height={SIZE}>
         <defs>
-          <radialGradient id="rg">
-            <stop offset="75%" stopColor={BG_COLOR} />
-            <stop offset="100%" stopColor="#1C1B1C" />
+          <radialGradient id="bg-gradient">
+            <stop className="stop1" offset="75%" />
+            <stop className="stop2" offset="100%" />
           </radialGradient>
         </defs>
 
         {circle({
-          className: 'dialBackground',
+          className: 'dial-background',
           center: CENTER,
-          fill: 'url(#rg)',
-          radius: RADIUS + 1,
-          stroke: 'black',
-          strokeWidth: 3
+          radius: RADIUS + 1
         })}
         {dialRings}
         {text({
           center: CENTER,
+          className: 'title',
           dy: 28,
-          fill: 'white',
-          fontSize: 8,
           text: title
         })}
         {this.tickMarks()}
         {this.getIcon()}
         {this.dialNeedle(value)}
-        {circle({center: CENTER, fill: CENTER_COLOR, radius: 8})}
+        {circle({
+          center: CENTER,
+          className: 'dial-button',
+          radius: 8
+        })}
       </svg>
     );
   }
