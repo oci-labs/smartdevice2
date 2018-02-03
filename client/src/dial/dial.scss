@@ -4,6 +4,9 @@
   $center: $size / 2;
   $icon-size: 32px;
 
+  height: $size;
+  width: $size;
+
   #bg-gradient {
     .stop1 {
       stop-color: #536071;
@@ -45,8 +48,6 @@
   .title {
     fill: white;
     font-size: 8px;
-    //x: $center; //TODO: Why doesn't this work?
-    //y: $center; //TODO: Why doesn't this work?
-    //dy: 28px; //TODO: Why doesn't this work?
+    transform: translate($center, $center + 28);
   }
 }

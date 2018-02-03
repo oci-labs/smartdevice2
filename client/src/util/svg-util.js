@@ -31,6 +31,7 @@ type CircleOptionsType = {
 
 type FatArcOptionsType = {
   center: PointType,
+  className?: string,
   clockwise?: boolean,
   endAngle: number,
   fill?: string,
@@ -117,6 +118,7 @@ export function circle(descriptor: CircleOptionsType) {
 export function fatArc(descriptor: FatArcOptionsType) {
   const {
     center,
+    className,
     innerRadius,
     outerRadius,
     startAngle,
@@ -141,17 +143,23 @@ export function fatArc(descriptor: FatArcOptionsType) {
     const labelLoc = polarToCartesian(center, radius, angle);
     const transform = `rotate(${90 - angle} ${labelLoc.x} ${labelLoc.y})`;
     labelText = text({
-      text: label,
       center: labelLoc,
       dy: 4,
       fontSize: 10,
+      text: label,
       transform
     });
   }
 
   return (
     <Fragment key={label}>
-      <path d={d} fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+      <path
+        className={className}
+        d={d}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+      />
       {labelText}
     </Fragment>
   );
@@ -235,9 +243,8 @@ export function text(descriptor: TextOptionsType) {
     text = '',
     transform = ''
   } = descriptor;
-  console.log('svg-util.js text: className =', className);
   const props = center ? {...center} : {};
-  console.log('svg-util.js text: props =', props);
+  if (transform) props.transform = transform;
   return (
     <text
       className={className}
@@ -248,7 +255,6 @@ export function text(descriptor: TextOptionsType) {
       fontSize={fontSize}
       stroke={stroke}
       textAnchor="middle"
-      transform={transform}
       {...props}
     >
       {text}

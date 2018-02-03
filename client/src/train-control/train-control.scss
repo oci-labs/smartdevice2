@@ -21,8 +21,28 @@
     display: inline-block;
   }
 
+  .light-dark {
+    fill: #555; // dark gray
+  }
+
+  .light-light {
+    fill: #AAA; // light gray
+  }
+
   .power {
     display: inline-block;
     margin-right: 20px;
+  }
+
+  .power-forward {
+    fill: #00FF02; // green
+  }
+
+  .power-idle {
+    fill: #FFFF02; // yellow
+  }
+
+  .power-reverse {
+    fill: #F00; // red
   }
 }

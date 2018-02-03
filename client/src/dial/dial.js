@@ -7,8 +7,8 @@ import {circle, fatArc, polarToCartesian, text} from '../util/svg-util';
 
 import './dial.css';
 
-type RingType = {
-  color: string,
+export type RingType = {
+  className: string,
   iconUrl?: string,
   min: number,
   max: number,
@@ -34,15 +34,15 @@ const RING_WIDTH = 12;
 const SIZE = RADIUS * 2 + 6;
 const CENTER = {x: SIZE / 2, y: SIZE / 2};
 
-function dialArc(label, color, startAngle, endAngle) {
+function dialArc({className, label, startAngle, endAngle}) {
   return fatArc({
     center: CENTER,
+    className,
     innerRadius: RADIUS - RING_WIDTH,
     label,
     outerRadius: RADIUS,
     startAngle,
-    endAngle,
-    fill: color
+    endAngle
   });
 }
 
@@ -142,11 +142,16 @@ class Dial extends Component<PropsType> {
     const dialRings = rings.map(ring => {
       const startAngle = this.valueToAngle(ring.max);
       const endAngle = this.valueToAngle(ring.min);
-      return dialArc(ring.name, ring.color, startAngle, endAngle);
+      return dialArc({
+        className: ring.className,
+        label: ring.name,
+        startAngle,
+        endAngle
+      });
     });
 
     return (
-      <svg className="dial" width={SIZE} height={SIZE}>
+      <svg className="dial">
         <defs>
           <radialGradient id="bg-gradient">
             <stop className="stop1" offset="75%" />
@@ -160,12 +165,7 @@ class Dial extends Component<PropsType> {
           radius: RADIUS + 1
         })}
         {dialRings}
-        {text({
-          center: CENTER,
-          className: 'title',
-          dy: 28,
-          text: title
-        })}
+        {text({className: 'title', text: title})}
         {this.tickMarks()}
         {this.getIcon()}
         {this.dialNeedle(value)}

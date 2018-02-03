@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {Input} from 'redux-easy';
-import Dial from '../dial/dial';
+import Dial, {type RingType} from '../dial/dial';
 
 import './train-control.css';
 
@@ -17,19 +17,19 @@ class TrainControl extends Component<PropsType> {
   lightDial = () => {
     const {light, lightCalibration} = this.props.trainControl;
 
-    const rings = [
+    const rings: RingType[] = [
       {
+        className: 'light-light',
         name: 'Light',
         min: lightCalibration,
         max: 256,
-        color: '#AAA',
         iconUrl: 'images/light-off.png'
       },
       {
+        className: 'light-dark',
         name: 'Dark',
         min: 0,
         max: lightCalibration,
-        color: '#555',
         iconUrl: 'images/light-on.png'
       }
     ];
@@ -49,26 +49,26 @@ class TrainControl extends Component<PropsType> {
   powerDial = () => {
     const {idleCalibration, power} = this.props.trainControl;
 
-    const rings = [
+    const rings: RingType[] = [
       {
+        className: 'power-forward',
         name: 'Forward',
         min: idleCalibration,
         max: 100,
-        color: '#00FF02',
         iconUrl: 'images/forward.png'
       },
       {
+        className: 'power-idle',
         name: 'Idle',
         min: -idleCalibration,
         max: idleCalibration,
-        color: '#FFFF02',
         iconUrl: 'images/idle.png'
       },
       {
+        className: 'power-reverse',
         name: 'Reverse',
         min: -100,
         max: -idleCalibration,
-        color: '#F00',
         iconUrl: 'images/reverse.png'
       }
     ];
