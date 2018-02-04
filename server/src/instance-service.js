@@ -205,10 +205,12 @@ export async function getTopInstances() {
 }
 
 function getUniqueNames(expression: string): string[] {
-  const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
+  // Names can start with ! for boolean negation.
+  const PROPERTY_NAME_RE = /^!?[A-Za-z]\w*$/;
   const names = expression
     .split(' ')
-    .filter(word => PROPERTY_NAME_RE.test(word));
+    .filter(word => PROPERTY_NAME_RE.test(word))
+    .map(word => word.startsWith('!') ? word.substring(1) : word);
   return uniq(names);
 }
 
