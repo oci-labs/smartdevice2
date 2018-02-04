@@ -9,7 +9,6 @@ import {dispatchSet} from 'redux-easy';
 import Button from '../share/button';
 import Enums from '../enums/enums';
 import {showModal} from '../share/sd-modal';
-import TrainControl from '../train-control/train-control';
 import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
@@ -187,7 +186,6 @@ class TypeProperties extends Component<PropsType> {
       return (
         <section className="type-properties">
           <h3>Select a type in the left nav.</h3>
-          <TrainControl />
         </section>
       );
     }

@@ -8,6 +8,7 @@ import InstanceDetail from './instance-detail/instance-detail';
 import InstanceHierarchy from './instance-hierarchy/instance-hierarchy';
 import LeftNav from './left-nav/left-nav';
 import SdModal from './share/sd-modal';
+import TrainControl from './train-control/train-control';
 import TypeAlerts from './type-alerts/type-alerts';
 import TypeProperties from './type-properties/type-properties';
 
@@ -20,7 +21,8 @@ type PropsType = {
 };
 
 const middleMap = {
-  '': null,
+  //'': null,
+  '': <TrainControl />,
   instance: <InstanceHierarchy />,
   type: <TypeProperties />
 };

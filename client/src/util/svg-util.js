@@ -142,13 +142,16 @@ export function fatArc(descriptor: FatArcOptionsType) {
     const angle = (startAngle + endAngle) / 2;
     const labelLoc = polarToCartesian(center, radius, angle);
     const transform = `rotate(${90 - angle} ${labelLoc.x} ${labelLoc.y})`;
-    labelText = text({
-      center: labelLoc,
-      dy: 4,
-      fontSize: 10,
-      text: label,
-      transform
-    });
+    const deltaAngle = endAngle - startAngle;
+    if (deltaAngle >= 25) {
+      labelText = text({
+        center: labelLoc,
+        dy: 4,
+        fontSize: 10,
+        text: label,
+        transform
+      });
+    }
   }
 
   return (
