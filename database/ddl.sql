@@ -205,3 +205,8 @@ insert into type (id, name, parentId) values
 insert into instance (id, name, organizationId, typeId)
 values (1, 'Creve Coeur', 1, 1);
 */
+
+grant all on smartdevice.* to 'root'@'%' identified by 'legosrock' with grant option;
+
+create user 'devo'@'%' identified by 'whipit';
+grant all on smartdevice.* to 'devo'@'%' with grant option;

@@ -1,0 +1,15 @@
+#!/bin/bash
+# This resets the database, deleting all and recreating all tables.
+
+ipAddress=`kubectl get services devo-database | awk 'FNR==2 {print $4}'`
+
+username=root
+password=`./get-secret mysql-root-auth root-password`
+
+#username=`./get-secret mysql-user-auth username`
+#password=`./get-secret mysql-user-auth password`
+
+echo username = $username
+echo password = $password
+
+mysql -u$username -p$password -h$ipAddress < ddl.sql

@@ -1,0 +1,48 @@
+apiVersion: extensions/v1
+kind: Deployment
+metadata:
+  name: devo-database
+  labels:
+    app: devo-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devo-database
+  template:
+    metadata:
+      labels:
+        app: devo-database
+    spec:
+      containers:
+        - image: devo-database
+          name: devo-database
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-auth
+                  key: root-password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-auth
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-auth
+                  key: password
+          ports:
+            - containerPort: 3306
+              name: devo-database
+          volumeMounts:
+            - name: smartdevice-disk
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: smartdevice-disk
+          gcePersistentDisk:
+            pdName: smartdevice-disk
+            fsType: ext4
+          secret:
+            secretName: mysql-user-auth

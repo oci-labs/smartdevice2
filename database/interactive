@@ -1,0 +1,13 @@
+#!/bin/bash
+# This starts interactive mode for MySQL.
+
+dbName=smartdevice
+ipAddress=`kubectl get services devo-database | awk 'FNR==2 {print $4}'`
+
+username=root
+password=`./get-secret mysql-root-auth root-password`
+
+#username=`./get-secret mysql-user-auth username`
+#password=`./get-secret mysql-user-auth password`
+
+mysql -u$username -p$password -h${ipAddress} -D$dbName

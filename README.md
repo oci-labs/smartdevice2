@@ -198,6 +198,17 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   `docker-compose up --build`
 - creates a virtual network where the virtual host names match the service names
 
+## Kubernetes
+
+### Terminology
+
+* Image
+* Container
+* Pod
+* Replica Set
+* Deployment
+* Service
+
 ## Deploying to the Google Cloud Platform (GCP)
 - these steps assumes Docker is installed
 - to go to GCP Console
@@ -259,6 +270,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
     - omit pod-name to see all
 - to see logs for a given pod
   * kubectl logs {pod-name}
+  * ex. kubectl logs devo-server-3609554682-c36p2
 - to delete a pod, delete the corresponding deployment
   * kubectl delete deployment {pod-name}
 - to see list of existing services
@@ -268,3 +280,42 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   * kubectl describe services {service-name}
     - omit service-name to see all
   * browse the IP address labelled "LoadBalancer Ingress" with the port in "Port"
+    - ex. http://35.225.141.14:3001
+
+## Google Cloud Persistent Disk
+- enables using for MySQL in a way that
+  data is not lost when the database service is restarted
+- allocate space
+  gcloud compute disks create --size 1GB smartdevice-disk
+  * 1GB is the smallest size that can be requested
+- create Kubernetes secret containing MySQL username and password
+  * values are in database/username.secret and database/password.secret
+    which are not in the Git repository
+  * to create the "mysql-root-auth" and "mysql-user-auth" secrets,
+    enter "./database/create-secrets.sh"
+  * to verify that this secret exists,
+    enter "kubectl get secrets" and look for "mysql-*-auth"
+  * to delete a secret, enter "kubectl delete secret {name}"
+- cd database
+  * see devo-database.yaml which describes an instance/container
+    - refers to the devo-database-root-auth secret
+    - refers to the smartdevice-disk persistent disk
+  * devo-database-service.yaml which describes a service
+- create service with ./gcpdeploy
+- verify service is running with
+  kubectl get service devo-database
+- delete service with
+  kubectl delete service devo-database
+- configure server to use this database
+  - by changing "host" from "localhost" to "devo-database"
+    in config.json
+    * also change "user" and "password"
+      to secret values
+- get web app URL
+  * kubectl get service devo-server
+  * note EXTERNAL IP
+  * browse http://{external-ip}:3001
+- view server logs
+  * get server name with
+    kubectl describe pods devo-server | grep "^Name:"
+  * kubectl logs {server-name}
