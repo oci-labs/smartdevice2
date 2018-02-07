@@ -2,8 +2,10 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Input} from 'redux-easy';
+import {dispatchSet} from 'redux-easy';
+
 import Dial, {type RingType} from '../dial/dial';
+import {send} from '../websocket';
 
 import './train-control.css';
 
@@ -13,6 +15,8 @@ type PropsType = {
   mqttConnected: boolean,
   trainControl: TrainControlType
 };
+
+const trainName = 'thejoveexpress';
 
 class TrainControl extends Component<PropsType> {
   lightDial = () => {
@@ -86,8 +90,27 @@ class TrainControl extends Component<PropsType> {
     );
   };
 
+  publish = (
+    topic: string,
+    property: string,
+    event: SyntheticInputEvent<HTMLInputElement>
+  ) => {
+    const value = Number(event.target.value);
+
+    //TODO: Include server id in message?
+    let msg = `set ${trainName}/${topic}/control = ${value}`;
+    const max = topic.startsWith('engine/')
+      ? 100
+      : topic.startsWith('lights/') ? 256 : 0;
+    if (max) msg += ' ' + max;
+
+    send(msg);
+
+    dispatchSet('trainControl.' + property, value);
+  };
+
   render() {
-    const {mqttConnected} = this.props;
+    const {mqttConnected, trainControl} = this.props;
     const connImg = mqttConnected ? 'connected' : 'disconnected';
 
     return (
@@ -98,25 +121,47 @@ class TrainControl extends Component<PropsType> {
         </header>
         <div className="power">
           {this.powerDial()}
-          <Input path="trainControl.power" type="range" min="-100" max="100" />
+
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            onChange={e => this.publish('engine/power', 'power', e)}
+            value={trainControl.power}
+          />
           <label>Power</label>
-          <Input
-            path="trainControl.idleCalibration"
+
+          <input
             type="range"
             min="0"
             max="100"
+            onChange={e =>
+              this.publish('engine/calibration', 'idleCalibration', e)
+            }
+            value={trainControl.idleCalibration}
           />
           <label>Calibrate Idle</label>
         </div>
         <div className="light">
           {this.lightDial()}
-          <Input path="trainControl.light" type="range" min="0" max="256" />
-          <label>Lights</label>
-          <Input
-            path="trainControl.lightCalibration"
+
+          <input
             type="range"
             min="0"
             max="256"
+            onChange={e => this.publish('lights/ambient', 'light', e)}
+            value={trainControl.light}
+          />
+          <label>Lights</label>
+
+          <input
+            type="range"
+            min="0"
+            max="256"
+            onChange={e =>
+              this.publish('lights/calibration', 'lightCalibration', e)
+            }
+            value={trainControl.lightCalibration}
           />
           <label>Calibrate Ambient Light</label>
         </div>

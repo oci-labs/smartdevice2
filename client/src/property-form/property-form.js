@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatchSet, Input} from 'redux-easy';
+import {dispatch, dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
 //import Input from '../share/input';
@@ -19,13 +19,17 @@ type PropsType = {
   typeProps: PropertyType[]
 };
 
+const inputTypes = {
+  boolean: 'checkbox',
+  number: 'number',
+  percent: 'number',
+  text: 'text'
+};
+
 class PropertyForm extends Component<PropsType> {
   getInput = (property: PropertyType) => {
     const {kind, name} = property;
-    const type =
-      kind === 'boolean'
-        ? 'checkbox'
-        : kind === 'number' ? kind : kind === 'text' ? kind : undefined;
+    const type = inputTypes[kind];
     return type ? (
       <Input type={type} path={'instanceData.' + name} />
     ) : (
@@ -56,6 +60,17 @@ class PropertyForm extends Component<PropsType> {
 
   saveProperties = async () => {
     const {instanceData, node} = this.props;
+
+    Object.keys(instanceData).forEach(property => {
+      const value = instanceData[property];
+      const change = {
+        instanceId: node.id,
+        property,
+        value
+      };
+      dispatch('setInstanceProperty', change);
+    });
+
     const res = await postJson(`instances/${node.id}/data`, instanceData);
     const alerts = await res.json();
     dispatchSet('alerts', alerts);

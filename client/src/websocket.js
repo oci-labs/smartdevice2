@@ -4,19 +4,21 @@ import {dispatch, dispatchSet} from 'redux-easy';
 
 import {reloadAlerts} from './instance-detail/instance-detail';
 
-function configure(connection) {
-  connection.onclose = () => {
+let ws;
+
+function configure(ws) {
+  ws.onclose = () => {
     console.info('got WebSocket close');
-    // Try to get a new connection in 5 seconds.
-    setTimeout(connect, 5000);
+    // Try to get a new WebSocket connection in 5 seconds.
+    setTimeout(websocketSetup, 5000);
   };
 
   /*
-  connection.onerror = error =>
+  ws.onerror = error =>
     console.error('WebSocket error:', error);
   */
 
-  connection.onmessage = message => {
+  ws.onmessage = message => {
     const data = String(message.data);
 
     if (data.startsWith('MQTT ')) {
@@ -33,20 +35,22 @@ function configure(connection) {
     try {
       // $FlowFixMe - doesn't think data is a string
       const change = JSON.parse(data);
+      //console.log('websocket.js onmessage: change =', change);
       dispatch('setInstanceProperty', change);
     } catch (e) {
       console.info('unsupported WebSocket message:', data);
     }
   };
 
-  connection.onopen = () =>
-    console.info('got WebSocket connection');
+  ws.onopen = () => console.info('got WebSocket connection');
 }
 
-function connect() {
+export function send(message: string): void {
+  if (ws) ws.send(message);
+}
+
+export function websocketSetup() {
   const {hostname} = window.location;
-  const connection = new WebSocket(`ws://${hostname}:1337`);
-  configure(connection);
+  ws = new WebSocket(`ws://${hostname}:1337`);
+  configure(ws);
 }
-
-export const websocketSetup = connect;

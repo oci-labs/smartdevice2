@@ -26,7 +26,10 @@ const SPECIAL_SUFFIXES = ['control', 'feedback'];
 const clientMap = {}; // keys are server ids
 const serverMap = {}; // keys are server ids
 
-let lastChange, mqttConnected = false, mySql, ws;
+let lastChange,
+  mqttConnected = false,
+  mySql,
+  ws;
 
 export async function connect(server: MessageServerType) {
   const topLevelTypes = await getTopLevelTypes();
@@ -39,7 +42,8 @@ export async function connect(server: MessageServerType) {
       }
     } else {
       console.error(
-        `The type "${type.name}" has no associated message server.`);
+        `The type "${type.name}" has no associated message server.`
+      );
     }
   }
 }
@@ -92,6 +96,47 @@ export function disconnect(server: MessageServerType) {
     const url = `mqtt://${server.host}:${server.port}`;
     console.info('disconnected from', url);
   }
+}
+
+function encode(type: string, value: number | string, max?: number): Buffer {
+  return typeof value === 'number'
+    ? encodeNumber(type, value, max)
+    : Buffer.from(value);
+}
+
+function encodeNumber(type: string, value: number, max?: number): Buffer {
+  let buffer;
+
+  switch (type) {
+    case 'boolean':
+      buffer = Buffer.alloc(1);
+      buffer.writeInt8(value, 0);
+      break;
+
+    case 'number':
+      buffer = Buffer.alloc(4);
+      buffer.writeInt32BE(value, 0);
+      break;
+
+    case 'percent': {
+      if (!max) {
+        throw new Error(
+          'mqtt-service encodeNumber: percent type requires max value'
+        );
+      }
+      buffer = Buffer.alloc(8);
+      buffer.writeIntBE(value, 0, 4);
+      buffer.writeIntBE(max, 4, 4);
+      break;
+    }
+
+    default:
+      throw new Error(
+        'mqttService encodeNumber: ' + type + 'is not a numeric type'
+      );
+  }
+
+  return buffer;
 }
 
 function getInstances(typeId: number) {
@@ -164,10 +209,15 @@ async function getTopicType(topic: string): Promise<string> {
       } else {
         type = row.kind;
       }
-    } else { // no row found
-      console.error('mqtt-service.js getTopicType:',
-        'no type_data record found for', property,
-        'with typeId =', typeId);
+    } else {
+      // no row found
+      console.error(
+        'mqtt-service.js getTopicType:',
+        'no type_data record found for',
+        property,
+        'with typeId =',
+        typeId
+      );
     }
   }
 
@@ -312,10 +362,7 @@ export async function mqttService(app: express$Application): Promise<void> {
   // Request feedback from all current clients.
   // This is train-specific.
   const URL_PREFIX = '/mqtt/feedback';
-  app.post(URL_PREFIX, async (
-    req: express$Request,
-    res: express$Response
-  ) => {
+  app.post(URL_PREFIX, async (req: express$Request, res: express$Response) => {
     await requestFeedback();
     res.send();
   });
@@ -420,6 +467,21 @@ export function webSocketSetup() {
     ws.on('error', error => {
       if (error.code !== 'ECONNRESET') {
         console.error('WebSocket error:', error.code);
+      }
+    });
+
+    ws.on('message', async (message: string) => {
+      if (message.startsWith('set')) {
+        const [, topic, , value, max] = message.split(' ');
+
+        const topLevelTypes = await getTopLevelTypes();
+        for (const {messageServerId} of topLevelTypes) {
+          //TODO: Verify this is a train client?
+          const client = clientMap[messageServerId];
+          if (client) {
+            client.publish(topic, encode(value, max));
+          }
+        }
       }
     });
 
