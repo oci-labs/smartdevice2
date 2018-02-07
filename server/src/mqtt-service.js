@@ -409,9 +409,11 @@ export function webSocketSetup() {
   wsServer.on('connection', webSocket => {
     console.info('got WebSocket connection to browser');
     ws = webSocket;
+    if (Object.keys(clientMap).length) wsSend('MQTT connected');
 
     ws.on('close', () => {
       console.info('WebSocket connection to browser closed');
+      wsSend('MQTT closed');
       ws = null;
     });
 
