@@ -428,5 +428,9 @@ export function webSocketSetup() {
 }
 
 function wsSend(message: string): void {
-  if (ws) ws.send(message);
+  try {
+    if (ws) ws.send(message);
+  } catch (e) {
+    console.error('mqtt-service.js wsSend:', e.message);
+  }
 }

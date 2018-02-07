@@ -4,6 +4,12 @@
   padding: 20px;
   width: auto;
 
+  header {
+    img {
+      height: 33px;
+    }
+  }
+
   input[type=range] {
     display: block;
     margin-top: 10px;

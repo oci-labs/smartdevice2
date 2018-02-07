@@ -10,6 +10,7 @@ import './train-control.css';
 import type {StateType, TrainControlType} from '../types';
 
 type PropsType = {
+  mqttConnected: boolean,
   trainControl: TrainControlType
 };
 
@@ -86,8 +87,15 @@ class TrainControl extends Component<PropsType> {
   };
 
   render() {
+    const {mqttConnected} = this.props;
+    const connImg = mqttConnected ? 'connected' : 'disconnected';
+
     return (
       <div className="train-control">
+        <header>
+          <img src="images/dead.png" alt="lifecycle" />
+          <img src={`images/${connImg}.png`} alt="broker connected" />
+        </header>
         <div className="power">
           {this.powerDial()}
           <Input path="trainControl.power" type="range" min="-100" max="100" />
@@ -118,8 +126,8 @@ class TrainControl extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {trainControl} = state;
-  return {trainControl};
+  const {mqttConnected, trainControl} = state;
+  return {mqttConnected, trainControl};
 };
 
 export default connect(mapState)(TrainControl);
