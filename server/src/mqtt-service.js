@@ -98,10 +98,10 @@ export function disconnect(server: MessageServerType) {
   }
 }
 
-function encode(type: string, value: number | string, max?: number): Buffer {
-  return typeof value === 'number'
-    ? encodeNumber(type, value, max)
-    : Buffer.from(value);
+function encode(type: string, value: string, max?: string): Buffer {
+  return type === 'text'
+    ? Buffer.from(value)
+    : encodeNumber(type, Number(value), Number(max));
 }
 
 function encodeNumber(type: string, value: number, max?: number): Buffer {
@@ -125,8 +125,8 @@ function encodeNumber(type: string, value: number, max?: number): Buffer {
         );
       }
       buffer = Buffer.alloc(8);
-      buffer.writeIntBE(value, 0, 4);
-      buffer.writeIntBE(max, 4, 4);
+      buffer.writeInt32BE(value, 0);
+      buffer.writeInt32BE(max, 4);
       break;
     }
 
@@ -473,13 +473,15 @@ export function webSocketSetup() {
     ws.on('message', async (message: string) => {
       if (message.startsWith('set')) {
         const [, topic, , value, max] = message.split(' ');
+        //console.log('mqtt-service.js x: topic =', topic);
 
         const topLevelTypes = await getTopLevelTypes();
         for (const {messageServerId} of topLevelTypes) {
           //TODO: Verify this is a train client?
           const client = clientMap[messageServerId];
           if (client) {
-            client.publish(topic, encode(value, max));
+            const buffer = encode('percent', value, max);
+            client.publish(topic, buffer);
           }
         }
       }
