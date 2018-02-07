@@ -185,28 +185,14 @@ create table user_role (
     on delete cascade
 );
 
+insert into type (id, name) values (0, 'root');
+insert into instance (id, name) values (0, 'root');
+
+-- Optional data follows
+
 insert into organization (id, name)
 values (1, 'Object Computing, Inc.');
 
 insert into user (id, email, firstName, lastName, organizationId) values
   (1, 'mark@objectcomputing.com', 'Mark', 'Volkmann', 1),
   (2, 'stanleyk@objectcomputing.com', 'Kevin', 'Stanley', 1);
-
-insert into type (id, name) values (0, 'root');
-insert into instance (id, name) values (0, 'root');
-
-/*
-insert into type (id, name) values (1, 'site');
-insert into type (id, name, parentId) values
-  (2, 'department', 1),
-  (3, 'machine', 2),
-  (4, 'valve', 3);
-
-insert into instance (id, name, organizationId, typeId)
-values (1, 'Creve Coeur', 1, 1);
-*/
-
-grant all on smartdevice.* to 'root'@'%' identified by 'legosrock' with grant option;
-
-create user 'devo'@'%' identified by 'whipit';
-grant all on smartdevice.* to 'devo'@'%' with grant option;

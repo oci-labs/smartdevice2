@@ -1,0 +1,4 @@
+#!/bin/bash
+# This outputs logs for the web/REST server deployment.
+
+kubectl logs deploy/devo-server

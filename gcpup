@@ -1,0 +1,4 @@
+#!/bin/bash
+
+kubectl apply -f database/database.yaml
+kubectl apply -f server.yaml

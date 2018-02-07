@@ -1,5 +1,4 @@
 #!/bin/bash
-# This outputs logs for the database pod.
+# This outputs logs for the database deployment.
 
-serverName=`kubectl describe pods devo-database | grep "^Name:" | awk '{print $2}'`
-kubectl logs $serverName
+kubectl logs deploy/devo-database

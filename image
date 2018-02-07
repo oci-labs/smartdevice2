@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo building Docker image
+docker build -t gcr.io/ocismartdevice/devo-server .
+
+echo pushing image to Google Cloud Container Registry
+gcloud docker -- push gcr.io/ocismartdevice/devo-server

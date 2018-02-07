@@ -1,9 +1,5 @@
 FROM node:alpine
 
-# DB_HOST is a Docker container name or a Kubernetes service name
-ENV DB_HOST devo-database
-ENV DB_PORT 3306
-
 WORKDIR /usr/src/app
 
 COPY .babelrc .eslintrc.json .prettierrc server/config.json server/package.json server/package-lock.json server/.flowconfig ./

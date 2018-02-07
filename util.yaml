@@ -1,0 +1,54 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: devo-util
+  labels:
+    app: devo-util
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devo-util
+  template:
+    metadata:
+      labels:
+        app: devo-util
+    spec:
+      containers:
+        - image: mysql/mysql:5.7
+          name: devo-util
+          command: ["while true; do sleep 60; done"]
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-auth
+                  key: root-password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-auth
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-user-auth
+                  key: password
+          ports:
+            - containerPort: 3002
+              name: devo-util
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devo-util
+  labels:
+    app: devo-util
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3002
+  selector:
+    app: devo-util

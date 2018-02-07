@@ -1,4 +1,19 @@
-apiVersion: extensions/v1
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: devo-database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: devo-database
@@ -15,9 +30,12 @@ spec:
         app: devo-database
     spec:
       containers:
-        - image: devo-database
+        - image: mysql:5.7
           name: devo-database
           env:
+            # This allows root access from all IP addresses.
+            - name: MYSQL_ROOT_HOST
+              value: "%"
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -41,8 +59,36 @@ spec:
               mountPath: /var/lib/mysql
       volumes:
         - name: smartdevice-disk
-          gcePersistentDisk:
-            pdName: smartdevice-disk
-            fsType: ext4
-          secret:
-            secretName: mysql-user-auth
+          #gcePersistentDisk: # This is GCP-specific!
+          #  pdName: smartdevice-disk
+          #  fsType: ext4
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devo-database
+  labels:
+    app: devo-database
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+  selector:
+    app: devo-database
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devo-database
+  labels:
+    app: devo-database
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+  selector:
+    app: devo-database

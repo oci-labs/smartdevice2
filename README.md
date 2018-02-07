@@ -202,14 +202,14 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 
 ### Terminology
 
-* Image
-* Container
-* Pod
-* Replica Set
-* Deployment
-* Service
+* Image - a Docker image
+* Container - a Docker container
+* Pod - Is this the Kubernetes equivalent of a Docker image?
+* Replica Set - set of pod instances that can handle requests?
+* Deployment - Is this the Kubernetes equivalent of a Docker container?
+* Service - exposes a deployment on a port
 
-## Deploying to the Google Cloud Platform (GCP)
+## Google Cloud Platform (GCP) Setup
 - these steps assumes Docker is installed
 - to go to GCP Console
   * browse http://cloud.google.com
@@ -240,13 +240,19 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
     - can accept all the other defaults
     - press "Create" button
     - takes a few minutes to complete
-- the remaining steps can be executed by running the "gcpdeploy" scripts
-  in the top directory (for the web/REST server)
-  and the database directory (for MySQL)
-  * read these scripts to understand the steps involved
-- the web app and database are ready to run
-  when both services have an EXTERNAL-IP
+
+## Deploying to Google Cloud Platform (GCP)
+- cd to top project directory
+- to build a Docker image and push it to the Google Cloud Container Registry
+  * ./image
+- to start everything in GCP
+  * ./gcpup
+- to stop everything in GCP
+  * ./gcpdown
+- the web/REST server is ready to use when it has an EXTERNAL-IP
   * enter "kubectl get services" repeatedly until they do
+
+## Miscellaneious Google Cloud Platform tips
 - to connect to the database from a terminal
   * mysql -uroot -h{database-external-ip}
   * use smartdevice
@@ -285,7 +291,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 ## Google Cloud Persistent Disk
 - enables using for MySQL in a way that
   data is not lost when the database service is restarted
-- allocate space
+- allocate persistent disk space
   gcloud compute disks create --size 1GB smartdevice-disk
   * 1GB is the smallest size that can be requested
 - create Kubernetes secret containing MySQL username and password

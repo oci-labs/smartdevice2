@@ -2,13 +2,11 @@
   "db": {
     "database": "smartdevice",
     "debug": false,
-    "Xhost": "localhost",
-    "host": "devo-database",
+    "host": "localhost",
+    "Xhost": "devo-database",
     "insecureAuth": true,
-    "Xpassword": "",
-    "password": "whipit",
+    "password": "",
     "port": 3306,
-    "Xuser": "root",
-    "user": "devo"
+    "user": "root"
   }
 }
