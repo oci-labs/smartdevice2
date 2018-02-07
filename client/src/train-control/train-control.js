@@ -19,6 +19,16 @@ type PropsType = {
 const trainName = 'thejoveexpress';
 
 class TrainControl extends Component<PropsType> {
+  counters = () => (
+    <div className="counters">
+      <div>1</div>
+      <div>.</div>
+      <div>-</div>
+      <div>.</div>
+      <div>-</div>
+    </div>
+  );
+
   lightDial = () => {
     const {light, lightCalibration} = this.props.trainControl;
 
@@ -116,8 +126,14 @@ class TrainControl extends Component<PropsType> {
     return (
       <div className="train-control">
         <header>
-          <img src="images/dead.png" alt="lifecycle" />
-          <img src={`images/${connImg}.png`} alt="broker connected" />
+          <div className="left">
+            <img src="images/dead.png" alt="lifecycle" />
+            <div className="title">The Jove Express</div>
+          </div>
+          <div className="right">
+            {this.counters()}
+            <img src={`images/${connImg}.png`} alt="broker connected" />
+          </div>
         </header>
         <div className="power">
           {this.powerDial()}

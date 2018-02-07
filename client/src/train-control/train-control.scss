@@ -5,8 +5,36 @@
   width: auto;
 
   header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    .counters {
+      display: inline-block;
+
+      > div {
+        background-color: black;
+        color: white;
+        display: inline-block;
+        margin-right: 2px;
+        padding: 2px 5px;
+      }
+    }
+
     img {
       height: 33px;
+    }
+
+    .left, .right {
+      align-items: center;
+      display: flex;
+    }
+
+    .title {
+      display: inline-block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-left: 5px;
     }
   }
 
