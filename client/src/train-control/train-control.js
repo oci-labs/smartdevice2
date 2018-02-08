@@ -161,6 +161,7 @@ class TrainControl extends Component<PropsType> {
         <div className="light">
           {this.lightDial()}
 
+          {/*
           <input
             type="range"
             min="0"
@@ -169,6 +170,7 @@ class TrainControl extends Component<PropsType> {
             value={trainControl.light}
           />
           <label>Lights</label>
+          */}
 
           <input
             type="range"

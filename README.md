@@ -51,8 +51,9 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   - may need to run `ps -ef | grep mysql`
     and kill some processes in order for this to work
 * `npm run dbsetup` (initially and only after schema changes)
-  WARNING: This will delete all data in the database.
-  It can be restored by importing a .json file.
+  - This uses database/ddl.sql.
+  - WARNING: This will delete all data in the database.
+  - It can be restored by importing a .json file.
 * `npm run build` (initially and for each new version)
 * `npm run start-dev`
 
@@ -292,6 +293,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   * this uses server.yaml and database/database.yaml
 - to create/recreate the database in GCP
   * `./dbsetup`
+  * this uses database/ddl.sql
 - to interactively query the database in GCP
   * `./dbi`
   * `show tables;`
