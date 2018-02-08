@@ -32,6 +32,8 @@ spec:
                   name: mysql-root-auth
                   key: root-password
           ports:
+            - containerPort: 1337
+              name: devo-websocket
             - containerPort: 3001
               name: devo-server
 
@@ -45,6 +47,9 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
+    - port: 1337
+      name: devo-websocket
     - port: 3001
+      name: devo-server
   selector:
     app: devo-server
