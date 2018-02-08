@@ -16,7 +16,19 @@ type PropsType = {
   trainControl: TrainControlType
 };
 
+const lightOverrideMap = {
+  Off: 0,
+  On: 1,
+  Auto: 2
+};
 const trainName = 'thejoveexpress';
+
+function getButton(label: string, lightOverride: number) {
+  const buttonValue = lightOverrideMap[label];
+  const selected = buttonValue === lightOverride;
+  const className = selected ? 'selected' : '';
+  return <button className={className}>{label}</button>;
+}
 
 class TrainControl extends Component<PropsType> {
   counters = () => (
@@ -121,6 +133,8 @@ class TrainControl extends Component<PropsType> {
 
   render() {
     const {mqttConnected, trainControl} = this.props;
+    const {lightOverride} = trainControl;
+
     const connImg = mqttConnected ? 'connected' : 'disconnected';
 
     return (
@@ -139,6 +153,7 @@ class TrainControl extends Component<PropsType> {
           {this.powerDial()}
 
           <input
+            className="power-slider"
             type="range"
             min="-100"
             max="100"
@@ -161,6 +176,13 @@ class TrainControl extends Component<PropsType> {
         <div className="light">
           {this.lightDial()}
 
+          {/*TODO: These aren't wired up yet. */}
+          <div className="light-mode">
+            {getButton('Off', lightOverride)}
+            {getButton('On', lightOverride)}
+            {getButton('Auto', lightOverride)}
+          </div>
+
           {/*
           <input
             type="range"
@@ -169,8 +191,8 @@ class TrainControl extends Component<PropsType> {
             onChange={e => this.publish('lights/ambient', 'light', e)}
             value={trainControl.light}
           />
-          <label>Lights</label>
           */}
+          <label>Lights</label>
 
           <input
             type="range"
@@ -190,7 +212,11 @@ class TrainControl extends Component<PropsType> {
 
 const mapState = (state: StateType): PropsType => {
   const {mqttConnected, trainControl} = state;
-  return {mqttConnected, trainControl};
+  //TODO: Fix this to get real value of lightOverride.
+  return {
+    mqttConnected,
+    trainControl: {...trainControl, lightOverride: 2}
+  };
 };
 
 export default connect(mapState)(TrainControl);

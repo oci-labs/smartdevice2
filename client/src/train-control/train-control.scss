@@ -1,5 +1,7 @@
 .train-control {
-  background-color: #737373;
+  $background-color: #737373;
+
+  background-color: $background-color;
   display: inline-block;
   padding: 20px;
   width: auto;
@@ -64,10 +66,50 @@
     fill: #AAA; // light gray
   }
 
+  .light-mode {
+    $color: #B8B8B8;
+    $radius: 5px;
+
+    display: flex;
+    margin-bottom: 12px;
+    margin-top: 10px;
+
+    button {
+      color: $color;
+      background-color: transparent;
+      border-color: $color;
+      border-radius: 0;
+      flex-grow: 1;
+      font-size: 12px;
+      padding: 8px 0;
+    }
+
+    button.selected {
+      color: $background-color;
+      background-color: $color;
+    }
+
+    button:nth-child(1) {
+      border-top-left-radius: $radius;
+      border-bottom-left-radius: $radius;
+      border-right: none;
+    }
+
+    button:nth-child(3) {
+      border-left: none;
+      border-top-right-radius: $radius;
+      border-bottom-right-radius: $radius;
+    }
+  }
+
   .power {
     display: inline-block;
     margin-right: 20px;
     vertical-align: top;
+
+    .power-slider {
+      margin-top: 28px;
+    }
   }
 
   .power-forward {

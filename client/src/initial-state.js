@@ -15,6 +15,7 @@ const state: StateType = {
     idleCalibration: 18,
     light: 0,
     lightCalibration: 128,
+    lightOverride: 2,
     power: 0
   },
   typeNodeMap: {},

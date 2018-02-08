@@ -178,6 +178,7 @@ export type TrainControlType = {
   idleCalibration: number,
   light: number,
   lightCalibration: number,
+  lightOverride: number,
   power: number
 };
 
