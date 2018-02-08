@@ -1,0 +1,4 @@
+#!/bin/bash
+# This outputs the logs for the Kubernetes web/REST server deployment.
+
+kubectl logs deploy/devo-server

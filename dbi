@@ -1,0 +1,7 @@
+#!/bin/bash
+# This enters MySQL interactive mode on the database in Kubernetes.
+
+name=devo-database
+podName=$(kubectl get pods | grep $name | cut -d" " -f1)
+password=$(./get-secret mysql-root-auth root-password)
+kubectl exec -ti $podName -- mysql -uroot -p${password} --database smartdevice

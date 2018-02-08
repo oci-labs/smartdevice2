@@ -30,8 +30,11 @@ spec:
         app: devo-database
     spec:
       containers:
-        - image: mysql:5.7
+        - image: mysql/mysql-server:5.7
           name: devo-database
+          args:
+            - "--ignore-db-dir"
+            - "lost+found"
           env:
             # This allows root access from all IP addresses.
             - name: MYSQL_ROOT_HOST
@@ -59,11 +62,11 @@ spec:
               mountPath: /var/lib/mysql
       volumes:
         - name: smartdevice-disk
-          #gcePersistentDisk: # This is GCP-specific!
-          #  pdName: smartdevice-disk
-          #  fsType: ext4
-          persistentVolumeClaim:
-            claimName: mysql-pv-claim
+          gcePersistentDisk: # This is GCP-specific!
+            pdName: smartdevice-disk
+            fsType: ext4
+          #persistentVolumeClaim:
+            #claimName: mysql-pv-claim
 
 ---
 apiVersion: v1

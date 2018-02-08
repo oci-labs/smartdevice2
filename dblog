@@ -1,0 +1,4 @@
+#!/bin/bash
+# This outputs the logs for the Kubernetes database deployment.
+
+kubectl logs deploy/devo-database

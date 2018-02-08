@@ -17,23 +17,20 @@ spec:
     spec:
       containers:
         - image: gcr.io/ocismartdevice/devo-server
+          imagePullPolicy: Always
           name: devo-server
           env:
-            - name: MYSQL_ROOT_PASSWORD
+            - name: DB_HOST
+              value: devo-database
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mysql-root-auth
                   key: root-password
-            - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-user-auth
-                  key: username
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-user-auth
-                  key: password
           ports:
             - containerPort: 3001
               name: devo-server
@@ -46,7 +43,7 @@ metadata:
   labels:
     app: devo-server
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 3001
   selector:

@@ -35,7 +35,8 @@ This installs the server and client.
 
 ## MQTT Setup
 
-See `MosquittoNotes.txt` in the top directory for Mac
+See `MosquittoNotes.txt` in the top directory
+for steps to start the MQTT server on a Mac.
 On a RaspberryPi, `sudo apt-get install mosquitto`.
 
 ## Server Setup
@@ -49,7 +50,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 * `npm run build` (initially and for each new version)
 * `npm run start`
 
-## Client Setup
+## Local Client Setup
 * open a terminal window
 * `cd client`
 * `npm install` (initially and for each new version)
@@ -60,7 +61,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 * define alerts for each type
 * create instances of each type
 
-## Simulator Setup
+## Local Simulator Setup
 * open a terminal window
 * `java -jar TheJoveExpress.jar`
 
@@ -102,8 +103,6 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   - start server again
 
 ## Running with Docker
-
-### Docker tips
 
 - images run in containers
 - to build an image, use the `docker build` command
@@ -209,7 +208,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 * Deployment - Is this the Kubernetes equivalent of a Docker container?
 * Service - exposes a deployment on a port
 
-## Google Cloud Platform (GCP) Setup
+### Google Cloud Platform (GCP) Setup
 - these steps assumes Docker is installed
 - to go to GCP Console
   * browse http://cloud.google.com
@@ -218,18 +217,18 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   * select an existing project from dropdown near upper-left
 - install "Google Cloud SDK"
   * follow steps at https://cloud.google.com/sdk/
-  * if already installed, enter "gcloud components update"
+  * if already installed, enter `gcloud components update`
     to get the latest version
 - install kubectl
   * open a terminal window
-  * gcloud components install kubectl
+  * `gcloud components install kubectl`
 - set gcloud defaults
-  * export PROJECT_ID=ocismartdevice
-    - in Fish shell, set -x PROJECT_ID ocismartdevice
-  * gcloud config set project $PROJECT_ID
-  * gcloud config set compute/zone us-central1-b
+  * `export PROJECT_ID=ocismartdevice`
+    - in Fish shell, `set -x PROJECT_ID ocismartdevice`
+  * `gcloud config set project $PROJECT_ID`
+  * `gcloud config set compute/zone us-central1-b`
 - create a container cluster (one-time)
-  * gcloud container clusters create {cluster-name} --num-nodes=3
+  * `gcloud container clusters create {cluster-name} --num-nodes=3`
     - I used "ocismartdevice" for the cluster name
     - takes a few minutes to complete
   * another way is to use the web console
@@ -241,23 +240,75 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
     - press "Create" button
     - takes a few minutes to complete
 
-## Deploying to Google Cloud Platform (GCP)
-- cd to top project directory
-- to build a Docker image and push it to the Google Cloud Container Registry
-  * ./image
-- to start everything in GCP
-  * ./gcpup
-- to stop everything in GCP
-  * ./gcpdown
-- the web/REST server is ready to use when it has an EXTERNAL-IP
-  * enter "kubectl get services" repeatedly until they do
+### Google Cloud Persistent Disk
+- one use is to enable using MySQL in a way that
+  data is not lost when the database service is restarted
+- to allocate persistent disk space
+  * `gcloud compute disks create --size 1GB smartdevice-disk`
+  * 1GB is the smallest size that can be requested
+- to delete a persistent disk space
+  * `gcloud compute disks delete smartdevice-disk`
+  * this must be done before one can be recreated
 
-## Miscellaneious Google Cloud Platform tips
-- to connect to the database from a terminal
-  * mysql -uroot -h{database-external-ip}
-  * use smartdevice
-  * show tables;
+### Kubernetes Secrets
+- to create a Kubernetes secret
+  * `./create-secret {secret-name} {data-name} {data-value}`
+  * these are typically referenced in a Kubernetes .yaml file
+  * ex.
+    ```
+    env:
+      - name: MYSQL_ROOT_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mysql-root-auth
+            key: root-password
+    ```
+- to delete a Kubernetes secret
+  * `kubectl delete secret {secret-name}`
+- to get a Kubernetes secret
+  * `./get-secret {secret-name} {data-name}`
+  * it may appear that the value ends with a newline, but it doesn't
+- to get the names defined in a Kubernetes secret
+  * `./get-secrets {secret-name}`
+
+### Deploying to Google Cloud Platform (GCP)
+- cd to top project directory
+- to build a Docker image for the web/REST server
+  and push it to the Google Cloud Container Registry
+  * `./image`
+  * this uses Dockerfile
+- to start everything in GCP
+  * `./gcpup`
+  * this uses server.yaml and database/database.yaml
+- to create/recreate the database in GCP
+  * `./dbsetup`
+- to interactively query the database in GCP
+  * `./dbi`
+  * `show tables;`
   * enter any SQL commands
+- to see a list of things managed by Kubernetes
+  * `kubectl get {kind}`
+    where kind can be many values including
+    all, services (or svc), deployments (or deploy),
+    pods (or po), replicasets (or rc), or secrets
+  * enter `kubectl get --help` to see more valid kinds
+- to see even more detail
+  * `kubectl describe {kind}`
+- to view the logs of the database deployment
+  * `./dblog`
+- to view the logs of the web/REST server deployment
+  * `./serverlog`
+- to get a shell into a Kubernetes pod for poking around
+  * `./kshell {pod-name}`
+  * ex. ./kshell devo-database or ./kshell devo-server
+- to open the web app running in Kubernetes
+  * `./openapp`
+- to stop everything in GCP
+  * `./gcpdown`
+- the web/REST server is ready to use when it has an EXTERNAL-IP
+  * enter `kubectl get services` repeatedly until they do
+
+### Miscellaneious Google Cloud Platform tips
 - to see content of GCP Container Registry
   * browse https://cloud.google.com
   * make sure the correct account is selected
@@ -266,62 +317,4 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   * select a project from the dropdown near upper-left
   * select "Container Registry" from hamburger menu
 - to see list of running instances
-  * gcloud compute instances list
-- to see list of existing pods
-  * kubectl get pods
-  * STATUS will be "ContainerCreating" initially
-    and will change to "Running" if successful
-- to see detail about a given pod
-  * kubectl describe pods {pod-name}
-    - omit pod-name to see all
-- to see logs for a given pod
-  * kubectl logs {pod-name}
-  * ex. kubectl logs devo-server-3609554682-c36p2
-- to delete a pod, delete the corresponding deployment
-  * kubectl delete deployment {pod-name}
-- to see list of existing services
-  (created by "kubectl expose" in the gcpdeploy scripts)
-  * kubectl get services
-- to see detail about a given service
-  * kubectl describe services {service-name}
-    - omit service-name to see all
-  * browse the IP address labelled "LoadBalancer Ingress" with the port in "Port"
-    - ex. http://35.225.141.14:3001
-
-## Google Cloud Persistent Disk
-- enables using for MySQL in a way that
-  data is not lost when the database service is restarted
-- allocate persistent disk space
-  gcloud compute disks create --size 1GB smartdevice-disk
-  * 1GB is the smallest size that can be requested
-- create Kubernetes secret containing MySQL username and password
-  * values are in database/username.secret and database/password.secret
-    which are not in the Git repository
-  * to create the "mysql-root-auth" and "mysql-user-auth" secrets,
-    enter "./database/create-secrets.sh"
-  * to verify that this secret exists,
-    enter "kubectl get secrets" and look for "mysql-*-auth"
-  * to delete a secret, enter "kubectl delete secret {name}"
-- cd database
-  * see devo-database.yaml which describes an instance/container
-    - refers to the devo-database-root-auth secret
-    - refers to the smartdevice-disk persistent disk
-  * devo-database-service.yaml which describes a service
-- create service with ./gcpdeploy
-- verify service is running with
-  kubectl get service devo-database
-- delete service with
-  kubectl delete service devo-database
-- configure server to use this database
-  - by changing "host" from "localhost" to "devo-database"
-    in config.json
-    * also change "user" and "password"
-      to secret values
-- get web app URL
-  * kubectl get service devo-server
-  * note EXTERNAL IP
-  * browse http://{external-ip}:3001
-- view server logs
-  * get server name with
-    kubectl describe pods devo-server | grep "^Name:"
-  * kubectl logs {server-name}
+  * `gcloud compute instances list`

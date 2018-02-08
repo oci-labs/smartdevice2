@@ -1,0 +1,12 @@
+#!/bin/bash
+# This opens a shell to a Kubernetes pod
+# so you can interactively poke around.
+
+if [ $# -ne 1 ]; then
+  echo usage: kshell {pod-name}
+  exit 1
+fi
+
+podName=$1
+longName=$(kubectl get pods | grep $podName | cut -d" " -f1)
+kubectl exec -ti ${longName} /bin/sh

@@ -1,0 +1,7 @@
+#!/bin/bash
+# This opens the Devo web app running in Kubernetes in the default browser.
+
+line=$(kubectl get services | grep devo-server)
+ip=$(echo $line | awk '{print $4}')
+port=$(echo $line | awk '{print $5}' | cut -d: -f1)
+open http://$ip:$port
