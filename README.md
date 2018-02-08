@@ -39,16 +39,22 @@ See `MosquittoNotes.txt` in the top directory
 for steps to start the MQTT server on a Mac.
 On a RaspberryPi, `sudo apt-get install mosquitto`.
 
-## Server Setup
+## Local Train Software Setup
+* open a terminal window
+* `java -jar TheJoveExpress.jar`
+
+## Local Server Setup
 * open a terminal window
 * `cd server`
 * `npm install` (initially and for each new version)
 * `npm run dbstart` (only if MySQL server isn't running)
+  - may need to run `ps -ef | grep mysql`
+    and kill some processes in order for this to work
 * `npm run dbsetup` (initially and only after schema changes)
   WARNING: This will delete all data in the database.
   It can be restored by importing a .json file.
 * `npm run build` (initially and for each new version)
-* `npm run start`
+* `npm run start-dev`
 
 ## Local Client Setup
 * open a terminal window
@@ -56,14 +62,18 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
 * `npm install` (initially and for each new version)
 * `npm run start`
 * a new tab will open in the default web browser
-* add types in the hierarchy
-* define properties to each type
-* define alerts for each type
-* create instances of each type
-
-## Local Simulator Setup
-* open a terminal window
-* `java -jar TheJoveExpress.jar`
+* two options for data
+  - to manually add data
+    * add types in the hierarchy
+    * define properties to each type
+    * define alerts for each type
+    * create instances of each type
+  - to import from a .json file
+    * click gear icon in upper-right
+    * press "Choose File" button
+    * select the file "devo.json"
+    * press "Open" button
+    * press "Import" button
 
 ## Building on Raspberry Pi
 
