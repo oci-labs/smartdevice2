@@ -42,14 +42,13 @@ class TrainControl extends Component<PropsType> {
   );
 
   handleBillboardChange = event => {
-    dispatchSet('trainControl.billboardText', event.target.value);
+    const {value} = event.target;
+    dispatchSet('trainControl.controlledBillboardText', value);
+    this.publish('billboard', 'controlledBillboardText', event);
   };
 
   lightDial = () => {
-    const {
-      detectedLight,
-      detectedLightCalibration
-    } = this.props.trainControl;
+    const {detectedLight, detectedLightCalibration} = this.props.trainControl;
 
     const rings: RingType[] = [
       {
@@ -124,7 +123,7 @@ class TrainControl extends Component<PropsType> {
     property: string,
     event: SyntheticInputEvent<HTMLInputElement>
   ) => {
-    const value = Number(event.target.value);
+    const {value} = event.target;
 
     //TODO: Include server id in message?
     let msg = `set ${trainName}/${topic}/control = ${value}`;
@@ -133,17 +132,14 @@ class TrainControl extends Component<PropsType> {
       : topic.startsWith('lights/') ? 256 : 0;
     if (max) msg += ' ' + max;
 
-    console.log('train-control.js publish: msg =', msg);
     send(msg);
 
-    console.log('train-control.js publish: property =', property);
-    console.log('train-control.js publish: value =', value);
-    dispatchSet('trainControl.' + property, value);
+    const typedValue = topic === 'billboard' ? value : Number(value);
+    dispatchSet('trainControl.' + property, typedValue);
   };
 
   render() {
     const {mqttConnected, trainControl} = this.props;
-    console.log('train-control.js render: trainControl =', trainControl);
     const {controlledBillboardText, controlledLightOverride} = trainControl;
 
     const connImg = mqttConnected ? 'connected' : 'disconnected';
@@ -173,7 +169,7 @@ class TrainControl extends Component<PropsType> {
             type="range"
             min="-100"
             max="100"
-            onChange={e => this.publish('engine/power', 'power', e)}
+            onChange={e => this.publish('engine/power', 'controlledPower', e)}
             value={trainControl.controlledPower}
           />
           <label>Power</label>
@@ -183,7 +179,7 @@ class TrainControl extends Component<PropsType> {
             min="0"
             max="100"
             onChange={e =>
-              this.publish('engine/calibration', 'idleCalibration', e)
+              this.publish('engine/calibration', 'controlledIdleCalibration', e)
             }
             value={trainControl.controlledIdleCalibration}
           />
@@ -204,7 +200,7 @@ class TrainControl extends Component<PropsType> {
             type="range"
             min="0"
             max="256"
-            onChange={e => this.publish('lights/ambient', 'light', e)}
+            onChange={e => this.publish('lights/ambient', 'controlledLight', e)}
             value={trainControl.light}
           />
           */}
@@ -215,7 +211,11 @@ class TrainControl extends Component<PropsType> {
             min="0"
             max="256"
             onChange={e =>
-              this.publish('lights/calibration', 'lightCalibration', e)
+              this.publish(
+                'lights/calibration',
+                'controlledLightCalibration',
+                e
+              )
             }
             value={trainControl.controlledLightCalibration}
           />

@@ -1,6 +1,6 @@
 // @flow
 
-import {dispatch, dispatchSet} from 'redux-easy';
+import {dispatch, dispatchSet, getState} from 'redux-easy';
 
 import {reloadAlerts} from './instance-detail/instance-detail';
 
@@ -35,14 +35,65 @@ function configure(ws) {
     try {
       // $FlowFixMe - doesn't think data is a string
       const change = JSON.parse(data);
-      console.log('websocket.js onmessage: change =', change);
-      dispatch('setInstanceProperty', change);
+      //console.log('websocket.js onmessage: change =', change);
+      const {instanceId, value} = change;
+
+      const {selectedInstanceNodeId} = getState().ui;
+      if (instanceId === selectedInstanceNodeId) {
+        dispatch('setInstanceProperty', change);
+      }
+
+      // Train-specific code
+      if (isTrainProperty(instanceId)) {
+        const trainProperty = getTrainProperty(change);
+        if (trainProperty) {
+          const scaledValue =
+            trainProperty === 'detectedLightCalibration'
+              ? 256 * value / 100
+              : value;
+          dispatchSet('trainControl.' + trainProperty, scaledValue);
+        }
+      }
     } catch (e) {
       console.info('unsupported WebSocket message:', data);
     }
   };
 
   ws.onopen = () => console.info('got WebSocket connection');
+}
+
+function getInstanceNode(instanceId) {
+  const {instanceNodeMap} = getState();
+  return instanceNodeMap[instanceId];
+}
+
+function getTrainProperty(change) {
+  const {property} = change;
+  if (property === 'ambient') return 'detectedLight';
+  if (property === 'power') return 'detectedPower';
+  if (property === 'calibration') {
+    const {instanceId} = change;
+    const instanceNode = getInstanceNode(instanceId);
+    const typeNode = getTypeNode(instanceNode);
+    const {name} = typeNode;
+    return name === 'engine'
+      ? 'detectedIdleCalibration'
+      : name === 'lights' ? 'detectedLightCalibration' : null;
+  }
+}
+
+function getTypeNode(instanceNode) {
+  const {typeNodeMap} = getState();
+  return typeNodeMap[instanceNode.typeId];
+}
+
+function isTrainProperty(instanceId: number): boolean {
+  const instanceNode = getInstanceNode(instanceId);
+  const typeNode = getTypeNode(instanceNode);
+  if (typeNode.name === 'train') return true;
+
+  const {parentId} = instanceNode;
+  return parentId ? isTrainProperty(parentId) : false;
 }
 
 export function send(message: string): void {

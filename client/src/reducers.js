@@ -232,7 +232,6 @@ addReducer('setInstanceProperty', (state: StateType, change: ChangeType) => {
   const {instanceData, ui} = state;
   const {selectedInstanceNodeId} = ui;
   const {instanceId, property, value} = change;
-  //console.log('reducers.js setInstanceProperty: change =', change);
 
   if (instanceId !== selectedInstanceNodeId) return state;
 
