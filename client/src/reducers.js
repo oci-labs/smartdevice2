@@ -314,8 +314,9 @@ addReducer(
 addReducer('toggleExpandAll', (state: StateType, kind: TreeType): StateType => {
   const key = kind + 'NodeMap';
   const nodeMap = state[key];
-
   const [firstNode] = values(nodeMap);
+  if (!firstNode) return state;
+
   const expanded = !firstNode.expanded;
 
   const newNodeMap = {};
