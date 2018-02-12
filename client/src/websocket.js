@@ -35,7 +35,7 @@ function configure(ws) {
     try {
       // $FlowFixMe - doesn't think data is a string
       const change = JSON.parse(data);
-      //console.log('websocket.js onmessage: change =', change);
+      console.log('websocket.js onmessage: change =', change);
       dispatch('setInstanceProperty', change);
     } catch (e) {
       console.info('unsupported WebSocket message:', data);

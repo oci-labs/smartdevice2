@@ -11,6 +11,13 @@
     justify-content: space-between;
     margin-bottom: 10px;
 
+    .billboard {
+      display: inline-block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+
     .counters {
       display: inline-block;
 
@@ -30,13 +37,6 @@
     .left, .right {
       align-items: center;
       display: flex;
-    }
-
-    .title {
-      display: inline-block;
-      font-size: 18px;
-      font-weight: bold;
-      margin-left: 5px;
     }
   }
 

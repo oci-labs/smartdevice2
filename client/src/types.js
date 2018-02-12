@@ -175,11 +175,16 @@ export type SystemType = {
 };
 
 export type TrainControlType = {
-  idleCalibration: number,
-  light: number,
-  lightCalibration: number,
-  lightOverride: number,
-  power: number
+  controlledBillboardText: string,
+  controlledIdleCalibration: number,
+  controlledLightCalibration: number,
+  controlledLightOverride: number,
+  controlledPower: number,
+
+  detectedIdleCalibration: number,
+  detectedLight: number,
+  detectedLightCalibration: number,
+  detectedPower: number
 };
 
 // These strings must correspond to the name of a database table.
