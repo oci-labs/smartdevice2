@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 import {dispatch, dispatchSet, Input} from 'redux-easy';
 
 import Button from '../share/button';
-//import Input from '../share/input';
 import {postJson} from '../util/rest-util';
 import {hideModal} from '../share/sd-modal';
 

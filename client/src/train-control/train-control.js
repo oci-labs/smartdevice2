@@ -43,18 +43,18 @@ class TrainControl extends Component<PropsType> {
 
   handleBillboardChange = event => {
     const {value} = event.target;
-    dispatchSet('trainControl.controlledBillboardText', value);
+    dispatchSet('trainControl.controlled.billboardText', value);
     this.publish('billboard', 'controlledBillboardText', event);
   };
 
   lightDial = () => {
-    const {detectedLight, detectedLightCalibration} = this.props.trainControl;
+    const {light, lightCalibration} = this.props.trainControl.detected;
 
     const rings: RingType[] = [
       {
         className: 'light-light',
         name: 'Light',
-        min: detectedLightCalibration,
+        min: lightCalibration,
         max: 256,
         iconUrl: 'images/light-off.png'
       },
@@ -62,7 +62,7 @@ class TrainControl extends Component<PropsType> {
         className: 'light-dark',
         name: 'Dark',
         min: 0,
-        max: detectedLightCalibration,
+        max: lightCalibration,
         iconUrl: 'images/light-on.png'
       }
     ];
@@ -74,34 +74,34 @@ class TrainControl extends Component<PropsType> {
         tickMajor={32}
         tickMinor={8}
         title="Lighting"
-        value={detectedLight}
+        value={light}
       />
     );
   };
 
   powerDial = () => {
-    const {detectedIdleCalibration, detectedPower} = this.props.trainControl;
+    const {idleCalibration, power} = this.props.trainControl.detected;
 
     const rings: RingType[] = [
       {
         className: 'power-forward',
         name: 'Forward',
-        min: detectedIdleCalibration,
+        min: idleCalibration,
         max: 100,
         iconUrl: 'images/forward.png'
       },
       {
         className: 'power-idle',
         name: 'Idle',
-        min: -detectedIdleCalibration,
-        max: detectedIdleCalibration,
+        min: -idleCalibration,
+        max: idleCalibration,
         iconUrl: 'images/idle.png'
       },
       {
         className: 'power-reverse',
         name: 'Reverse',
         min: -100,
-        max: -detectedIdleCalibration,
+        max: -idleCalibration,
         iconUrl: 'images/reverse.png'
       }
     ];
@@ -113,7 +113,7 @@ class TrainControl extends Component<PropsType> {
         tickMajor={20}
         tickMinor={2}
         title="Power"
-        value={detectedPower}
+        value={power}
       />
     );
   };
@@ -140,7 +140,13 @@ class TrainControl extends Component<PropsType> {
 
   render() {
     const {mqttConnected, trainControl} = this.props;
-    const {controlledBillboardText, controlledLightOverride} = trainControl;
+    const {
+      billboardText,
+      idleCalibration,
+      lightCalibration,
+      lightOverride,
+      power
+    } = trainControl.controlled;
 
     const connImg = mqttConnected ? 'connected' : 'disconnected';
 
@@ -153,7 +159,7 @@ class TrainControl extends Component<PropsType> {
               className="billboard"
               type="text"
               onChange={this.handleBillboardChange}
-              value={controlledBillboardText}
+              value={billboardText}
             />
           </div>
           <div className="right">
@@ -169,8 +175,8 @@ class TrainControl extends Component<PropsType> {
             type="range"
             min="-100"
             max="100"
-            onChange={e => this.publish('engine/power', 'controlledPower', e)}
-            value={trainControl.controlledPower}
+            onChange={e => this.publish('engine/power', 'controlled.power', e)}
+            value={power}
           />
           <label>Power</label>
 
@@ -179,9 +185,9 @@ class TrainControl extends Component<PropsType> {
             min="0"
             max="100"
             onChange={e =>
-              this.publish('engine/calibration', 'controlledIdleCalibration', e)
+              this.publish('engine/calibration', 'controlled.idleCalibration', e)
             }
-            value={trainControl.controlledIdleCalibration}
+            value={idleCalibration}
           />
           <label>Calibrate Idle</label>
         </div>
@@ -190,9 +196,9 @@ class TrainControl extends Component<PropsType> {
 
           {/*TODO: These aren't wired up yet. */}
           <div className="light-mode">
-            {getButton('Off', controlledLightOverride)}
-            {getButton('On', controlledLightOverride)}
-            {getButton('Auto', controlledLightOverride)}
+            {getButton('Off', lightOverride)}
+            {getButton('On', lightOverride)}
+            {getButton('Auto', lightOverride)}
           </div>
 
           {/*
@@ -200,7 +206,7 @@ class TrainControl extends Component<PropsType> {
             type="range"
             min="0"
             max="256"
-            onChange={e => this.publish('lights/ambient', 'controlledLight', e)}
+            onChange={e => this.publish('lights/ambient', 'controlled.light', e)}
             value={trainControl.light}
           />
           */}
@@ -213,11 +219,11 @@ class TrainControl extends Component<PropsType> {
             onChange={e =>
               this.publish(
                 'lights/calibration',
-                'controlledLightCalibration',
+                'controlled.lightCalibration',
                 e
               )
             }
-            value={trainControl.controlledLightCalibration}
+            value={lightCalibration}
           />
           <label>Calibrate Ambient Light</label>
         </div>

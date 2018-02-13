@@ -12,15 +12,30 @@ const state: StateType = {
   messageServerMap: {},
   mqttConnected: false,
   trainControl: {
-    controlledBillboardText: 'The Jove Express',
-    controlledIdleCalibration: 18,
-    controlledLightCalibration: 128,
-    controlledLightOverride: 2,
-    controlledPower: 0,
-    detectedIdleCalibration: 18,
-    detectedLight: 0,
-    detectedLightCalibration: 128,
-    detectedPower: 0
+    controlled: {
+      billboardText: '',
+      idleCalibration: 0,
+      light: 0,
+      lightCalibration: 0,
+      lightOverride: 0,
+      power: 0
+    },
+    default: {
+      billboardText: '',
+      idleCalibration: 30,
+      light: 0,
+      lightCalibration: 256 / 2,
+      lightOverride: 2,
+      power: 0
+    },
+    detected: {
+      billboardText: '',
+      idleCalibration: 0,
+      light: 0,
+      lightCalibration: 0,
+      lightOverride: 0,
+      power: 0
+    }
   },
   typeNodeMap: {},
   typeRootId: 0,

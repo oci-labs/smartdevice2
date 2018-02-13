@@ -48,13 +48,14 @@ function configure(ws) {
         const trainProperty = getTrainProperty(change);
         if (trainProperty) {
           const scaledValue =
-            trainProperty === 'detectedLightCalibration'
+            trainProperty === 'detected.lightCalibration'
               ? 256 * value / 100
               : value;
           dispatchSet('trainControl.' + trainProperty, scaledValue);
         }
       }
     } catch (e) {
+      console.error('websocket.js: e =', e);
       console.info('unsupported WebSocket message:', data);
     }
   };
@@ -69,16 +70,16 @@ function getInstanceNode(instanceId) {
 
 function getTrainProperty(change) {
   const {property} = change;
-  if (property === 'ambient') return 'detectedLight';
-  if (property === 'power') return 'detectedPower';
+  if (property === 'ambient') return 'detected.light';
+  if (property === 'power') return 'detected.power';
   if (property === 'calibration') {
     const {instanceId} = change;
     const instanceNode = getInstanceNode(instanceId);
     const typeNode = getTypeNode(instanceNode);
     const {name} = typeNode;
     return name === 'engine'
-      ? 'detectedIdleCalibration'
-      : name === 'lights' ? 'detectedLightCalibration' : null;
+      ? 'detected.idleCalibration'
+      : name === 'lights' ? 'detected.lightCalibration' : null;
   }
 }
 
@@ -89,6 +90,7 @@ function getTypeNode(instanceNode) {
 
 function isTrainProperty(instanceId: number): boolean {
   const instanceNode = getInstanceNode(instanceId);
+  if (!instanceNode) return false;
   const typeNode = getTypeNode(instanceNode);
   if (typeNode.name === 'train') return true;
 
