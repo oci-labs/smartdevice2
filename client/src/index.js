@@ -13,6 +13,13 @@ import './reducers';
 
 import './index.css';
 
+//TODO: This is the reset logic that should be
+//TODO: executed when the connection is lost.
+const {trainControl} = initialState;
+const {defaults} = trainControl;
+trainControl.controlled = {...defaults};
+trainControl.detected = {...defaults};
+
 const store = reduxSetup({initialState, render});
 
 function render() {

@@ -20,7 +20,7 @@ const state: StateType = {
       lightOverride: 0,
       power: 0
     },
-    default: {
+    defaults: {
       billboardText: '',
       idleCalibration: 30,
       light: 0,
