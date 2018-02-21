@@ -13,6 +13,7 @@ import type {PrimitiveType, StateType, TrainControlType} from '../types';
 
 type PropsType = {
   mqttConnected: boolean,
+  mqttConnectionAttempts: number,
   trainControl: TrainControlType
 };
 
@@ -31,15 +32,18 @@ class TrainControl extends Component<PropsType> {
     }
   }
 
-  counters = () => (
-    <div className="counters">
-      <div>1</div>
-      <div>.</div>
-      <div>-</div>
-      <div>.</div>
-      <div>-</div>
-    </div>
-  );
+  counters = () => {
+    const {mqttConnected, mqttConnectionAttempts} = this.props;
+    return (
+      <div className="counters">
+        <div>{mqttConnected ? 1 : 0}</div>
+        <div>.</div>
+        <div>{mqttConnectionAttempts}</div>
+        <div>.</div>
+        <div>-</div>
+      </div>
+    );
+  };
 
   changeLightOverride = event => {
     const value = lightOverrideMap[event.target.textContent];
@@ -253,11 +257,12 @@ class TrainControl extends Component<PropsType> {
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {mqttConnected, trainControl} = state;
-  //TODO: Fix this to get real value of lightOverride.
+  const {mqttConnected, mqttConnectionAttempts, trainControl} = state;
+  const {lightOverride} = trainControl.detected;
   return {
     mqttConnected,
-    trainControl: {...trainControl, lightOverride: 2}
+    mqttConnectionAttempts,
+    trainControl: {...trainControl, lightOverride}
   };
 };
 

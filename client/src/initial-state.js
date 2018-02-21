@@ -11,6 +11,7 @@ const state: StateType = {
   instanceRootId: 0,
   messageServerMap: {},
   mqttConnected: false,
+  mqttConnectionAttempts: 0,
   trainControl: {
     trainAlive: false,
     controlled: {

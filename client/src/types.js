@@ -152,6 +152,7 @@ export type StateType = {
   instanceRootId: number,
   messageServerMap: MessageServerMapType,
   mqttConnected: boolean,
+  mqttConnectionAttempts: number,
   trainControl: TrainControlType,
   typeNodeMap: NodeMapType,
   typeRootId: number,

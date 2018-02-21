@@ -49,6 +49,7 @@ export async function connect(server: MessageServerType) {
 }
 
 export function connectToType(server: MessageServerType, typeId: number) {
+  let connectionAttempts = 0;
   const {id} = server;
   serverMap[id] = server;
 
@@ -59,10 +60,14 @@ export function connectToType(server: MessageServerType, typeId: number) {
   } else {
     const url = `mqtt://${server.host}:${server.port}`;
     const options = {};
+
+    connectionAttempts++;
+    wsSend('MQTT attempts ' + connectionAttempts);
     const client = mqtt.connect(url, options);
     clientMap[id] = client;
 
     client.on('connect', () => {
+      connectionAttempts = 0;
       console.info(`MQTT server ${url} connected.`);
       mqttConnected = true;
       wsSend('MQTT connected');
@@ -83,6 +88,8 @@ export function connectToType(server: MessageServerType, typeId: number) {
       console.info(`MQTT server ${url} is offline.`);
     });
     client.on('reconnect', () => {
+      connectionAttempts++;
+      wsSend('MQTT attempts ' + connectionAttempts);
       console.info(`MQTT server ${url} reconnect started.`);
     });
   }
@@ -326,7 +333,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
 
     if (value !== undefined) {
       //if (topic.includes('light') && topic.includes('power')) {
-      console.log(topic, '=', value);
+      //console.log(topic, '=', value);
       //}
 
       const path = parts.join(PATH_DELIMITER);

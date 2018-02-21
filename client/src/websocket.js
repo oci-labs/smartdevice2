@@ -22,8 +22,14 @@ function configure(ws) {
     const data = String(message.data);
 
     if (data.startsWith('MQTT ')) {
-      const connected = data.endsWith('connected');
-      dispatchSet('mqttConnected', connected);
+      const [, word, count] = data.split(' ');
+      if (word === 'attempts') {
+        dispatchSet('mqttConnectionAttempts', Number(count));
+      } else {
+        const connected = word === 'connected';
+        dispatchSet('mqttConnected', connected);
+        dispatchSet('mqttConnectionAttempts', 0);
+      }
       return;
     }
 
