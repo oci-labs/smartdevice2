@@ -216,6 +216,7 @@ export type UiType = {
   selectedEnumId: number,
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,
+  showUserDropdown: boolean,
   treeType: TreeType,
   typeAlerts: AlertTypeType[],
   typeName: string,

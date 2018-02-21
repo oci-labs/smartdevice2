@@ -1,5 +1,5 @@
 $add-color: lightgreen;
-$alert-red: #BA2316;
+$alert-red: #9D0D0D;
 $delete-color: red;
 $error-color: #ba2316; // red
 $font-color: white;
@@ -9,3 +9,8 @@ $oci-light-blue: #72C7D5;
 $oci-orange: #FEB772;
 $padding: 10px;
 $selected-color: lightgreen;
+
+/* New variables are below here until
+   we determine what needs to remain. */
+$primary-color: #72C7D5; /* teal */
+$text-color: #444; /* black */

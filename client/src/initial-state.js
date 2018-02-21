@@ -69,6 +69,7 @@ const state: StateType = {
     selectedEnumId: -1, // 0 is a valid id
     selectedInstanceNodeId: 0,
     selectedTypeNodeId: 0,
+    showUserDropdown: false,
     // Need to start with treeType set to "type"
     // to force loading of typeNodeMap in Redux.
     treeType: 'type',

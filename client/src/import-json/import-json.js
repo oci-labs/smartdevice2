@@ -8,18 +8,18 @@ import {loadMessageServers} from '../message-servers/message-servers';
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
 import {loadTree} from '../tree/tree-builder';
-import {getUrlPrefix, postJson} from '../util/rest-util';
+import {postJson} from '../util/rest-util';
 
 import type {StateType} from '../types';
 
-import './import-export.css';
+import './import-json.css';
 
 type PropsType = {};
 type MyStateType = {
   file: ?File
 };
 
-class ImportExport extends Component<PropsType, MyStateType> {
+class ImportJson extends Component<PropsType, MyStateType> {
   state: MyStateType = {file: null};
 
   clear = () => {
@@ -67,14 +67,10 @@ class ImportExport extends Component<PropsType, MyStateType> {
   render() {
     const disabled = !this.state.file;
     return (
-      <section className="import-export">
-        <div>
-          <a href={getUrlPrefix() + 'export'}>
-            <Button onClick={this.clear}>Export</Button>
-          </a>
-        </div>
+      <section className="import-json">
         <div>
           <input type="file" onChange={this.loadFile} />
+          <a onClick={this.clear}>Cancel</a>
           <Button onClick={this.import} disabled={disabled}>
             Import
           </Button>
@@ -89,4 +85,4 @@ const mapState = (state: StateType): PropsType => {
   return {jsonPath};
 };
 
-export default connect(mapState)(ImportExport);
+export default connect(mapState)(ImportJson);

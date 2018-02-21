@@ -1,3 +1,5 @@
+@import '../share.scss';
+
 .left-nav {
   h3 {
     color: white;
@@ -7,7 +9,7 @@
     text-align: left;
 
     .react-tabs__tab {
-      color: white;
+      color: $text-color;
     }
 
     .react-tabs__tab--selected {

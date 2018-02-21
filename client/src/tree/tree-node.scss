@@ -12,8 +12,12 @@
     margin-left: 5px;
   }
 
-  .expand {
-    color: white;
+  .button.fa {
+    color: $text-color;
+  }
+
+  .expand.fa {
+    color: $text-color;
     display: inline-block;
     width: 15px;
   }
@@ -31,7 +35,7 @@
   }
 
   .tree-node-name {
-    color: white;
+    color: $text-color;
     display: inline-block;
   }
   .tree-node-name.have-alerts {

@@ -2,10 +2,9 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {dispatchSet} from 'redux-easy';
 
 import Button from '../share/button';
-import ImportExport from '../import-export/import-export';
-import {showModal} from '../share/sd-modal';
 import {post} from '../util/rest-util';
 
 import type {StateType} from '../types';
@@ -17,12 +16,9 @@ type PropsType = {
 };
 
 class Header extends Component<PropsType> {
-  importExport = () => {
-    const renderFn = () => <ImportExport />;
-    showModal({title: 'Import/Export JSON Schema', renderFn});
-  };
-
   refresh = () => post('mqtt/feedback');
+
+  showUserDropdown = () => dispatchSet('ui.showUserDropdown', true);
 
   render() {
     const {mqttConnected} = this.props;
@@ -30,8 +26,10 @@ class Header extends Component<PropsType> {
     const messageBrokerStatus = mqttConnected ? 'connected' : 'not running';
     return (
       <header className="header">
-        <img className="logo" alt="OCI logo" src="images/oci-logo.svg" />
-        <div className="title">Devo</div>
+        <div className="left">
+          <img className="logo" alt="OCI logo" src="images/oci-logo.svg" />
+          <div className="title">Devo</div>
+        </div>
         <div className="right">
           <span
             className={`fa fa-2x fa-${heartIcon}`}
@@ -44,10 +42,9 @@ class Header extends Component<PropsType> {
             tooltip="request latest data"
           />
           <Button
-            className="import-export-btn fa-2x"
-            icon="cog"
-            onClick={() => this.importExport()}
-            tooltip="import/export"
+            className="user-btn fa-2x"
+            icon="user"
+            onClick={() => this.showUserDropdown()}
           />
         </div>
       </header>

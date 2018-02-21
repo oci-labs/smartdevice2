@@ -1,0 +1,28 @@
+.user-dropdown {
+  $spacing: 16px;
+
+  background-color: #444;
+  color: white;
+  font-size: 12px; /*20px;*/
+  height: 200px;
+  padding: $spacing;
+  position: absolute;
+  right: 0;
+  text-align: left;
+  top: 64px;
+  width: 71px;
+  z-index: 1;
+
+  & > div {
+    margin-bottom: $spacing;
+  }
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .divider {
+    border-bottom: solid white 1px;
+  }
+}

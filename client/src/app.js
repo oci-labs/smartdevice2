@@ -11,6 +11,7 @@ import SdModal from './share/sd-modal';
 import TrainControl from './train-control/train-control';
 import TypeAlerts from './type-alerts/type-alerts';
 import TypeProperties from './type-properties/type-properties';
+import UserDropdown from './user-dropdown/user-dropdown';
 
 import type {StateType, TreeType} from './types';
 
@@ -39,6 +40,7 @@ class App extends Component<PropsType> {
     return (
       <div className="app">
         <Header />
+        <UserDropdown />
         <section id="body">
           <LeftNav />
           {middleMap[treeType]}
