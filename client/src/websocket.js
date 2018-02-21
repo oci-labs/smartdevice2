@@ -35,7 +35,6 @@ function configure(ws) {
     try {
       // $FlowFixMe - doesn't think data is a string
       const change = JSON.parse(data);
-      //console.log('websocket.js onmessage: change =', change);
       const {instanceId, value} = change;
 
       const {selectedInstanceNodeId} = getState().ui;
@@ -89,6 +88,7 @@ function getTrainProperty(change) {
       ? 'detected.idleCalibration'
       : name === 'lights' ? 'detected.lightCalibration' : null;
   }
+  if (property === 'lifecycle') return 'trainAlive';
 }
 
 function getTypeNode(instanceNode) {

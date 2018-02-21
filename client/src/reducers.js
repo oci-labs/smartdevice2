@@ -345,22 +345,14 @@ addReducer(
 addReducer(
   'trainReset',
   (state: StateType): StateType => {
-    const {defaults} = state.trainControl;
+    const {trainControl} = state;
+    const {defaults} = trainControl;
     return {
       ...state,
       trainControl: {
+        ...trainControl,
         controlled: {...defaults},
-        defaults,
         detected: {...defaults}
-        /*
-          billboardText: '',
-          idleCalibration: 0,
-          light: 0,
-          lightCalibration: 0,
-          lightOverride: 0,
-          power: 0
-        }
-        */
       }
     };
   }

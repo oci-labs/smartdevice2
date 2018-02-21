@@ -325,9 +325,9 @@ async function handleMessage(client, topic: string, message: Buffer) {
     }
 
     if (value !== undefined) {
-      if (topic.includes('light') && topic.includes('power')) {
-        console.log(topic, '=', value);
-      }
+      //if (topic.includes('light') && topic.includes('power')) {
+      console.log(topic, '=', value);
+      //}
 
       const path = parts.join(PATH_DELIMITER);
       await saveProperty(path, property, value);

@@ -175,6 +175,7 @@ export type SystemType = {
 };
 
 export type TrainControlType = {
+  trainAlive: boolean,
   controlled: TrainValuesType,
   defaults: TrainValuesType,
   detected: TrainValuesType

@@ -161,12 +161,14 @@ class TrainControl extends Component<PropsType> {
 
   render() {
     const {mqttConnected, trainControl} = this.props;
+    const {controlled, trainAlive} = trainControl;
     const {
       billboardText,
       idleCalibration,
       lightCalibration,
       power
-    } = trainControl.controlled;
+    } = controlled;
+    const deadAlive = trainAlive ? 'alive' : 'dead';
 
     const connImg = mqttConnected ? 'connected' : 'disconnected';
 
@@ -174,7 +176,9 @@ class TrainControl extends Component<PropsType> {
       <div className="train-control">
         <header>
           <div className="left">
-            <img src="images/dead.png" alt="lifecycle" />
+            {/* Train alive? */}
+            <img src={`images/${deadAlive}.png`} alt="lifecycle" />
+
             <input
               className="billboard"
               type="text"
@@ -184,6 +188,8 @@ class TrainControl extends Component<PropsType> {
           </div>
           <div className="right">
             {this.counters()}
+
+            {/* MQTT broker alive? */}
             <img src={`images/${connImg}.png`} alt="broker connected" />
           </div>
         </header>

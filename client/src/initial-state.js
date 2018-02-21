@@ -12,12 +12,14 @@ const state: StateType = {
   messageServerMap: {},
   mqttConnected: false,
   trainControl: {
+    trainAlive: false,
     controlled: {
       billboardText: '',
       idleCalibration: 0,
       light: 0,
       lightCalibration: 0,
       lightOverride: 0,
+      lightPower: false,
       power: 0
     },
     defaults: {
@@ -26,6 +28,7 @@ const state: StateType = {
       light: 0,
       lightCalibration: 256 / 2,
       lightOverride: 2,
+      lightPower: false,
       power: 0
     },
     detected: {
@@ -34,6 +37,7 @@ const state: StateType = {
       light: 0,
       lightCalibration: 0,
       lightOverride: 0,
+      lightPower: false,
       power: 0
     }
   },
