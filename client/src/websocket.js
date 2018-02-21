@@ -45,8 +45,16 @@ function configure(ws) {
 
       // Train-specific code
       if (isTrainProperty(instanceId)) {
-        const trainProperty = getTrainProperty(change);
+        let trainProperty = getTrainProperty(change);
         if (trainProperty) {
+          if (trainProperty === 'detected.power') {
+            const instanceNode = getInstanceNode(instanceId);
+            const typeNode = getTypeNode(instanceNode);
+            if (typeNode.name === 'lights') {
+              trainProperty = 'detected.lightPower';
+            }
+          }
+
           const scaledValue =
             trainProperty === 'detected.lightCalibration'
               ? 256 * value / 100

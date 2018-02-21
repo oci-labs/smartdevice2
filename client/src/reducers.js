@@ -341,3 +341,27 @@ addReducer(
     return setUserProp(state, 'subscriptions', newSubscriptions);
   }
 );
+
+addReducer(
+  'trainReset',
+  (state: StateType): StateType => {
+    const {defaults} = state.trainControl;
+    return {
+      ...state,
+      trainControl: {
+        controlled: {...defaults},
+        defaults,
+        detected: {...defaults}
+        /*
+          billboardText: '',
+          idleCalibration: 0,
+          light: 0,
+          lightCalibration: 0,
+          lightOverride: 0,
+          power: 0
+        }
+        */
+      }
+    };
+  }
+);

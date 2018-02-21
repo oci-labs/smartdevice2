@@ -181,12 +181,13 @@ export type TrainControlType = {
 };
 
 export type TrainValuesType = {
-  billboardText: string,
-  idleCalibration: number,
-  light: number,
-  lightCalibration: number,
-  lightOverride: number,
-  power: number
+  billboardText: string, // displayed on train
+  idleCalibration: number, // range before forward or reverse
+  light: number, // measured ambient light
+  lightCalibration: number, // range for Auto
+  lightOverride: number, // 0=Off, 1=On, 2=Auto
+  lightPower: boolean, // are lights on?
+  power: number // for engine
 };
 
 // These strings must correspond to the name of a database table.

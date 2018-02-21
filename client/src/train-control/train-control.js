@@ -2,14 +2,14 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatch, dispatchSet} from 'redux-easy';
 
 import Dial, {type RingType} from '../dial/dial';
 import {send} from '../websocket';
 
 import './train-control.css';
 
-import type {StateType, TrainControlType} from '../types';
+import type {PrimitiveType, StateType, TrainControlType} from '../types';
 
 type PropsType = {
   mqttConnected: boolean,
@@ -23,14 +23,14 @@ const lightOverrideMap = {
 };
 const trainName = 'thejoveexpress';
 
-function getButton(label: string, lightOverride: number) {
-  const buttonValue = lightOverrideMap[label];
-  const selected = buttonValue === lightOverride;
-  const className = selected ? 'selected' : '';
-  return <button className={className}>{label}</button>;
-}
-
 class TrainControl extends Component<PropsType> {
+  componentWillReceiveProps(nextProps) {
+    // If MQTT disconnected ...
+    if (!nextProps.mqttConnected && this.props.mqttConnected) {
+      dispatch('trainReset');
+    }
+  }
+
   counters = () => (
     <div className="counters">
       <div>1</div>
@@ -41,14 +41,41 @@ class TrainControl extends Component<PropsType> {
     </div>
   );
 
+  changeLightOverride = event => {
+    const value = lightOverrideMap[event.target.textContent];
+    this.publish('lights/override', 'controlled.lightOverride', value);
+    dispatchSet('trainControl.controlled.lightOverride', value);
+  };
+
+  getButton = (label: string) => {
+    const {lightOverride} = this.props.trainControl.controlled;
+    const buttonValue = lightOverrideMap[label];
+    const selected = buttonValue === lightOverride;
+    const className = selected ? 'selected' : '';
+    return (
+      <button className={className} onClick={this.changeLightOverride}>
+        {label}
+      </button>
+    );
+  };
+
   handleBillboardChange = event => {
     const {value} = event.target;
     dispatchSet('trainControl.controlled.billboardText', value);
-    this.publish('billboard', 'controlledBillboardText', event);
+    this.publish('billboard', 'controlledBillboardText', value);
   };
 
+  handlePowerChange = e =>
+    this.publish('engine/power', 'controlled.power', e.target.value);
+
   lightDial = () => {
-    const {light, lightCalibration} = this.props.trainControl.detected;
+    const {
+      light,
+      lightCalibration,
+      lightPower
+    } = this.props.trainControl.detected;
+    const onOff = lightPower ? 'on' : 'off';
+    const iconUrl = `images/light-${onOff}.png`;
 
     const rings: RingType[] = [
       {
@@ -56,14 +83,14 @@ class TrainControl extends Component<PropsType> {
         name: 'Light',
         min: lightCalibration,
         max: 256,
-        iconUrl: 'images/light-off.png'
+        iconUrl
       },
       {
         className: 'light-dark',
         name: 'Dark',
         min: 0,
         max: lightCalibration,
-        iconUrl: 'images/light-on.png'
+        iconUrl
       }
     ];
     return (
@@ -118,15 +145,9 @@ class TrainControl extends Component<PropsType> {
     );
   };
 
-  publish = (
-    topic: string,
-    property: string,
-    event: SyntheticInputEvent<HTMLInputElement>
-  ) => {
-    const {value} = event.target;
-
+  publish = (topic: string, property: string, value: PrimitiveType) => {
     //TODO: Include server id in message?
-    let msg = `set ${trainName}/${topic}/control = ${value}`;
+    let msg = `set ${trainName}/${topic}/control = ${Number(value)}`;
     const max = topic.startsWith('engine/')
       ? 100
       : topic.startsWith('lights/') ? 256 : 0;
@@ -144,7 +165,6 @@ class TrainControl extends Component<PropsType> {
       billboardText,
       idleCalibration,
       lightCalibration,
-      lightOverride,
       power
     } = trainControl.controlled;
 
@@ -175,7 +195,7 @@ class TrainControl extends Component<PropsType> {
             type="range"
             min="-100"
             max="100"
-            onChange={e => this.publish('engine/power', 'controlled.power', e)}
+            onChange={this.handlePowerChange}
             value={power}
           />
           <label>Power</label>
@@ -185,7 +205,11 @@ class TrainControl extends Component<PropsType> {
             min="0"
             max="100"
             onChange={e =>
-              this.publish('engine/calibration', 'controlled.idleCalibration', e)
+              this.publish(
+                'engine/calibration',
+                'controlled.idleCalibration',
+                e.target.value
+              )
             }
             value={idleCalibration}
           />
@@ -194,22 +218,12 @@ class TrainControl extends Component<PropsType> {
         <div className="light">
           {this.lightDial()}
 
-          {/*TODO: These aren't wired up yet. */}
           <div className="light-mode">
-            {getButton('Off', lightOverride)}
-            {getButton('On', lightOverride)}
-            {getButton('Auto', lightOverride)}
+            {this.getButton('Off')}
+            {this.getButton('On')}
+            {this.getButton('Auto')}
           </div>
 
-          {/*
-          <input
-            type="range"
-            min="0"
-            max="256"
-            onChange={e => this.publish('lights/ambient', 'controlled.light', e)}
-            value={trainControl.light}
-          />
-          */}
           <label>Lights</label>
 
           <input
@@ -220,7 +234,7 @@ class TrainControl extends Component<PropsType> {
               this.publish(
                 'lights/calibration',
                 'controlled.lightCalibration',
-                e
+                e.target.value
               )
             }
             value={lightCalibration}
