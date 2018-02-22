@@ -1,4 +1,12 @@
+@import '../share.scss';
+
 .instance-detail {
+  .breadcrumbs {
+    background-color: $secondary-color;
+    color: gray;
+    padding-top: 5px;
+  }
+
   .button {
     border: none;
     margin-left: 5px;
@@ -6,5 +14,13 @@
 
   .number, .percent {
     text-align: right;
+  }
+
+  .title {
+    background-color: $secondary-color;
+    border-bottom: solid gray 1px;
+    color: $primary-color;
+    font-size: 24px;
+    padding-bottom: 5px;
   }
 }

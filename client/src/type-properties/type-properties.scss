@@ -1,8 +1,16 @@
+@import '../share.scss';
+
 .type-properties {
   text-align: left;
 
   .actions-column {
     text-align: center;
+  }
+
+  .breadcrumbs {
+    background-color: $secondary-color;
+    color: gray;
+    padding-top: 5px;
   }
 
   .button {
@@ -11,5 +19,13 @@
 
   table {
     width: 100%;
+  }
+
+  .title {
+    background-color: $secondary-color;
+    border-bottom: solid gray 1px;
+    color: $primary-color;
+    font-size: 24px;
+    padding-bottom: 5px;
   }
 }

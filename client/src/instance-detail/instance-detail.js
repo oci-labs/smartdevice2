@@ -84,6 +84,25 @@ class InstanceDetail extends Component<PropsType> {
     return children.some(childId => this.alertIsFor(childId, alertInstanceId));
   }
 
+  breadcrumbs = instanceNode => {
+    const {instanceNodeMap} = this.props;
+    let crumbs = instanceNode.name;
+
+    while (true) {
+      const {parentId} = instanceNode;
+      if (!parentId) break;
+      const parentNode = instanceNodeMap[parentId];
+      const {name} = parentNode;
+      if (name === 'root') break;
+      crumbs = name + ' > ' + crumbs;
+      instanceNode = parentNode;
+    }
+
+    return (
+      <div className="breadcrumbs">{crumbs}</div>
+    );
+  };
+
   componentDidMount() {
     const {node} = this.props;
     this.loadData(node);
@@ -228,6 +247,9 @@ class InstanceDetail extends Component<PropsType> {
 
     return (
       <section className="instance-detail">
+        <div className="title">{node.name}</div>
+        {this.breadcrumbs(node)}
+
         <h3 className="node-name">
           {capitalize(typeName)} &quot;{node.name}&quot; Detail
           <Button

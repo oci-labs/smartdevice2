@@ -15,6 +15,7 @@ import {deleteResource, getJson, postJson} from '../util/rest-util';
 
 import type {
   EnumMapType,
+  NodeMapType,
   NodeType,
   PropertyType,
   StateType,
@@ -26,6 +27,7 @@ import './type-properties.css';
 type PropsType = {
   enumMap: EnumMapType,
   typeNode: ?NodeType,
+  typeNodeMap: NodeMapType,
   ui: UiType
 };
 
@@ -60,6 +62,25 @@ class TypeProperties extends Component<PropsType> {
 
     this.added = true;
     dispatchSet('ui.newPropName', '');
+  };
+
+  breadcrumbs = typeNode => {
+    const {typeNodeMap} = this.props;
+    let crumbs = typeNode.name;
+
+    while (true) {
+      const {parentId} = typeNode;
+      if (!parentId) break;
+      const parentNode = typeNodeMap[parentId];
+      const {name} = parentNode;
+      if (name === 'root') break;
+      crumbs = name + ' > ' + crumbs;
+      typeNode = parentNode;
+    }
+
+    return (
+      <div className="breadcrumbs">{crumbs}</div>
+    );
   };
 
   getEnumId = (enumName: string): number => {
@@ -192,7 +213,9 @@ class TypeProperties extends Component<PropsType> {
 
     return (
       <section className="type-properties">
-        <h3>Properties for type &quot;{typeNode.name}&quot;</h3>
+        <div className="title">{typeNode.name}</div>
+        {this.breadcrumbs(typeNode)}
+        <h3>Properties</h3>
         <table>
           {this.renderTableHead()}
           <tbody>
@@ -211,7 +234,7 @@ const mapState = (state: StateType): PropsType => {
   const {enumMap, typeNodeMap, ui} = state;
   const {selectedTypeNodeId} = ui;
   const typeNode = typeNodeMap[selectedTypeNodeId];
-  return {enumMap, typeNode, ui};
+  return {enumMap, typeNode, typeNodeMap, ui};
 };
 
 export default connect(mapState)(TypeProperties);
