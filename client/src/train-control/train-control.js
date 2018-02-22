@@ -39,8 +39,6 @@ class TrainControl extends Component<PropsType> {
         <div>{mqttConnected ? 1 : 0}</div>
         <div>.</div>
         <div>{mqttConnectionAttempts}</div>
-        <div>.</div>
-        <div>-</div>
       </div>
     );
   };
