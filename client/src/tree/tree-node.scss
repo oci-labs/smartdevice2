@@ -1,10 +1,34 @@
 @import '../share.scss';
 
 .tree-node {
+  margin-top: 5px;
+
   &.selected {
     & > .tree-node-name {
-      border-bottom: solid $selected-color 2px;
+      border-bottom: solid $underline-color 1px;
     }
+  }
+
+  $alert-count-radius: 9px;
+
+  .alert-count {
+    background-color: $alert-urgent-color;
+    border-radius: $alert-count-radius;
+    color: white;
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 5px;
+    position: relative;
+    top: -1px;
+  }
+
+  .alert-count-container {
+    display: inline-block;
+    height: $alert-count-radius * 2;
+    margin-right: 5px;
+    text-align: right;
+    vertical-align: top;
+    width: 27px;
   }
 
   .button {
@@ -14,6 +38,10 @@
 
   .button.fa {
     color: $text-color;
+  }
+
+  .expand {
+    float: right;
   }
 
   .expand.fa {
@@ -37,8 +65,5 @@
   .tree-node-name {
     color: $text-color;
     display: inline-block;
-  }
-  .tree-node-name.have-alerts {
-    color: red;
   }
 }

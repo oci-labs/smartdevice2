@@ -25,10 +25,10 @@ input[type=checkbox] {
 
   .fa {
     color: white;
+    outline: none;
   }
 
   #body {
-    background-color: $oci-light-blue;
     display: flex;
     flex-grow: 1;
 
@@ -105,8 +105,12 @@ table {
     }
   }
 
+  td, th {
+    padding-top: 10px;
+  }
+
   td:not(:last-child), th:not(:last-child) {
-    padding: 10px 10px 0 0;
+    padding-right: 10px;
   }
 
   th {

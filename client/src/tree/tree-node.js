@@ -4,9 +4,9 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatch, dispatchSet} from 'redux-easy';
 
-import {addNode} from './tree-util';
+//import {addNode} from './tree-util';
 import {getAlertCount} from '../node/node';
-import Button from '../share/button';
+//import Button from '../share/button';
 import {showConfirm} from '../share/sd-modal';
 import {deleteResource, getJson, patchJson} from '../util/rest-util';
 
@@ -90,6 +90,36 @@ class TreeNode extends Component<PropsType> {
     target.selectionStart = value.length;
   };
 
+  renderAlertCount = () => {
+    const {alerts, instanceNodeMap, kind, node} = this.props;
+    let alertCount =
+      kind === 'instance' ? getAlertCount(node, instanceNodeMap, alerts) : 0;
+    //let alertCount = 999;
+
+    // Not enough room in UI to display larger values.
+    if (alertCount > 999) alertCount = '...';
+
+    return (
+      <div className="alert-count-container">
+        {alertCount === 0 ? null : (
+          <div className="alert-count">{alertCount}</div>
+        )}
+      </div>
+    );
+  };
+
+  renderChildren = () => {
+    const {level, node, nodeMap} = this.props;
+    return getSortedChildren(node, nodeMap).map(child => (
+      <TreeNode
+        {...this.props}
+        key={'tn' + child.id}
+        level={level + 1}
+        node={child}
+      />
+    ));
+  };
+
   saveChange = async () => {
     const {editedName: name, editingNode, kind, node} = this.props;
     if (!editingNode) return;
@@ -116,51 +146,33 @@ class TreeNode extends Component<PropsType> {
 
   toggleSubscribe = () => dispatch('toggleSubscribeNode', this.props.node);
 
-  renderChildren = () => {
-    const {level, node, nodeMap} = this.props;
-    return getSortedChildren(node, nodeMap).map(child => (
-      <TreeNode
-        {...this.props}
-        key={'tn' + child.id}
-        level={level + 1}
-        node={child}
-      />
-    ));
-  };
-
   render = () => {
     const {
-      alerts,
       editedName,
-      instanceNodeMap,
-      kind,
+      //kind,
       level,
-      newNodeName,
+      //newNodeName,
       node,
-      selectedNodeId,
-      subscriptions
+      selectedNodeId
+      //subscriptions
     } = this.props;
 
     if (!node.parentId) return this.renderChildren();
 
-    const direction = node.expanded ? 'down' : 'right';
+    const direction = node.expanded ? 'down' : 'left';
     const triangleClasses =
       node.children.length === 0 ? '' : `fa fa-caret-${direction}`;
 
-    const subscribed = kind === 'instance' && subscriptions.includes(node.id);
+    //const subscribed = kind === 'instance' && subscriptions.includes(node.id);
     const classes = ['tree-node', `tree-level-${level}`];
     if (node.id === selectedNodeId) classes.push('selected');
 
     const nameClasses = ['tree-node-name'];
-    const alertCount = getAlertCount(node, instanceNodeMap, alerts);
-    if (alertCount) nameClasses.push('have-alerts');
 
     return (
       <div className={classes.join(' ')}>
-        <div
-          className={`expand ${triangleClasses}`}
-          onClick={this.toggleExpand}
-        />
+        {this.renderAlertCount()}
+
         {this.isEditing(node) ? (
           <input
             type="text"
@@ -177,6 +189,8 @@ class TreeNode extends Component<PropsType> {
             {node.name}
           </div>
         )}
+
+        {/*
         <Button
           className="add"
           disabled={newNodeName === ''}
@@ -204,6 +218,12 @@ class TreeNode extends Component<PropsType> {
             tooltip="subscribe"
           />
         ) : null}
+        */}
+
+        <div
+          className={`expand ${triangleClasses}`}
+          onClick={this.toggleExpand}
+        />
         {node.expanded ? this.renderChildren() : null}
       </div>
     );

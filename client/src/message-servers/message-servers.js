@@ -124,10 +124,15 @@ class MessageServers extends Component<PropsType> {
             className="host-input"
             onKeyDown={hostHandler}
             path="ui.newServerHost"
+            placeholder="Host"
           />
         </td>
         <td>
-          <Input className="port-input" path="ui.newServerPort" type="number" />
+          <Input
+            className="port-input"
+            path="ui.newServerPort"
+            placeholder="Port"
+            type="number" />
         </td>
         <td className="actions-column">
           <Button
@@ -164,7 +169,7 @@ class MessageServers extends Component<PropsType> {
 
     return (
       <section className="message-servers">
-        <h3>Message Servers</h3>
+        <div className="heading">Message Servers</div>
         <table>
           {this.renderTableHead()}
           <tbody>
