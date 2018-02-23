@@ -193,7 +193,7 @@ export type TrainValuesType = {
 };
 
 // These strings must correspond to the name of a database table.
-export type TreeType = 'type' | 'instance';
+export type TreeType = 'instance' | 'type';
 
 export type UiType = {
   editedName: string, // within type or instance tree
@@ -220,7 +220,8 @@ export type UiType = {
   treeType: TreeType,
   typeAlerts: AlertTypeType[],
   typeName: string,
-  typeProps: PropertyType[]
+  typeProps: PropertyType[],
+  view: ViewType
 };
 
 export type UserType = {
@@ -239,3 +240,5 @@ export type UserType = {
 };
 
 export type ValidationFnType = (string) => string[];
+
+export type ViewType = 'instance' | 'server' | 'type';

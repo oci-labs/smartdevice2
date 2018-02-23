@@ -64,6 +64,9 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
   };
 
   async loadMessageServers() {
+    //TODO: Message servers are currently associated with
+    //TODO: top-level types, but this should change so
+    //TODO: they are associated with top-level instances.
     if (this.props.treeType !== 'type') return;
 
     const json = await getJson('message_server');

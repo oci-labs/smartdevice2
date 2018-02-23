@@ -75,7 +75,8 @@ const state: StateType = {
     treeType: 'type',
     typeAlerts: [],
     typeName: '',
-    typeProps: []
+    typeProps: [],
+    view: 'type'
   },
   user: {
     confirmEmail: '',

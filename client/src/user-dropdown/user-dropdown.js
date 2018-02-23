@@ -1,5 +1,6 @@
 // @flow
 
+import lowerFirst from 'lodash/lowerFirst';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
@@ -16,17 +17,28 @@ type PropsType = {
   showUserDropdown: boolean
 };
 
+const TREE_TYPES = ['instance', 'type'];
+const VIEW_TYPES = ['instance', 'server', 'type'];
+
 class UserDropdown extends Component<PropsType> {
   handleItem = (event: SyntheticEvent<HTMLElement>) => {
     dispatchSet('ui.showUserDropdown', false);
 
     // $FlowFixMe - doesn't know about textContent
     const {textContent} = event.target;
+    const massaged = lowerFirst(textContent.slice(0, -1));
+
+    if (VIEW_TYPES.includes(massaged)) {
+      dispatchSet('ui.view', massaged);
+    }
+
+    if (TREE_TYPES.includes(massaged)) {
+      dispatchSet('ui.treeType', massaged);
+    }
+
     if (textContent === 'Import JSON') {
       const renderFn = () => <ImportJson />;
       showModal({title: 'Import JSON Schema', renderFn});
-    } else if (textContent !== 'Export JSON') {
-      alert(`"${textContent}" is not implemented yet.`);
     }
   };
 

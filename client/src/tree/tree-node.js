@@ -92,8 +92,9 @@ class TreeNode extends Component<PropsType> {
 
   renderAlertCount = () => {
     const {alerts, instanceNodeMap, kind, node} = this.props;
-    let alertCount =
-      kind === 'instance' ? getAlertCount(node, instanceNodeMap, alerts) : 0;
+    if (kind !== 'instance') return null;
+
+    let alertCount = getAlertCount(node, instanceNodeMap, alerts);
     //let alertCount = 999;
 
     // Not enough room in UI to display larger values.

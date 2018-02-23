@@ -6,7 +6,8 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
-import MessageServerSelect from '../message-server-select/message-server-select';
+import MessageServerSelect
+  from '../message-server-select/message-server-select';
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
 import {values} from '../util/flow-util';
@@ -171,8 +172,8 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   async loadAlertTypes(typeNode: ?NodeType) {
     if (!typeNode) return;
 
-    const {treeType} = this.props.ui;
-    if (treeType !== 'type') return;
+    const {view} = this.props.ui;
+    if (view !== 'type') return;
 
     const json = await getJson(`types/${typeNode.id}/alerts`);
     const alertTypes = ((json: any): AlertTypeType[]);
