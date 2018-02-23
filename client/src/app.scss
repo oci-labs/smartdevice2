@@ -56,7 +56,7 @@ input[type=checkbox] {
 
   // Right side
   .instance-detail, .type-alerts {
-    background-color: $oci-orange;
+    background-color: white;
     text-align: left;
   }
 
@@ -86,8 +86,6 @@ input[type=checkbox] {
 }
 
 table {
-  background-color: white;
-  border: solid gray 5px;
   border-collapse: collapse;
 
   .button {
@@ -107,8 +105,11 @@ table {
     }
   }
 
-  td, th {
-    border: solid lightgray 1px;
-    padding: $padding / 2;
+  td:not(:last-child), th:not(:last-child) {
+    padding: 10px 10px 0 0;
+  }
+
+  th {
+    text-align: left;
   }
 }

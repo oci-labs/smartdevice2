@@ -3,6 +3,7 @@
 import {dispatch, dispatchSet, getState} from 'redux-easy';
 
 import {reloadAlerts} from './instance-detail/instance-detail';
+import {getInstanceNode, getTypeNode} from './util/node-util';
 
 let ws;
 
@@ -76,11 +77,6 @@ function configure(ws) {
   ws.onopen = () => console.info('got WebSocket connection');
 }
 
-function getInstanceNode(instanceId) {
-  const {instanceNodeMap} = getState();
-  return instanceNodeMap[instanceId];
-}
-
 function getTrainProperty(change) {
   const {property} = change;
   if (property === 'ambient') return 'detected.light';
@@ -95,11 +91,6 @@ function getTrainProperty(change) {
       : name === 'lights' ? 'detected.lightCalibration' : null;
   }
   if (property === 'lifecycle') return 'trainAlive';
-}
-
-function getTypeNode(instanceNode) {
-  const {typeNodeMap} = getState();
-  return typeNodeMap[instanceNode.typeId];
 }
 
 function isTrainProperty(instanceId: number): boolean {

@@ -4,6 +4,7 @@
   .breadcrumbs {
     background-color: $secondary-color;
     color: gray;
+    margin-bottom: 20px;
     padding-top: 5px;
   }
 
@@ -12,8 +13,22 @@
     margin-left: 5px;
   }
 
+  .button.fa {
+    color: black;
+  }
+
+  caption {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+  }
+
   .number, .percent {
     text-align: right;
+  }
+
+  tbody {
+    border-top: solid #707070 1px;
   }
 
   .title {
@@ -22,5 +37,10 @@
     color: $primary-color;
     font-size: 24px;
     padding-bottom: 5px;
+  }
+
+  td:last-child {
+    text-align: right;
+    width: 100%;
   }
 }

@@ -6,12 +6,13 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {dispatchSet} from 'redux-easy';
 
+import InstanceAlerts from '../instance-alerts/instance-alerts';
 import PropertyForm from '../property-form/property-form';
-import Alert from '../alert/alert';
 import Button from '../share/button';
 import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
 import {showModal} from '../share/sd-modal';
+import {getTypeNode, loadTypeNode} from '../util/node-util';
 
 import type {
   AlertType,
@@ -27,12 +28,10 @@ import type {
 import './instance-detail.css';
 
 type PropsType = {
-  alerts: AlertType[],
   enumMap: EnumMapType,
   instanceData: Object,
   instanceNodeMap: NodeMapType,
   node: NodeType,
-  typeName: string,
   typeProps: PropertyType[]
 };
 
@@ -55,18 +54,6 @@ function getData(node: NodeType): InstanceDataType[] {
 
   const json = getJson(`instances/${node.id}/data`);
   return ((json: any): InstanceDataType[]);
-}
-
-async function getTypeNode(node: NodeType): Promise<?NodeType> {
-  if (!node) return null;
-
-  const {typeId} = node;
-  if (!typeId) {
-    throw new Error(`instance ${node.name} has no type id`);
-  }
-
-  const json = await getJson(`type/${typeId}`);
-  return ((json: any): Promise<NodeType>);
 }
 
 export async function reloadAlerts() {
@@ -125,8 +112,29 @@ class InstanceDetail extends Component<PropsType> {
     showModal({title: node.name + ' Properties', renderFn});
   };
 
+  formatValue = (kind, value) => {
+    if (value === undefined) return 'unset';
+    if (kind === 'boolean') return Boolean(Number(value));
+    if (kind === 'percent') return Number(value).toFixed(2) + '%';
+    if (kind === 'number') return value;
+    if (kind === 'text') return value;
+
+    // Define if this is an enumerated type ...
+    const {enumMap} = this.props;
+    const enums = values(enumMap);
+    const anEnum = enums.find(anEnum => anEnum.name === kind);
+    if (anEnum) {
+      const members = values(anEnum.memberMap);
+      const v = Number(value);
+      const member = members.find(member => member.value === v);
+      return member ? member.name : 'bad enum value ' + value;
+    }
+
+    return value; // works for kind = 'number', 'text', ...
+  };
+
   async loadData(instanceNode: NodeType) {
-    const typeNode = await getTypeNode(instanceNode);
+    const typeNode = await loadTypeNode(instanceNode);
 
     reloadAlerts();
 
@@ -166,25 +174,6 @@ class InstanceDetail extends Component<PropsType> {
     dispatchSet('ui.typeProps', sortedProperties);
   }
 
-  renderAlerts = () => {
-    const {alerts, node} = this.props;
-
-    if (!alerts || alerts.length === 0) {
-      return <div>none</div>;
-    }
-
-    const {id} = node;
-    const myAlerts = alerts.filter(alert =>
-      this.alertIsFor(id, alert.instanceId)
-    );
-
-    return (
-      <div>
-        {myAlerts.map(alert => <Alert key={alert.name} alert={alert} />)}
-      </div>
-    );
-  };
-
   renderProperties = () => {
     const {instanceData, typeProps} = this.props;
 
@@ -194,12 +183,16 @@ class InstanceDetail extends Component<PropsType> {
 
     return (
       <table className="property-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Value</th>
-          </tr>
-        </thead>
+        <caption>
+          Properties
+          <Button
+            className="edit-properties"
+            icon="cog"
+            onClick={() => this.editProperties()}
+            tooltip="edit properties"
+          />
+        </caption>
+
         <tbody>
           {typeProps.map(typeProp =>
             this.renderProperty(typeProp, instanceData)
@@ -207,27 +200,6 @@ class InstanceDetail extends Component<PropsType> {
         </tbody>
       </table>
     );
-  };
-
-  formatValue = (kind, value) => {
-    if (value === undefined) return 'unset';
-    if (kind === 'boolean') return Boolean(Number(value));
-    if (kind === 'percent') return Number(value).toFixed(2) + '%';
-    if (kind === 'number') return value;
-    if (kind === 'text') return value;
-
-    // Define if this is an enumerated type ...
-    const {enumMap} = this.props;
-    const enums = values(enumMap);
-    const anEnum = enums.find(anEnum => anEnum.name === kind);
-    if (anEnum) {
-      const members = values(anEnum.memberMap);
-      const v = Number(value);
-      const member = members.find(member => member.value === v);
-      return member ? member.name : 'bad enum value ' + value;
-    }
-
-    return value; // works for kind = 'number', 'text', ...
   };
 
   renderProperty = (typeProp: PropertyType, instanceData: Object) => {
@@ -242,45 +214,37 @@ class InstanceDetail extends Component<PropsType> {
   };
 
   render() {
-    const {node, typeName} = this.props;
+    const {node} = this.props;
     if (!node) return null;
+
+    const typeNode = getTypeNode(node);
+    const typeName = typeNode.name;
 
     return (
       <section className="instance-detail">
-        <div className="title">{node.name}</div>
+        <div className="title">
+          {capitalize(typeName)} &quot;{node.name}&quot;
+        </div>
+
         {this.breadcrumbs(node)}
 
-        <h3 className="node-name">
-          {capitalize(typeName)} &quot;{node.name}&quot; Detail
-          <Button
-            className="edit-properties"
-            icon="cog"
-            onClick={() => this.editProperties()}
-            tooltip="edit properties"
-          />
-        </h3>
-
-        <h4>Properties</h4>
         {this.renderProperties()}
 
-        <h4>Alerts</h4>
-        {this.renderAlerts()}
+        <InstanceAlerts />
       </section>
     );
   }
 }
 
 const mapState = (state: StateType): PropsType => {
-  const {alerts, enumMap, instanceData, instanceNodeMap, ui} = state;
-  const {selectedChildNodeId, typeName, typeProps} = ui;
+  const {enumMap, instanceData, instanceNodeMap, ui} = state;
+  const {selectedChildNodeId, typeProps} = ui;
   const node = instanceNodeMap[selectedChildNodeId];
   return {
-    alerts,
     enumMap,
     instanceData,
     instanceNodeMap,
     node,
-    typeName,
     typeProps
   };
 };
