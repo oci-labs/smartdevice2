@@ -3,12 +3,12 @@
 import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, getState, Input, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import Enums from '../enums/enums';
 import {showModal} from '../share/sd-modal';
+import {addNode, deleteNode} from '../tree/tree-util';
 import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
@@ -18,7 +18,6 @@ import type {
   NodeMapType,
   NodeType,
   PropertyType,
-  StateType,
   UiType
 } from '../types';
 
@@ -26,7 +25,6 @@ import './type-properties.css';
 
 type PropsType = {
   enumMap: EnumMapType,
-  typeNode: ?NodeType,
   typeNodeMap: NodeMapType,
   ui: UiType
 };
@@ -35,12 +33,19 @@ const BUILTIN_TYPES = ['boolean', 'number', 'percent', 'text'];
 
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
+function createNewType(parent: NodeType) {
+  const name = getState().ui.typeName;
+  addNode('type', name, parent);
+}
+
 class TypeProperties extends Component<PropsType> {
   added: boolean;
 
   addProp = async () => {
-    const {typeNode, ui: {newPropName, newPropType}} = this.props;
+    const typeNode = this.getTypeNode(this.props);
     if (!typeNode) return;
+
+    const {ui: {newPropName, newPropType}} = this.props;
 
     if (!this.isValidName()) {
       showModal({
@@ -64,6 +69,24 @@ class TypeProperties extends Component<PropsType> {
     dispatchSet('ui.newPropName', '');
   };
 
+  addType = () => {
+    const typeNode = this.getTypeNode(this.props);
+    const renderFn = () => (
+      <div>
+        <div>
+          <label>Name</label>
+          <Input autoFocus path="ui.typeName" />
+        </div>
+        <div className="button-row">
+          <button className="button" onClick={() => createNewType(typeNode)}>
+            Create
+          </button>
+        </div>
+      </div>
+    );
+    showModal({title: 'Add Type', renderFn});
+  };
+
   breadcrumbs = typeNode => {
     const {typeNodeMap} = this.props;
     let crumbs = typeNode.name;
@@ -78,32 +101,23 @@ class TypeProperties extends Component<PropsType> {
       typeNode = parentNode;
     }
 
-    return (
-      <div className="breadcrumbs">{crumbs}</div>
-    );
-  };
-
-  getEnumId = (enumName: string): number => {
-    const {enumMap} = this.props;
-    const enums = values(enumMap);
-    const anEnum = enums.find(anEnum => anEnum.name === enumName);
-    return anEnum ? anEnum.id : -1;
+    return <div className="breadcrumbs">{crumbs}</div>;
   };
 
   componentWillMount() {
-    this.loadTypeProps(this.props.typeNode);
+    this.loadTypeProps();
   }
 
   componentWillReceiveProps(nextProps) {
-    const {typeNode} = nextProps;
+    const typeNode = this.getTypeNode(nextProps);
     if (!typeNode) return;
 
-    const currentTypeNode = this.props.typeNode;
+    const currentTypeNode = this.getTypeNode(this.props);
     const newTypeSelected =
       !currentTypeNode || typeNode.id !== currentTypeNode.id;
 
     // If the type changed or a new property was just added ...
-    if (newTypeSelected || this.added) this.loadTypeProps(typeNode);
+    if (newTypeSelected || this.added) this.loadTypeProps();
     this.added = false;
   }
 
@@ -114,6 +128,23 @@ class TypeProperties extends Component<PropsType> {
     dispatchSet('ui.typeProps', typeProps);
   };
 
+  deleteType = () => {
+    const typeNode = this.getTypeNode(this.props);
+    deleteNode('type', typeNode);
+  };
+
+  getEnumId = (enumName: string): number => {
+    const {enumMap} = this.props;
+    const enums = values(enumMap);
+    const anEnum = enums.find(anEnum => anEnum.name === enumName);
+    return anEnum ? anEnum.id : -1;
+  };
+
+  getTypeNode = (props: PropsType) => {
+    const {typeNodeMap, ui: {selectedTypeNodeId}} = props;
+    return typeNodeMap[selectedTypeNodeId];
+  };
+
   isValidName = () => {
     const {ui: {newPropName, typeProps}} = this.props;
     const propNames = typeProps.map(at => at.name);
@@ -122,7 +153,8 @@ class TypeProperties extends Component<PropsType> {
     );
   };
 
-  async loadTypeProps(typeNode: ?NodeType) {
+  async loadTypeProps() {
+    const typeNode = this.getTypeNode(this.props);
     if (!typeNode) return;
 
     const json = await getJson(`types/${typeNode.id}/data`);
@@ -130,6 +162,18 @@ class TypeProperties extends Component<PropsType> {
     const sortedTypeProps = sortBy(typeProps, ['name']);
     dispatchSet('ui.typeProps', sortedTypeProps);
   }
+
+  propertyButtons = () => (
+    <div className="buttons">
+      <Button
+        key="delete"
+        className="delete"
+        icon="trash-o"
+        onClick={this.deleteType}
+      />
+      <Button key="add" className="add" icon="plus" onClick={this.addType} />
+    </div>
+  );
 
   propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatchSet('ui.newPropName', e.target.value);
@@ -202,7 +246,8 @@ class TypeProperties extends Component<PropsType> {
   );
 
   render() {
-    const {typeNode, ui: {typeProps}} = this.props;
+    const {ui: {typeProps}} = this.props;
+    const typeNode = this.getTypeNode(this.props);
     if (!typeNode) {
       return (
         <section className="type-properties">
@@ -213,16 +258,23 @@ class TypeProperties extends Component<PropsType> {
 
     return (
       <section className="type-properties">
-        <div className="title">{typeNode.name}</div>
-        {this.breadcrumbs(typeNode)}
-        <h3>Properties</h3>
-        <table>
-          {this.renderTableHead()}
-          <tbody>
-            {this.renderTableInputRow()}
-            {typeProps.map(typeProp => this.renderTableRow(typeProp))}
-          </tbody>
-        </table>
+        <header>
+          <div>
+            <div className="title">{typeNode.name}</div>
+            {this.propertyButtons()}
+          </div>
+          {this.breadcrumbs(typeNode)}
+        </header>
+        <section>
+          <h3>Properties</h3>
+          <table>
+            {this.renderTableHead()}
+            <tbody>
+              {this.renderTableInputRow()}
+              {typeProps.map(typeProp => this.renderTableRow(typeProp))}
+            </tbody>
+          </table>
+        </section>
 
         <Enums />
       </section>
@@ -230,11 +282,8 @@ class TypeProperties extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {enumMap, typeNodeMap, ui} = state;
-  const {selectedTypeNodeId} = ui;
-  const typeNode = typeNodeMap[selectedTypeNodeId];
-  return {enumMap, typeNode, typeNodeMap, ui};
-};
-
-export default connect(mapState)(TypeProperties);
+export default watch(TypeProperties, {
+  enumMap: '',
+  typeNodeMap: '',
+  ui: ''
+});

@@ -2,14 +2,15 @@
 
 import React, {Component} from 'react';
 import Modal from 'react-modal'; // See https://reactcommunity.org/react-modal/.
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import './sd-modal.css';
 
-import type {ConfirmType, ModalType, StateType} from '../types';
+import type {ConfirmType, ModalType} from '../types';
 
-type PropsType = ModalType;
+type PropsType = {
+  modal: ModalType
+};
 
 let renderFn: ?Function;
 
@@ -70,7 +71,7 @@ class SdModal extends Component<PropsType> {
   onCloseModal = hideModal;
 
   renderMessage = () => {
-    const {message} = this.props;
+    const {message} = this.props.modal;
     if (!message) return null;
 
     // If message contains newlines, honor them.
@@ -85,7 +86,7 @@ class SdModal extends Component<PropsType> {
   };
 
   render() {
-    const {error, message, open, title} = this.props;
+    const {error, message, open, title} = this.props.modal;
     let className = 'sd-modal';
     if (error) className += ' error';
     return (
@@ -112,9 +113,4 @@ class SdModal extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): ModalType => {
-  const {ui: {modal}} = state;
-  return modal;
-};
-
-export default connect(mapState)(SdModal);
+export default watch(SdModal, {modal: 'ui.modal'});

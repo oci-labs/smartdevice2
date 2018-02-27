@@ -1,13 +1,10 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import {post} from '../util/rest-util';
-
-import type {StateType} from '../types';
 
 import './header.css';
 
@@ -52,9 +49,4 @@ class Header extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {mqttConnected} = state;
-  return {mqttConnected};
-};
-
-export default connect(mapState)(Header);
+export default watch(Header, {mqttConnected: ''});

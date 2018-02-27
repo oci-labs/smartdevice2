@@ -3,8 +3,7 @@
 import capitalize from 'lodash/capitalize';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import InstanceAlerts from '../instance-alerts/instance-alerts';
 import PropertyForm from '../property-form/property-form';
@@ -22,7 +21,7 @@ import type {
   NodeMapType,
   NodeType,
   PropertyType,
-  StateType
+  UiType
 } from '../types';
 
 import './instance-detail.css';
@@ -31,8 +30,8 @@ type PropsType = {
   enumMap: EnumMapType,
   instanceData: Object,
   instanceNodeMap: NodeMapType,
-  node: NodeType,
-  typeProps: PropertyType[]
+  typeProps: PropertyType[],
+  ui: UiType
 };
 
 /*
@@ -91,23 +90,23 @@ class InstanceDetail extends Component<PropsType> {
   };
 
   componentDidMount() {
-    const {node} = this.props;
+    const node = this.getNode(this.props);
     this.loadData(node);
   }
 
   componentWillReceiveProps(nextProps: PropsType) {
-    const {node} = nextProps;
+    const node = this.getNode(nextProps);
     if (!node) return;
 
     // If the same node has already been processed ...
-    const prevNode = this.props.node;
+    const prevNode = this.getNode(this.props);
     if (prevNode && node.id === prevNode.id) return;
 
     this.loadData(node);
   }
 
   editProperties = () => {
-    const {node} = this.props;
+    const node = this.getNode(this.props);
     const renderFn = () => <PropertyForm />;
     showModal({title: node.name + ' Properties', renderFn});
   };
@@ -132,6 +131,11 @@ class InstanceDetail extends Component<PropsType> {
 
     return value; // works for kind = 'number', 'text', ...
   };
+
+  getNode = (props: PropsType) => {
+    const {instanceNodeMap, ui} = props;
+    return instanceNodeMap[ui.selectedChildNodeId];
+  }
 
   async loadData(instanceNode: NodeType) {
     const typeNode = await loadTypeNode(instanceNode);
@@ -214,7 +218,7 @@ class InstanceDetail extends Component<PropsType> {
   };
 
   render() {
-    const {node} = this.props;
+    const node = this.getNode(this.props);
     if (!node) return null;
 
     const typeNode = getTypeNode(node);
@@ -236,17 +240,9 @@ class InstanceDetail extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {enumMap, instanceData, instanceNodeMap, ui} = state;
-  const {selectedChildNodeId, typeProps} = ui;
-  const node = instanceNodeMap[selectedChildNodeId];
-  return {
-    enumMap,
-    instanceData,
-    instanceNodeMap,
-    node,
-    typeProps
-  };
-};
-
-export default connect(mapState)(InstanceDetail);
+export default watch(InstanceDetail, {
+  enumMap: '',
+  instanceData: '',
+  instanceNodeMap: '',
+  ui: ''
+});

@@ -5,9 +5,9 @@ import upperFirst from 'lodash/upperFirst';
 import React from 'react';
 import {dispatch, dispatchSet, getPathValue, getState} from 'redux-easy';
 
-import {postJson} from '../util/rest-util';
+import {deleteResource, getJson, postJson} from '../util/rest-util';
 import Button from '../share/button';
-import {hideModal, showModal} from '../share/sd-modal';
+import {hideModal, showConfirm, showModal} from '../share/sd-modal';
 import {values} from '../util/flow-util';
 
 import type {AddNodePayloadType, NodeType, TreeType} from '../types';
@@ -56,6 +56,31 @@ export function addNode(kind: TreeType, name: string, parent: NodeType): void {
   }
 }
 
+export async function deleteNode(
+  kind: TreeType,
+  node: NodeType
+): Promise<void> {
+  // Determine if any other nodes refer to this one.
+  const inUse = await hasDependents(kind, node.id);
+  if (inUse) {
+    showConfirm({
+      title: 'Node In Use',
+      message:
+        'Are you sure you want to delete this node?\n' +
+        'At least one other node refers to it.',
+      yesCb: () => doDelete(kind, node),
+      noCb: () => {}
+    });
+  } else {
+    doDelete(kind, node);
+  }
+}
+
+async function doDelete(kind, node) {
+  await deleteResource(`tree/${kind}/${node.id}`);
+  dispatch('deleteNode', {kind, node});
+}
+
 /**
  * Gets the type name for an instance node.
  */
@@ -76,6 +101,11 @@ function handleTypeSelectCancel(): void {
 function handleTypeSelectOk(name, parent): void {
   reallyAddNode('instance', name, parent, typeId);
   hideModal();
+}
+
+async function hasDependents(kind: TreeType, id: number): Promise<boolean> {
+  const inUse = await getJson(`${kind}s/${id}/inuse`);
+  return inUse;
 }
 
 function promptForType(name, parent, childTypes: NodeType[]): void {
@@ -127,6 +157,8 @@ async function reallyAddNode(
     const payload: AddNodePayloadType = {id, kind, name, parentId, typeId};
     if (newTopType && lastUsed) payload.messageServerId = lastUsed;
     dispatch('addNode', payload);
+
+    hideModal();
 
     // Clear the node name input.
     dispatchSet(`ui.${kind}Name`, '');

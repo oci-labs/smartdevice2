@@ -2,14 +2,11 @@
 
 import lowerFirst from 'lodash/lowerFirst';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import ImportJson from '../import-json/import-json';
 import {showModal} from '../share/sd-modal';
 import {getUrlPrefix} from '../util/rest-util';
-
-import type {StateType} from '../types';
 
 import './user-dropdown.css';
 
@@ -61,9 +58,6 @@ class UserDropdown extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {ui: {showUserDropdown}} = state;
-  return {showUserDropdown};
-};
-
-export default connect(mapState)(UserDropdown);
+export default watch(UserDropdown, {
+  showUserDropdown: 'ui.showUserDropdown'
+});

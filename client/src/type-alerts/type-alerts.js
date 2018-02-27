@@ -3,8 +3,7 @@
 import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import MessageServerSelect
   from '../message-server-select/message-server-select';
@@ -17,9 +16,8 @@ import {deleteResource, getJson, postJson} from '../util/rest-util';
 import type {
   AlertTypeType,
   EnumMapType,
+  NodeMapType,
   NodeType,
-  PropertyType,
-  StateType,
   UiType
 } from '../types';
 
@@ -27,8 +25,7 @@ import './type-alerts.css';
 
 type PropsType = {
   enumMap: EnumMapType,
-  typeNode: NodeType,
-  typeProps: PropertyType[],
+  typeNodeMap: NodeMapType,
   ui: UiType
 };
 
@@ -48,9 +45,10 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
   addAlertType = async () => {
     const {
-      typeNode,
       ui: {newAlertExpression, newAlertName, newAlertSticky}
     } = this.props;
+
+    const typeNode = this.getTypeNode(this.props);
     if (!typeNode) return;
 
     if (!this.isValidName()) {
@@ -109,14 +107,15 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   };
 
   componentWillMount() {
-    this.loadAlertTypes(this.props.typeNode);
+    const typeNode = this.getTypeNode(this.props);
+    this.loadAlertTypes(typeNode);
   }
 
   componentWillReceiveProps(nextProps: PropsType) {
-    const {typeNode} = nextProps;
+    const typeNode = this.getTypeNode(nextProps);
     if (!typeNode) return;
 
-    const currentTypeNode = this.props.typeNode;
+    const currentTypeNode = this.getTypeNode(this.props);
     const newTypeSelected =
       !currentTypeNode || typeNode.id !== currentTypeNode.id;
 
@@ -133,11 +132,12 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   };
 
   getBadNames = () => {
-    const {enumMap, typeProps, ui: {newAlertExpression}} = this.props;
+    const {enumMap, ui: {newAlertExpression}} = this.props;
 
     // Allow boolean constants.
     const validNames = new Set(['true', 'false']);
 
+    const {typeProps} = this.props.ui;
     typeProps.forEach(typeProp => {
       // Allow property names.
       validNames.add(typeProp.name);
@@ -158,6 +158,11 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
       .filter(word => PROPERTY_NAME_RE.test(word));
 
     return expressionNames.filter(n => !validNames.has(n));
+  };
+
+  getTypeNode = (props: PropsType) => {
+    const {typeNodeMap, ui: {selectedTypeNodeId}} = props;
+    return typeNodeMap[selectedTypeNodeId];
   };
 
   isValidName = () => {
@@ -254,7 +259,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   );
 
   render() {
-    const {typeNode} = this.props;
+    const typeNode = this.getTypeNode(this.props);
     if (!typeNode) return null;
 
     const {alertTypes} = this.state;
@@ -275,11 +280,4 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {enumMap, typeNodeMap, ui} = state;
-  const {selectedTypeNodeId, typeProps} = ui;
-  const typeNode = typeNodeMap[selectedTypeNodeId];
-  return {enumMap, typeNode, typeProps, ui};
-};
-
-export default connect(mapState)(TypeAlerts);
+export default watch(TypeAlerts, {enumMap: '', ui: ''});

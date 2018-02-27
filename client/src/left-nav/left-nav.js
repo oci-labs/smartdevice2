@@ -2,12 +2,11 @@
 
 import upperFirst from 'lodash/upperFirst';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import TreeBuilder from '../tree/tree-builder';
 
-import type {NodeMapType, StateType, TreeType, UiType} from '../types';
+import type {NodeMapType, TreeType, UiType} from '../types';
 
 import './left-nav.css';
 import 'react-tabs/style/react-tabs.css';
@@ -66,14 +65,9 @@ class LeftNav extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {instanceNodeMap, typeNodeMap, ui, user: {subscriptions}} = state;
-  return {
-    instanceNodeMap,
-    subscriptions,
-    typeNodeMap,
-    ui
-  };
-};
-
-export default connect(mapState)(LeftNav);
+export default watch(LeftNav, {
+  instanceNodeMap: '',
+  typeNodeMap: '',
+  ui: '',
+  subscriptions: 'user.subscriptions'
+});

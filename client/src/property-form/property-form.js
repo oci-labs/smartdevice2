@@ -1,21 +1,20 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch, dispatchSet, Input} from 'redux-easy';
+import {dispatch, dispatchSet, Input, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import {postJson} from '../util/rest-util';
 import {hideModal} from '../share/sd-modal';
 
-import type {NodeType, PropertyType, StateType} from '../types';
+import type {NodeMapType, NodeType, PropertyType, UiType} from '../types';
 
 import './property-form.css';
 
 type PropsType = {
   instanceData: Object,
-  node: NodeType,
-  typeProps: PropertyType[]
+  instanceNodeMap: NodeMapType,
+  ui: UiType
 };
 
 const inputTypes = {
@@ -35,6 +34,11 @@ class PropertyForm extends Component<PropsType> {
       <div>{`unsupported type ${kind}`}</div>
     );
   };
+
+  getInstanceNode = () => {
+    const {instanceNodeMap, ui} = this.props;
+    return instanceNodeMap[ui.selectedChildNodeId];
+  }
 
   renderTableHead = () => (
     <thead>
@@ -58,7 +62,8 @@ class PropertyForm extends Component<PropsType> {
   };
 
   saveProperties = async () => {
-    const {instanceData, node} = this.props;
+    const {instanceData} = this.props;
+    const node = this.getInstanceNode();
 
     Object.keys(instanceData).forEach(property => {
       const value = instanceData[property];
@@ -78,9 +83,10 @@ class PropertyForm extends Component<PropsType> {
   };
 
   render() {
-    const {node, typeProps} = this.props;
+    const {typeProps} = this.props.ui;
     if (!typeProps) return null;
 
+    const node = this.getInstanceNode();
     return (
       <div className="property-form">
         <table>
@@ -101,11 +107,4 @@ class PropertyForm extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {instanceData, instanceNodeMap, ui} = state;
-  const {selectedChildNodeId, typeProps} = ui;
-  const node = instanceNodeMap[selectedChildNodeId];
-  return {instanceData, node, typeProps};
-};
-
-export default connect(mapState)(PropertyForm);
+export default watch(PropertyForm, {instanceData: '', ui: ''});

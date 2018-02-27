@@ -17,15 +17,39 @@
     border: none;
   }
 
+  .buttons {
+    display: inline-block;
+  }
+
+  header {
+    background-color: $secondary-color;
+    padding: $padding;
+
+    .buttons {
+      float: right;
+    }
+
+    > div:first-child {
+      border-bottom: solid gray 1px;
+      padding-bottom: 5px;
+    }
+  }
+
+  > h3 {
+    padding: $padding;
+  }
+
+  > section {
+    padding: $padding;
+  }
+
   table {
     width: 100%;
   }
 
   .title {
-    background-color: $secondary-color;
-    border-bottom: solid gray 1px;
     color: $primary-color;
+    display: inline-block;
     font-size: 24px;
-    padding-bottom: 5px;
   }
 }

@@ -3,54 +3,61 @@
 import capitalize from 'lodash/capitalize';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import {watch} from 'redux-easy';
 
 import Node from '../node/node';
 import {getType} from '../tree/tree-util';
-import type {NodeMapType, NodeType, StateType} from '../types';
+import type {NodeMapType, NodeType, UiType} from '../types';
 
 import './instance-hierarchy.css';
 
 type PropsType = {
   instanceNodeMap: NodeMapType,
-  instanceNode: ?NodeType,
-  selectedChildNodeId: number
+  ui: UiType
 };
 
 class ParentInstances extends Component<PropsType> {
+  getInstanceNode = () => {
+    const {instanceNodeMap, ui} = this.props;
+    return instanceNodeMap[ui.selectedInstanceNodeId];
+  }
+
   renderChild = (child: NodeType) => {
-    const isSelected = child.id === this.props.selectedChildNodeId;
+    const {selectedChildNodeId} = this.props.ui;
+    const isSelected = child.id === selectedChildNodeId;
     return <Node key={child.id} isSelected={isSelected} node={child} />;
   };
 
   renderChildren = () => {
-    const {instanceNode, instanceNodeMap} = this.props;
+    const instanceNode = this.getInstanceNode();
     if (!instanceNode) return;
 
     const {children} = instanceNode;
     if (children.length === 0) return <div>none</div>;
 
+    const {instanceNodeMap} = this.props;
     const childNodes = children.map(id => instanceNodeMap[id]);
     const sortedChildren = sortBy(childNodes, ['name']);
     return sortedChildren.map(child => this.renderChild(child));
   };
 
   renderParent = () => {
-    const {instanceNode, instanceNodeMap, selectedChildNodeId} = this.props;
+    const instanceNode = this.getInstanceNode();
     if (!instanceNode) return;
 
     const {parentId} = instanceNode;
     if (!parentId) return <div>none</div>;
 
+    const {instanceNodeMap, ui} = this.props;
     const parent = instanceNodeMap[parentId];
     if (!parent || parent.name === 'root') return <div>none</div>;
 
-    const isSelected = parent.id === selectedChildNodeId;
+    const isSelected = parent.id === ui.selectedChildNodeId;
     return <Node isSelected={isSelected} node={parent} />;
   };
 
   render() {
-    const {instanceNode} = this.props;
+    const instanceNode = this.getInstanceNode();
     if (!instanceNode) {
       return (
         <section className="instance-hierarchy">
@@ -75,11 +82,7 @@ class ParentInstances extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {instanceNodeMap, ui} = state;
-  const {selectedChildNodeId, selectedInstanceNodeId} = ui;
-  const instanceNode = instanceNodeMap[selectedInstanceNodeId];
-  return {instanceNode, instanceNodeMap, selectedChildNodeId};
-};
-
-export default connect(mapState)(ParentInstances);
+export default watch(ParentInstances, {
+  instanceNodeMap: '',
+  ui: ''
+});

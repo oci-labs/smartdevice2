@@ -1,16 +1,13 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatch, watch} from 'redux-easy';
 
 import {loadMessageServers} from '../message-servers/message-servers';
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
 import {loadTree} from '../tree/tree-builder';
 import {postJson} from '../util/rest-util';
-
-import type {StateType} from '../types';
 
 import './import-json.css';
 
@@ -80,9 +77,4 @@ class ImportJson extends Component<PropsType, MyStateType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {ui: {jsonPath}} = state;
-  return {jsonPath};
-};
-
-export default connect(mapState)(ImportJson);
+export default watch(ImportJson, {jsonPath: 'ui.jsonPath'});

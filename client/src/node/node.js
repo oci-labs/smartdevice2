@@ -2,11 +2,10 @@
 
 import capitalize from 'lodash/capitalize';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatch, watch} from 'redux-easy';
 import {getType} from '../tree/tree-util';
 
-import type {AlertType, NodeMapType, NodeType, StateType} from '../types';
+import type {AlertType, NodeMapType, NodeType} from '../types';
 
 import './node.css';
 
@@ -68,9 +67,4 @@ class Node extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {alerts, instanceNodeMap} = state;
-  return {alerts, instanceNodeMap};
-};
-
-export default connect(mapState)(Node);
+export default watch(Node, {alerts: '', instanceNodeMap: ''});

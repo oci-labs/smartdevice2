@@ -1,20 +1,18 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import {watch} from 'redux-easy';
 
 import Header from './header/header';
-import InstanceDetail from './instance-detail/instance-detail';
 import InstanceHierarchy from './instance-hierarchy/instance-hierarchy';
 import LeftNav from './left-nav/left-nav';
 import MessageServers from './message-servers/message-servers';
 import SdModal from './share/sd-modal';
 import TrainControl from './train-control/train-control';
-import TypeAlerts from './type-alerts/type-alerts';
 import TypeProperties from './type-properties/type-properties';
 import UserDropdown from './user-dropdown/user-dropdown';
 
-import type {StateType, ViewType} from './types';
+import type {ViewType} from './types';
 
 import './app.css';
 
@@ -55,9 +53,4 @@ class App extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {view} = state.ui;
-  return {view};
-};
-
-export default connect(mapState)(App);
+export default watch(App, {view: 'ui.view'});

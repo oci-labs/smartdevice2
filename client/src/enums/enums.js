@@ -5,8 +5,7 @@ import sortBy from 'lodash/sortBy';
 // $FlowFixMe - doesn't know about Fragment yet
 import React, {Component, Fragment} from 'react';
 import ReactDOM from 'react-dom';
-import {connect} from 'react-redux';
-import {dispatch, dispatchSet, Input} from 'redux-easy';
+import {dispatch, dispatchSet, Input, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
@@ -18,7 +17,6 @@ import type {
   EnumMapType,
   EnumMemberType,
   EnumType,
-  StateType,
   UiType
 } from '../types';
 
@@ -200,7 +198,7 @@ class Enums extends Component<PropsType> {
   );
 
   renderEnumMemberTableInputRow = () => {
-    const {ui: {newEnumMemberName, newEnumMemberValue}} = this.props;
+    const {newEnumMemberName, newEnumMemberValue} = this.props.ui;
     return (
       <tr>
         <td>
@@ -338,9 +336,4 @@ class Enums extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {enumMap, ui} = state;
-  return {enumMap, ui};
-};
-
-export default connect(mapState)(Enums);
+export default watch(Enums, {enumMap: '', ui: ''});

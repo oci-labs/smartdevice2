@@ -2,8 +2,7 @@
 
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet, Input} from 'redux-easy';
+import {dispatchSet, Input, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
@@ -14,7 +13,6 @@ import {deleteResource, getJson, postJson, putJson} from '../util/rest-util';
 import type {
   MessageServerMapType,
   MessageServerType,
-  StateType,
   UiType
 } from '../types';
 
@@ -182,9 +180,7 @@ class MessageServers extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {messageServerMap, ui} = state;
-  return {messageServerMap, ui};
-};
-
-export default connect(mapState)(MessageServers);
+export default watch(MessageServers, {
+  messageServerMap: '',
+  ui: ''
+});

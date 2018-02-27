@@ -2,8 +2,7 @@
 
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch, dispatchSet} from 'redux-easy';
+import {dispatch, dispatchSet, watch} from 'redux-easy';
 
 import {getJson, putJson} from '../util/rest-util';
 
@@ -11,7 +10,6 @@ import type {
   MessageServerType,
   NodePayloadType,
   NodeType,
-  StateType,
   TreeType
 } from '../types';
 
@@ -103,9 +101,7 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {typeRootId, ui: {treeType}} = state;
-  return {treeType, typeRootId};
-};
-
-export default connect(mapState)(MessageServerSelect);
+export default watch(MessageServerSelect, {
+  treeType: 'ui.treeType',
+  typeRootId: ''
+});

@@ -1,12 +1,11 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatch, watch} from 'redux-easy';
 
 import {deleteResource} from '../util/rest-util';
 
-import type {AlertType, NodeMapType, StateType} from '../types';
+import type {AlertType, NodeMapType} from '../types';
 
 import './alert.css';
 
@@ -83,9 +82,4 @@ class Alert extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {instanceNodeMap, typeNodeMap} = state;
-  return {instanceNodeMap, typeNodeMap};
-};
-
-export default connect(mapState)(Alert);
+export default watch(Alert, {instanceNodeMap: '', typeNodeMap: ''});
