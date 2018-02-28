@@ -4,7 +4,7 @@
   text-align: left;
 
   .actions-column {
-    text-align: center;
+    width: 36px;
   }
 
   .breadcrumbs {
@@ -15,10 +15,15 @@
 
   .button {
     border: none;
+    margin-left: 0 !important;
   }
 
   .buttons {
     display: inline-block;
+  }
+
+  h3 {
+    margin-bottom: 0;
   }
 
   header {
@@ -35,16 +40,16 @@
     }
   }
 
-  > h3 {
-    padding: $padding;
+  .kind-column {
+    width: 100px;
+  }
+
+  .name-column {
+    width: 200px;
   }
 
   > section {
     padding: $padding;
-  }
-
-  table {
-    width: 100%;
   }
 
   .title {

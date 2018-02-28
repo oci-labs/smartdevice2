@@ -106,8 +106,8 @@ class Enums extends Component<PropsType> {
 
     if (propertiesUsing.length) {
       const message =
-        'This enum cannot be deleted ' +
-        'because it it being used by the following properties:' +
+        'This enum cannot be deleted because it\n' +
+        'is being used by the following properties:\n' +
         propertiesUsing.join(', ');
       showModal({
         error: true,
@@ -147,8 +147,8 @@ class Enums extends Component<PropsType> {
   };
 
   getTypesUsingEnum = async (anEnum: EnumType): Promise<string[]> => {
-    const res = await getJson('enums/used-by/' + anEnum.id);
-    return ((res: any): string[]);
+    const res = await getJson('types/enums/used-by/' + anEnum.id);
+    return res.map(obj => obj.name);
   };
 
   isDuplicateMember = (enumMember: EnumMemberType): boolean => {
@@ -178,38 +178,21 @@ class Enums extends Component<PropsType> {
     dispatchSet('enumMap', enumMap);
   };
 
-  renderEnumMemberTableHead = () => (
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Value</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-  );
-
-  renderEnumTableHead = () => (
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-  );
-
   renderEnumMemberTableInputRow = () => {
     const {newEnumMemberName, newEnumMemberValue} = this.props.ui;
     return (
       <tr>
-        <td>
+        <td className="name-column">
           <Input
             className="enum-member-name-input"
+            onEnter={this.addEnumMember}
             onKeyDown={validNameHandler}
             path="ui.newEnumMemberName"
+            placeholder="enum member name"
             ref={input => (this.enumMemberNameInput = input)}
           />
         </td>
-        <td>
+        <td className="value-column">
           <Input
             className="enum-member-value-input"
             path="ui.newEnumMemberValue"
@@ -233,11 +216,13 @@ class Enums extends Component<PropsType> {
     const {ui: {newEnumName}} = this.props;
     return (
       <tr>
-        <td>
+        <td className="name-column">
           <Input
             className="enum-name-input"
+            onEnter={this.addEnum}
             onKeyDown={validNameHandler}
             path="ui.newEnumName"
+            placeholder="enum name"
           />
         </td>
         <td className="actions-column">
@@ -255,8 +240,8 @@ class Enums extends Component<PropsType> {
 
   renderEnumMemberTableRow = (enumMember: EnumMemberType) => (
     <tr key={enumMember.name}>
-      <td>{enumMember.name}</td>
-      <td>{enumMember.value}</td>
+      <td className="name-column">{enumMember.name}</td>
+      <td className="value-column">{enumMember.value}</td>
       <td className="actions-column">
         <Button
           className="delete"
@@ -310,7 +295,6 @@ class Enums extends Component<PropsType> {
       <section className="enums">
         <h3>Enums</h3>
         <table className="enum-table">
-          {this.renderEnumTableHead()}
           <tbody>
             {this.renderEnumTableInputRow()}
             {sortedEnums.map(anEnum => this.renderEnumTableRow(anEnum))}
@@ -321,7 +305,6 @@ class Enums extends Component<PropsType> {
           <Fragment>
             <h3>Members of &quot;{selectedEnum.name}&quot;</h3>
             <table className="enum-member-table">
-              {this.renderEnumMemberTableHead()}
               <tbody>
                 {this.renderEnumMemberTableInputRow()}
                 {sortedEnumMembers.map(enumMember =>

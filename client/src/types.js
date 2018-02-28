@@ -126,6 +126,15 @@ export type NodeType = {
 
 export type PrimitiveType = boolean | number | string;
 
+export type PromptType = {
+  buttonText: string,
+  label: string,
+  message?: string,
+  okCb: Function,
+  path: string,
+  title: string
+};
+
 export type PropertyKindType =
   'boolean' | 'number' | 'percent' | 'text';
 

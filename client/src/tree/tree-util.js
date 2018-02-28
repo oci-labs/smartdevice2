@@ -56,6 +56,16 @@ export function addNode(kind: TreeType, name: string, parent: NodeType): void {
   }
 }
 
+export function createNode(kind: TreeType, parent?: NodeType): void {
+  const state = getState();
+  const name = state.ui[kind + 'Name'];
+  if (!parent) {
+    const rootId = state[kind + 'RootId'];
+    parent = state[kind + 'NodeMap'][rootId];
+  }
+  addNode(kind, name, parent);
+}
+
 export async function deleteNode(
   kind: TreeType,
   node: NodeType

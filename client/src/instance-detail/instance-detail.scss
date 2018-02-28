@@ -23,6 +23,10 @@
     text-align: left;
   }
 
+  > h3 {
+    padding: $padding;
+  }
+
   .number, .percent {
     text-align: right;
   }

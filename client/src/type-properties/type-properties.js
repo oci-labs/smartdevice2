@@ -3,12 +3,12 @@
 import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
-import {dispatchSet, getState, Input, watch} from 'redux-easy';
+import {dispatchSet, Input, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import Enums from '../enums/enums';
-import {showModal} from '../share/sd-modal';
-import {addNode, deleteNode} from '../tree/tree-util';
+import {showModal, showPrompt} from '../share/sd-modal';
+import {createNode, deleteNode} from '../tree/tree-util';
 import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
@@ -16,7 +16,6 @@ import {deleteResource, getJson, postJson} from '../util/rest-util';
 import type {
   EnumMapType,
   NodeMapType,
-  NodeType,
   PropertyType,
   UiType
 } from '../types';
@@ -32,11 +31,6 @@ type PropsType = {
 const BUILTIN_TYPES = ['boolean', 'number', 'percent', 'text'];
 
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
-
-function createNewType(parent: NodeType) {
-  const name = getState().ui.typeName;
-  addNode('type', name, parent);
-}
 
 class TypeProperties extends Component<PropsType> {
   added: boolean;
@@ -71,20 +65,13 @@ class TypeProperties extends Component<PropsType> {
 
   addType = () => {
     const typeNode = this.getTypeNode(this.props);
-    const renderFn = () => (
-      <div>
-        <div>
-          <label>Name</label>
-          <Input autoFocus path="ui.typeName" />
-        </div>
-        <div className="button-row">
-          <button className="button" onClick={() => createNewType(typeNode)}>
-            Create
-          </button>
-        </div>
-      </div>
-    );
-    showModal({title: 'Add Type', renderFn});
+    showPrompt({
+      buttonText: 'Create',
+      label: 'Name',
+      okCb: () => createNode('type', typeNode),
+      path: 'ui.typeName',
+      title: 'Add Type'
+    });
   };
 
   breadcrumbs = typeNode => {
@@ -165,33 +152,19 @@ class TypeProperties extends Component<PropsType> {
 
   propertyButtons = () => (
     <div className="buttons">
+      <Button key="add" className="add" icon="plus" onClick={this.addType} />
       <Button
         key="delete"
         className="delete"
         icon="trash-o"
         onClick={this.deleteType}
       />
-      <Button key="add" className="add" icon="plus" onClick={this.addType} />
     </div>
   );
-
-  propNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui.newPropName', e.target.value);
-  };
 
   propTypeChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     dispatchSet('ui.newPropType', e.target.value);
   };
-
-  renderTableHead = () => (
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Data Type</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-  );
 
   renderTableInputRow = () => {
     const {enumMap, ui: {newPropName, newPropType}} = this.props;
@@ -202,15 +175,17 @@ class TypeProperties extends Component<PropsType> {
 
     return (
       <tr>
-        <td>
-          <input
+        <td className="name-column">
+          <Input
+            placeholder="property name"
             type="text"
+            onEnter={this.addProp}
             onKeyDown={validNameHandler}
-            onChange={this.propNameChange}
+            path="ui.newPropName"
             value={newPropName}
           />
         </td>
-        <td>
+        <td className="kind-column">
           <select onChange={this.propTypeChange} value={newPropType}>
             {typeNames.map(typeName => (
               <option key={typeName}>{typeName}</option>
@@ -232,8 +207,8 @@ class TypeProperties extends Component<PropsType> {
 
   renderTableRow = (typeProp: PropertyType) => (
     <tr key={typeProp.name}>
-      <td>{typeProp.name}</td>
-      <td>{typeProp.kind}</td>
+      <td className="name-column">{typeProp.name}</td>
+      <td className="kind-column">{typeProp.kind}</td>
       <td className="actions-column">
         <Button
           className="delete"
@@ -251,7 +226,7 @@ class TypeProperties extends Component<PropsType> {
     if (!typeNode) {
       return (
         <section className="type-properties">
-          <h3>Select a type in the left nav.</h3>
+          <div className="message">Select a type in the left nav.</div>
         </section>
       );
     }
@@ -268,7 +243,6 @@ class TypeProperties extends Component<PropsType> {
         <section>
           <h3>Properties</h3>
           <table>
-            {this.renderTableHead()}
             <tbody>
               {this.renderTableInputRow()}
               {typeProps.map(typeProp => this.renderTableRow(typeProp))}

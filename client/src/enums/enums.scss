@@ -15,22 +15,26 @@
   }
 
   .enum-member-table {
-    margin-top: 20px;
-  }
 
-  & > h3 {
-    margin-top: 20px !important;
+    .value-column {
+      text-align: right;
+      width: 45px;
+
+      input {
+        width: 100%;
+      }
+    }
   }
 
   .port-input {
     width: 40px;
   }
 
-  .selected-enum {
-    background-color: $selected-color;
+  > h3:not(:first-child) {
+    margin-top: 20px !important;
   }
 
-  table {
-    width: 100%;
+  .selected-enum {
+    background-color: $selected-color;
   }
 }

@@ -78,6 +78,12 @@ input[type=checkbox] {
     width: 300px;
   }
 
+  .message {
+    font-size: 18px;
+    font-weight: bold;
+    padding: $padding;
+  }
+
   .type-alerts {
     width: 500px;
   }

@@ -2,11 +2,11 @@
 
 import React, {Component} from 'react';
 import Modal from 'react-modal'; // See https://reactcommunity.org/react-modal/.
-import {dispatchSet, watch} from 'redux-easy';
+import {dispatchSet, Input, watch} from 'redux-easy';
 
 import './sd-modal.css';
 
-import type {ConfirmType, ModalType} from '../types';
+import type {ConfirmType, ModalType, PromptType} from '../types';
 
 type PropsType = {
   modal: ModalType
@@ -52,6 +52,34 @@ export function showModal(options: ModalType): void {
   // Using a setTimeout allows this to be called from a reducer.
   setTimeout(() => {
     dispatchSet('ui.modal', {error, open: true, message, title});
+  });
+}
+
+export function showPrompt(options: PromptType): void {
+  const {buttonText, label, message, okCb, path, title} = options;
+
+  const handleOk = () => {
+    hideModal();
+    okCb();
+  };
+
+  renderFn = () => (
+    <div>
+      <div>
+        <label>{label}</label>
+        <Input autoFocus onEnter={handleOk} path={path} />
+      </div>
+      <div className="button-row">
+        <button className="button" onClick={handleOk}>
+          {buttonText}
+        </button>
+      </div>
+    </div>
+  );
+
+  // Using a setTimeout allows this to be called from a reducer.
+  setTimeout(() => {
+    dispatchSet('ui.modal', {open: true, message, renderFn, title});
   });
 }
 
