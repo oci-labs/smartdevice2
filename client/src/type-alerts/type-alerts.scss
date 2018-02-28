@@ -1,8 +1,11 @@
 @import '../share.scss';
 
 .type-alerts {
+  background-color: #F0E9E9;
   display: inline-block;
   flex-grow: 1;
+  height: calc(100vh - 161px);
+  padding: $padding;
   vertical-align: top;
 
   .button.fa-plus {

@@ -36,6 +36,8 @@ type MyStateType = {
 const ALERT_NAME_RE = /^[A-Za-z][\w ]*$/;
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
+const PRIORITIES = ['', 'info', 'low', 'medium', 'high'];
+
 class TypeAlerts extends Component<PropsType, MyStateType> {
   added: boolean;
 
@@ -234,7 +236,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     <tr key={alertType.name}>
       <td className="name-column">{alertType.name}</td>
       <td className="expression-column">{alertType.expression}</td>
-      <td className="priority-column">{alertType.priority}</td>
+      <td className="priority-column">{PRIORITIES[alertType.priority]}</td>
       <td className="sticky-column">{String(alertType.sticky)}</td>
       <td className="actions-column">
         <Button

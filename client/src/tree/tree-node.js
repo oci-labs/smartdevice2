@@ -1,7 +1,7 @@
 // @flow
 
 import React, {Component} from 'react';
-import {dispatch, dispatchSet, Input, watch} from 'redux-easy';
+import {dispatch, Input, watch} from 'redux-easy';
 
 //import {addNode} from './tree-util';
 import {getAlertCount} from '../node/node';
