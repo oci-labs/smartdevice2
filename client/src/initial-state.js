@@ -57,6 +57,7 @@ const state: StateType = {
     },
     newAlertExpression: '',
     newAlertName: '',
+    newAlertPriority: 0,
     newAlertSticky: false,
     newEnumMemberName: '',
     newEnumMemberValue: 0,

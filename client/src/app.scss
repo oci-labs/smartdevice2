@@ -63,7 +63,7 @@ input[type=checkbox] {
   }
 
   // Center
-  .instance-hierarchy, .type-properties {
+  .instance-hierarchy {
     flex-grow: 1;
     text-align: left;
   }
@@ -82,10 +82,6 @@ input[type=checkbox] {
     font-size: 18px;
     font-weight: bold;
     padding: $padding;
-  }
-
-  .type-alerts {
-    width: 500px;
   }
 }
 

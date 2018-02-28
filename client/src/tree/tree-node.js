@@ -1,7 +1,7 @@
 // @flow
 
 import React, {Component} from 'react';
-import {dispatch, dispatchSet, watch} from 'redux-easy';
+import {dispatch, dispatchSet, Input, watch} from 'redux-easy';
 
 //import {addNode} from './tree-util';
 import {getAlertCount} from '../node/node';
@@ -42,9 +42,6 @@ function nodeCompare(node1: NodeType, node2: NodeType) {
 }
 
 class TreeNode extends Component<PropsType> {
-  editNode = (event: SyntheticInputEvent<HTMLInputElement>) =>
-    dispatchSet('ui.editedName', event.target.value);
-
   handleEscape = (event: SyntheticInputEvent<HTMLInputElement>) => {
     if (event.key === 'Escape') this.toggleEdit();
   };
@@ -116,7 +113,6 @@ class TreeNode extends Component<PropsType> {
 
   render = () => {
     const {
-      editedName,
       //kind,
       level,
       //newNodeName,
@@ -142,14 +138,12 @@ class TreeNode extends Component<PropsType> {
         {this.renderAlertCount()}
 
         {this.isEditing(node) ? (
-          <input
-            type="text"
+          <Input
             autoFocus
             onBlur={this.saveChange}
-            onChange={this.editNode}
             onFocus={this.moveCursor}
             onKeyDown={this.handleEscape}
-            value={editedName}
+            path="ui.editedName"
           />
         ) : (
           <div className={nameClasses.join(' ')} onClick={this.selectNode}>

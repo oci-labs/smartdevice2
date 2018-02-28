@@ -86,6 +86,7 @@ create table alert_type (
   id int auto_increment primary key,
   name text not null,
   expression text not null, -- JS code
+  priority int,
   sticky boolean,
   typeId int, -- type to which it applies; ex. valve
   foreign key (typeId)

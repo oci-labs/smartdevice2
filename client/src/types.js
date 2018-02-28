@@ -32,6 +32,7 @@ export type AlertTypeType = {
   name: string,
   expression: string,
   id: number,
+  priority: number,
   sticky: boolean,
   typeId: number
 };
@@ -213,6 +214,7 @@ export type UiType = {
   modal: ModalType,
   newAlertExpression: string,
   newAlertName: string,
+  newAlertPriority: number,
   newAlertSticky: boolean,
   newEnumMemberName: string,
   newEnumMemberValue: number,

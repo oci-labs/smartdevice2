@@ -3,12 +3,11 @@
 import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
-import {dispatchSet, Input, watch} from 'redux-easy';
+import {dispatchSet, Input, Select, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import Enums from '../enums/enums';
-import {showModal, showPrompt} from '../share/sd-modal';
-import {createNode, deleteNode} from '../tree/tree-util';
+import {showModal} from '../share/sd-modal';
 import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
 import {deleteResource, getJson, postJson} from '../util/rest-util';
@@ -29,7 +28,6 @@ type PropsType = {
 };
 
 const BUILTIN_TYPES = ['boolean', 'number', 'percent', 'text'];
-
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
 class TypeProperties extends Component<PropsType> {
@@ -63,36 +61,9 @@ class TypeProperties extends Component<PropsType> {
     dispatchSet('ui.newPropName', '');
   };
 
-  addType = () => {
-    const typeNode = this.getTypeNode(this.props);
-    showPrompt({
-      buttonText: 'Create',
-      label: 'Name',
-      okCb: () => createNode('type', typeNode),
-      path: 'ui.typeName',
-      title: 'Add Type'
-    });
-  };
-
-  breadcrumbs = typeNode => {
-    const {typeNodeMap} = this.props;
-    let crumbs = typeNode.name;
-
-    while (true) {
-      const {parentId} = typeNode;
-      if (!parentId) break;
-      const parentNode = typeNodeMap[parentId];
-      const {name} = parentNode;
-      if (name === 'root') break;
-      crumbs = name + ' > ' + crumbs;
-      typeNode = parentNode;
-    }
-
-    return <div className="breadcrumbs">{crumbs}</div>;
-  };
-
   componentWillMount() {
-    this.loadTypeProps();
+    const typeNode = this.getTypeNode(this.props);
+    this.loadTypeProps(typeNode);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -104,7 +75,7 @@ class TypeProperties extends Component<PropsType> {
       !currentTypeNode || typeNode.id !== currentTypeNode.id;
 
     // If the type changed or a new property was just added ...
-    if (newTypeSelected || this.added) this.loadTypeProps();
+    if (newTypeSelected || this.added) this.loadTypeProps(typeNode);
     this.added = false;
   }
 
@@ -113,11 +84,6 @@ class TypeProperties extends Component<PropsType> {
     let {typeProps} = this.props.ui;
     typeProps = without(typeProps, typeProp);
     dispatchSet('ui.typeProps', typeProps);
-  };
-
-  deleteType = () => {
-    const typeNode = this.getTypeNode(this.props);
-    deleteNode('type', typeNode);
   };
 
   getEnumId = (enumName: string): number => {
@@ -140,8 +106,7 @@ class TypeProperties extends Component<PropsType> {
     );
   };
 
-  async loadTypeProps() {
-    const typeNode = this.getTypeNode(this.props);
+  async loadTypeProps(typeNode) {
     if (!typeNode) return;
 
     const json = await getJson(`types/${typeNode.id}/data`);
@@ -150,24 +115,8 @@ class TypeProperties extends Component<PropsType> {
     dispatchSet('ui.typeProps', sortedTypeProps);
   }
 
-  propertyButtons = () => (
-    <div className="buttons">
-      <Button key="add" className="add" icon="plus" onClick={this.addType} />
-      <Button
-        key="delete"
-        className="delete"
-        icon="trash-o"
-        onClick={this.deleteType}
-      />
-    </div>
-  );
-
-  propTypeChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui.newPropType', e.target.value);
-  };
-
   renderTableInputRow = () => {
-    const {enumMap, ui: {newPropName, newPropType}} = this.props;
+    const {enumMap, ui: {newPropName}} = this.props;
 
     const enums = values(enumMap);
     const enumNames = enums.map(obj => obj.name);
@@ -186,11 +135,11 @@ class TypeProperties extends Component<PropsType> {
           />
         </td>
         <td className="kind-column">
-          <select onChange={this.propTypeChange} value={newPropType}>
+          <Select path="ui.newPropType">
             {typeNames.map(typeName => (
               <option key={typeName}>{typeName}</option>
             ))}
-          </select>
+          </Select>
         </td>
         <td className="actions-column">
           <Button
@@ -233,13 +182,6 @@ class TypeProperties extends Component<PropsType> {
 
     return (
       <section className="type-properties">
-        <header>
-          <div>
-            <div className="title">{typeNode.name}</div>
-            {this.propertyButtons()}
-          </div>
-          {this.breadcrumbs(typeNode)}
-        </header>
         <section>
           <h3>Properties</h3>
           <table>

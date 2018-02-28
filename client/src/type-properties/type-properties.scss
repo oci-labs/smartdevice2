@@ -1,16 +1,11 @@
 @import '../share.scss';
 
 .type-properties {
-  text-align: left;
+  display: inline-block;
+  width: 300px;
 
   .actions-column {
     width: 36px;
-  }
-
-  .breadcrumbs {
-    background-color: $secondary-color;
-    color: gray;
-    padding-top: 5px;
   }
 
   .button {
@@ -26,20 +21,6 @@
     margin-bottom: 0;
   }
 
-  header {
-    background-color: $secondary-color;
-    padding: $padding;
-
-    .buttons {
-      float: right;
-    }
-
-    > div:first-child {
-      border-bottom: solid gray 1px;
-      padding-bottom: 5px;
-    }
-  }
-
   .kind-column {
     width: 100px;
   }
@@ -50,11 +31,5 @@
 
   > section {
     padding: $padding;
-  }
-
-  .title {
-    color: $primary-color;
-    display: inline-block;
-    font-size: 24px;
   }
 }

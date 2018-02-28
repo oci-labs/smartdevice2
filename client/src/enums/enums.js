@@ -22,6 +22,10 @@ import type {
 
 import './enums.css';
 
+type NamedType = {
+  name: string
+};
+
 type PropsType = {
   enumMap: EnumMapType,
   ui: UiType
@@ -148,7 +152,8 @@ class Enums extends Component<PropsType> {
 
   getTypesUsingEnum = async (anEnum: EnumType): Promise<string[]> => {
     const res = await getJson('types/enums/used-by/' + anEnum.id);
-    return res.map(obj => obj.name);
+    const types = ((res: any): NamedType[]);
+    return types.map(obj => obj.name);
   };
 
   isDuplicateMember = (enumMember: EnumMemberType): boolean => {

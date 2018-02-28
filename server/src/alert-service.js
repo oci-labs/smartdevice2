@@ -17,7 +17,7 @@ function alertService(app: express$Application): void {
 
 async function getAllAlerts(): Promise<AlertType[]> {
   const sql =
-    'select a.id, a.instanceId, t.name, t.sticky, a.timestamp ' +
+    'select a.id, a.instanceId, t.name, t.priority, t.sticky, a.timestamp ' +
     'from alert a, alert_type t ' +
     'where a.alertTypeId = t.id';
   const alerts = await mySql.query(sql);
@@ -62,7 +62,7 @@ async function getInstanceAlerts(
   includeDescendants: boolean
 ): Promise<AlertType[]> {
   const sql =
-    'select a.id, a.instanceId, t.name, t.sticky, a.timestamp ' +
+    'select a.id, a.instanceId, t.name, t.priority, t.sticky, a.timestamp ' +
     'from alert a, alert_type t ' +
     'where instanceId = ? and a.alertTypeId = t.id';
   const alerts = await mySql.query(sql, instanceId);

@@ -9,7 +9,7 @@ import LeftNav from './left-nav/left-nav';
 import MessageServers from './message-servers/message-servers';
 import SdModal from './share/sd-modal';
 import TrainControl from './train-control/train-control';
-import TypeProperties from './type-properties/type-properties';
+import TypeDefinitions from './type-definitions/type-definitions';
 import UserDropdown from './user-dropdown/user-dropdown';
 
 import type {ViewType} from './types';
@@ -25,7 +25,7 @@ const rightMap = {
   '': <TrainControl />,
   instance: <InstanceHierarchy />,
   server: <MessageServers />,
-  type: <TypeProperties />
+  type: <TypeDefinitions />
 };
 
 /*
