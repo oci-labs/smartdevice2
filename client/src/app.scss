@@ -39,6 +39,10 @@ input[type=checkbox] {
     margin-left: 5px;
   }
 
+  button.delete {
+    color: $delete-color;
+  }
+
   .delete {
     color: $delete-color;
   }
