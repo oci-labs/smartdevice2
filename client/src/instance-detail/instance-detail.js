@@ -161,12 +161,14 @@ class InstanceDetail extends Component<PropsType> {
           className="add"
           icon="plus"
           onClick={this.addInstance}
+          tooltip="add child instance"
         />}
         <Button
           key="delete"
           className="delete"
           icon="trash-o"
           onClick={this.deleteInstance}
+          tooltip="delete instance"
         />
       </div>
     );
@@ -217,7 +219,7 @@ class InstanceDetail extends Component<PropsType> {
     const {instanceData, ui: {typeProps}} = this.props;
 
     if (!typeProps || typeProps.length === 0) {
-      return <div>none</div>;
+      return <div className="property-table">none</div>;
     }
 
     return (

@@ -59,12 +59,19 @@ class TypeDefinitions extends Component<PropsType> {
 
   propertyButtons = () => (
     <div className="buttons">
-      <Button key="add" className="add" icon="plus" onClick={this.addType} />
+      <Button
+        key="add"
+        className="add"
+        icon="plus"
+        onClick={this.addType}
+        tooltip="add child type"
+      />
       <Button
         key="delete"
         className="delete"
         icon="trash-o"
         onClick={this.deleteType}
+        tooltip="delete type"
       />
     </div>
   );
