@@ -3,6 +3,7 @@
 import React, {Component} from 'react';
 import {watch} from 'redux-easy';
 
+import Enums from './enums/enums';
 import Header from './header/header';
 import InstanceHierarchy from './instance-hierarchy/instance-hierarchy';
 import LeftNav from './left-nav/left-nav';
@@ -23,6 +24,7 @@ type PropsType = {
 const rightMap = {
   //'': null,
   '': <TrainControl />,
+  enum: <Enums />,
   instance: <InstanceHierarchy />,
   server: <MessageServers />,
   type: <TypeDefinitions />
@@ -36,6 +38,8 @@ const rightMap = {
 };
 */
 
+const hasLeftNav = view => view === 'instance' || view === 'type';
+
 class App extends Component<PropsType> {
   render() {
     const {view} = this.props;
@@ -44,7 +48,7 @@ class App extends Component<PropsType> {
         <Header />
         <UserDropdown />
         <section id="body">
-          <LeftNav />
+          {hasLeftNav(view) && <LeftNav />}
           {rightMap[view]}
         </section>
         <SdModal />

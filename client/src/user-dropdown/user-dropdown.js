@@ -15,9 +15,10 @@ type PropsType = {
 };
 
 const TREE_TYPES = ['instance', 'type'];
-const VIEW_TYPES = ['instance', 'server', 'type'];
+const VIEW_TYPES = ['enum', 'instance', 'server', 'type'];
 
 class UserDropdown extends Component<PropsType> {
+
   handleItem = (event: SyntheticEvent<HTMLElement>) => {
     dispatchSet('ui.showUserDropdown', false);
 
@@ -43,9 +44,10 @@ class UserDropdown extends Component<PropsType> {
     if (!this.props.showUserDropdown) return null;
     return (
       <div className="user-dropdown">
-        <div onClick={this.handleItem}>Instances</div>
         <div onClick={this.handleItem}>Servers</div>
+        <div onClick={this.handleItem}>Enums</div>
         <div onClick={this.handleItem}>Types</div>
+        <div onClick={this.handleItem}>Instances</div>
         <div className="divider" />
         <div onClick={this.handleItem}>Import JSON</div>
         <div onClick={this.handleItem}>

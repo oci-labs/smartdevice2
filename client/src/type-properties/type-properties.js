@@ -6,7 +6,6 @@ import React, {Component} from 'react';
 import {dispatchSet, Input, Select, watch} from 'redux-easy';
 
 import Button from '../share/button';
-import Enums from '../enums/enums';
 import {showModal} from '../share/sd-modal';
 import {values} from '../util/flow-util';
 import {validNameHandler} from '../util/input-util';
@@ -191,8 +190,6 @@ class TypeProperties extends Component<PropsType> {
             </tbody>
           </table>
         </section>
-
-        <Enums />
       </section>
     );
   }

@@ -3,7 +3,7 @@
 import omit from 'lodash/omit';
 import sortBy from 'lodash/sortBy';
 // $FlowFixMe - doesn't know about Fragment yet
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {dispatch, dispatchSet, Input, watch} from 'redux-easy';
 
@@ -298,17 +298,19 @@ class Enums extends Component<PropsType> {
 
     return (
       <section className="enums">
-        <h3>Enums</h3>
-        <table className="enum-table">
-          <tbody>
-            {this.renderEnumTableInputRow()}
-            {sortedEnums.map(anEnum => this.renderEnumTableRow(anEnum))}
-          </tbody>
-        </table>
+        <div className="left">
+          <h3>Enums</h3>
+          <table className="enum-table">
+            <tbody>
+              {this.renderEnumTableInputRow()}
+              {sortedEnums.map(anEnum => this.renderEnumTableRow(anEnum))}
+            </tbody>
+          </table>
+        </div>
 
         {selectedEnum && (
-          <Fragment>
-            <h3>Members of &quot;{selectedEnum.name}&quot;</h3>
+          <div className="right">
+            <h3>Members</h3>
             <table className="enum-member-table">
               <tbody>
                 {this.renderEnumMemberTableInputRow()}
@@ -317,7 +319,7 @@ class Enums extends Component<PropsType> {
                 )}
               </tbody>
             </table>
-          </Fragment>
+          </div>
         )}
       </section>
     );
