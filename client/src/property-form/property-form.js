@@ -107,4 +107,8 @@ class PropertyForm extends Component<PropsType> {
   }
 }
 
-export default watch(PropertyForm, {instanceData: '', ui: ''});
+export default watch(PropertyForm, {
+  instanceData: '',
+  instanceNodeMap: '',
+  ui: ''
+});

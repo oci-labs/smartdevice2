@@ -82,8 +82,8 @@ class TypeDefinitions extends Component<PropsType> {
     return (
       <section className="type-definitions">
         <header>
-          <div>
-            <div className="title">{typeNode.name}</div>
+          <div className="title">
+            {typeNode.name}
             {this.propertyButtons()}
           </div>
           {this.breadcrumbs(typeNode)}

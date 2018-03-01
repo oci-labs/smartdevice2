@@ -2,14 +2,6 @@
 
 .instance-alerts {
   display: inline-block;
-  margin: $padding;
+  margin-left: $padding;
   vertical-align: top;
-
-  .heading {
-    border-bottom: solid $underline-color 1px;
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-  }
 }

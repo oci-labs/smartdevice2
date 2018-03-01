@@ -24,27 +24,7 @@ export function addNode(kind: TreeType, name: string, parent: NodeType): void {
     return;
   }
 
-  const state = getState();
-  const {typeNodeMap} = state;
-
-  let childTypes;
-  if (parent.typeId) {
-    // Get the type of the parent.
-    const parentTypeNode: NodeType = typeNodeMap[parent.typeId];
-
-    // Get all child types of the parent type.
-    const childTypeIds = parentTypeNode.children;
-    childTypes = childTypeIds.map(id => typeNodeMap[id]);
-  } else {
-    // Find the root type node.
-    const typeNodes: NodeType[] = values(typeNodeMap);
-    const rootTypeNode = typeNodes.find(typeNode => !typeNode.parentId);
-    if (!rootTypeNode) throw new Error('failed to find root type node');
-
-    // Get all child types directly under the root type node.
-    const rootId = rootTypeNode.id;
-    childTypes = typeNodes.filter(typeNode => typeNode.parentId === rootId);
-  }
+  const childTypes = getChildTypes(parent);
 
   // If there is more than one child type,
   // ask the user to pick one.
@@ -89,6 +69,31 @@ export async function deleteNode(
 async function doDelete(kind, node) {
   await deleteResource(`tree/${kind}/${node.id}`);
   dispatch('deleteNode', {kind, node});
+}
+
+export function getChildTypes(parent: NodeType): NodeType[] {
+  let childTypes;
+
+  const {typeNodeMap} = getState();
+  if (parent.typeId) {
+    // Get the type of the parent.
+    const parentTypeNode: NodeType = typeNodeMap[parent.typeId];
+
+    // Get all child types of the parent type.
+    const childTypeIds = parentTypeNode.children;
+    childTypes = childTypeIds.map(id => typeNodeMap[id]);
+  } else {
+    // Find the root type node.
+    const typeNodes: NodeType[] = values(typeNodeMap);
+    const rootTypeNode = typeNodes.find(typeNode => !typeNode.parentId);
+    if (!rootTypeNode) throw new Error('failed to find root type node');
+
+    // Get all child types directly under the root type node.
+    const rootId = rootTypeNode.id;
+    childTypes = typeNodes.filter(typeNode => typeNode.parentId === rootId);
+  }
+
+  return childTypes;
 }
 
 /**
@@ -172,7 +177,8 @@ async function reallyAddNode(
 
     // Clear the node name input.
     dispatchSet(`ui.${kind}Name`, '');
-    dispatchSet(`ui.selected${upperFirst(kind)}NodeId`, id);
+    const path = `ui.selected${upperFirst(kind)}NodeId`;
+    dispatchSet(path, id);
   } catch (e) {
     console.error('tree-builder.js addNode:', e.message);
   }

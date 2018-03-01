@@ -60,10 +60,7 @@ class InstanceAlerts extends Component<PropsType> {
   }
 
   render() {
-    const {alerts} = this.props;
-    if (!alerts || alerts.length === 0) {
-      return <section className="instance-alerts">none</section>;
-    }
+    const {alerts = []} = this.props;
 
     const {id} = this.getNode();
     const myAlerts = alerts.filter(alert =>
@@ -73,7 +70,12 @@ class InstanceAlerts extends Component<PropsType> {
     return (
       <section className="instance-alerts">
         <div className="heading">Alerts</div>
-        {myAlerts.map(alert => <Alert key={alert.name} alert={alert} />)}
+        {
+          myAlerts.length === 0 ?
+            'none' :
+            myAlerts.map(alert =>
+              <Alert key={alert.name} alert={alert} />)
+        }
       </section>
     );
   }

@@ -23,11 +23,6 @@ input[type=checkbox] {
     color: $add-color;
   }
 
-  .fa {
-    color: white;
-    outline: none;
-  }
-
   #body {
     display: flex;
     flex-grow: 1;
@@ -46,6 +41,19 @@ input[type=checkbox] {
 
   .delete {
     color: $delete-color;
+  }
+
+  .fa {
+    color: white;
+    outline: none;
+  }
+
+  .heading {
+    border-bottom: solid $underline-color 1px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
   }
 
   .import-export-btn:focus {

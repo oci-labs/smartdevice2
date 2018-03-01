@@ -14,14 +14,14 @@
     margin-left: 5px;
   }
 
-  .button.fa {
-    color: black;
-  }
-
   caption {
     font-weight: bold;
     margin-bottom: 5px;
     text-align: left;
+  }
+
+  button.fa {
+    color: black;
   }
 
   > h3 {
@@ -48,12 +48,12 @@
 
   .property-table {
     display: inline-block;
-    margin: $padding;
     width: 300px;
   }
 
-  tbody {
-    border-top: solid $underline-color 1px;
+  > section {
+    display: inline-block;
+    padding: $padding;
   }
 
   .title {

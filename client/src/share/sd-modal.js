@@ -34,8 +34,8 @@ export function showConfirm(options: ConfirmType): void {
 
   renderFn = () => (
     <div className="button-row">
-      <button onClick={handleYes}>Yes</button>
-      <button onClick={handleNo}>No</button>
+      <button className="button" onClick={handleYes}>Yes</button>
+      <button className="button" onClick={handleNo}>No</button>
     </div>
   );
 

@@ -8,9 +8,10 @@ import {dispatchSet, watch} from 'redux-easy';
 import InstanceAlerts from '../instance-alerts/instance-alerts';
 import PropertyForm from '../property-form/property-form';
 import Button from '../share/button';
+import {showModal, showPrompt} from '../share/sd-modal';
+import {createNode, deleteNode, getChildTypes} from '../tree/tree-util';
 import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
-import {showModal} from '../share/sd-modal';
 import {getTypeNode, loadTypeNode} from '../util/node-util';
 
 import type {
@@ -60,6 +61,17 @@ export async function reloadAlerts() {
 }
 
 class InstanceDetail extends Component<PropsType> {
+  addInstance = () => {
+    const node = this.getNode(this.props);
+    showPrompt({
+      buttonText: 'Create',
+      label: 'Name',
+      okCb: () => createNode('instance', node),
+      path: 'ui.instanceName',
+      title: 'Add Instance'
+    });
+  };
+
   alertIsFor(instanceId: number, alertInstanceId: number) {
     if (alertInstanceId === instanceId) return true;
 
@@ -83,9 +95,7 @@ class InstanceDetail extends Component<PropsType> {
       instanceNode = parentNode;
     }
 
-    return (
-      <div className="breadcrumbs">{crumbs}</div>
-    );
+    return <div className="breadcrumbs">{crumbs}</div>;
   };
 
   componentDidMount() {
@@ -103,6 +113,11 @@ class InstanceDetail extends Component<PropsType> {
 
     this.loadData(node);
   }
+
+  deleteInstance = () => {
+    const node = this.getNode(this.props);
+    deleteNode('instance', node);
+  };
 
   editProperties = () => {
     const node = this.getNode(this.props);
@@ -133,8 +148,29 @@ class InstanceDetail extends Component<PropsType> {
 
   getNode = (props: PropsType) => {
     const {instanceNodeMap, ui} = props;
-    return instanceNodeMap[ui.selectedChildNodeId];
-  }
+    return instanceNodeMap[ui.selectedInstanceNodeId];
+  };
+
+  instanceButtons = () => {
+    const node = this.getNode(this.props);
+    const canAddChild = getChildTypes(node).length > 0;
+    return (
+      <div className="buttons">
+        {canAddChild && <Button
+          key="add"
+          className="add"
+          icon="plus"
+          onClick={this.addInstance}
+        />}
+        <Button
+          key="delete"
+          className="delete"
+          icon="trash-o"
+          onClick={this.deleteInstance}
+        />
+      </div>
+    );
+  };
 
   async loadData(instanceNode: NodeType) {
     const typeNode = await loadTypeNode(instanceNode);
@@ -186,15 +222,6 @@ class InstanceDetail extends Component<PropsType> {
 
     return (
       <table className="property-table">
-        <caption>
-          Properties
-          <Button
-            className="edit-properties"
-            icon="cog"
-            onClick={() => this.editProperties()}
-            tooltip="edit properties"
-          />
-        </caption>
         <tbody>
           {typeProps.map(typeProp =>
             this.renderProperty(typeProp, instanceData)
@@ -227,13 +254,23 @@ class InstanceDetail extends Component<PropsType> {
         <header>
           <div className="title">
             {capitalize(typeName)} &quot;{node.name}&quot;
+            {this.instanceButtons()}
           </div>
           {this.breadcrumbs(node)}
         </header>
         <section>
+          <div className="heading">
+            Properties
+            <Button
+              className="edit-properties"
+              icon="cog"
+              onClick={() => this.editProperties()}
+              tooltip="edit properties"
+            />
+          </div>
           {this.renderProperties()}
-          <InstanceAlerts />
         </section>
+        <InstanceAlerts />
       </section>
     );
   }
