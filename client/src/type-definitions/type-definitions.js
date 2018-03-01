@@ -1,7 +1,7 @@
 // @flow
 
 import React, {Component} from 'react';
-import {watch} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import {showPrompt} from '../share/sd-modal';
@@ -32,7 +32,10 @@ class TypeDefinitions extends Component<PropsType> {
 
   breadcrumbs = typeNode => {
     const {typeNodeMap} = this.props;
-    let crumbs = typeNode.name;
+    const crumbs = [<span key="self">{typeNode.name}</span>];
+
+    const selectType = id =>
+      dispatchSet('ui.selectedTypeNodeId', id);
 
     while (true) {
       const {parentId} = typeNode;
@@ -40,7 +43,15 @@ class TypeDefinitions extends Component<PropsType> {
       const parentNode = typeNodeMap[parentId];
       const {name} = parentNode;
       if (name === 'root') break;
-      crumbs = name + ' > ' + crumbs;
+      crumbs.unshift(<span key={parentId}> &gt; </span>);
+      crumbs.unshift(
+        <a className="breadcrumb"
+          key={parentId + name}
+          onClick={() => selectType(parentId)}
+        >
+          {name}
+        </a>
+      );
       typeNode = parentNode;
     }
 

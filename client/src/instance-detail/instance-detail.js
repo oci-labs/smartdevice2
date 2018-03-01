@@ -83,7 +83,10 @@ class InstanceDetail extends Component<PropsType> {
 
   breadcrumbs = instanceNode => {
     const {instanceNodeMap} = this.props;
-    let crumbs = instanceNode.name;
+    const crumbs = [<span key="self">{instanceNode.name}</span>];
+
+    const selectInstance = id =>
+      dispatchSet('ui.selectedInstanceNodeId', id);
 
     while (true) {
       const {parentId} = instanceNode;
@@ -91,7 +94,15 @@ class InstanceDetail extends Component<PropsType> {
       const parentNode = instanceNodeMap[parentId];
       const {name} = parentNode;
       if (name === 'root') break;
-      crumbs = name + ' > ' + crumbs;
+      crumbs.unshift(<span key={parentId}> &gt; </span>);
+      crumbs.unshift(
+        <a className="breadcrumb"
+          key={parentId + name}
+          onClick={() => selectInstance(parentId)}
+        >
+          {name}
+        </a>
+      );
       instanceNode = parentNode;
     }
 
@@ -156,13 +167,15 @@ class InstanceDetail extends Component<PropsType> {
     const canAddChild = getChildTypes(node).length > 0;
     return (
       <div className="buttons">
-        {canAddChild && <Button
-          key="add"
-          className="add"
-          icon="plus"
-          onClick={this.addInstance}
-          tooltip="add child instance"
-        />}
+        {canAddChild && (
+          <Button
+            key="add"
+            className="add"
+            icon="plus"
+            onClick={this.addInstance}
+            tooltip="add child instance"
+          />
+        )}
         <Button
           key="delete"
           className="delete"
