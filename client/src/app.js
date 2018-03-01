@@ -5,7 +5,7 @@ import {watch} from 'redux-easy';
 
 import Enums from './enums/enums';
 import Header from './header/header';
-import InstanceHierarchy from './instance-hierarchy/instance-hierarchy';
+import InstanceDetail from './instance-detail/instance-detail';
 import LeftNav from './left-nav/left-nav';
 import MessageServers from './message-servers/message-servers';
 import SdModal from './share/sd-modal';
@@ -22,23 +22,15 @@ type PropsType = {
 };
 
 const rightMap = {
-  //'': null,
-  '': <TrainControl />,
-  enum: <Enums />,
-  instance: <InstanceHierarchy />,
-  server: <MessageServers />,
-  type: <TypeDefinitions />
-};
-
-/*
-const rightMap = {
   '': null,
-  instance: <InstanceDetail />,
-  type: <TypeAlerts />
+  Enums: <Enums />,
+  Instances: <InstanceDetail />,
+  Servers: <MessageServers />,
+  'Train Control': <TrainControl />,
+  Types: <TypeDefinitions />
 };
-*/
 
-const hasLeftNav = view => view === 'instance' || view === 'type';
+const hasLeftNav = view => view === 'Instances' || view === 'Types';
 
 class App extends Component<PropsType> {
   render() {

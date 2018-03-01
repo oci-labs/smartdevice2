@@ -14,8 +14,8 @@ type PropsType = {
   showUserDropdown: boolean
 };
 
-const TREE_TYPES = ['instance', 'type'];
-const VIEW_TYPES = ['enum', 'instance', 'server', 'type'];
+const TREE_TYPES = ['Instances', 'Types'];
+const VIEW_TYPES = ['Enums', 'Instances', 'Servers', 'Train Control', 'Types'];
 
 class UserDropdown extends Component<PropsType> {
 
@@ -23,18 +23,18 @@ class UserDropdown extends Component<PropsType> {
     dispatchSet('ui.showUserDropdown', false);
 
     // $FlowFixMe - doesn't know about textContent
-    const {textContent} = event.target;
-    const massaged = lowerFirst(textContent.slice(0, -1));
+    const view = event.target.textContent;
 
-    if (VIEW_TYPES.includes(massaged)) {
-      dispatchSet('ui.view', massaged);
+    if (VIEW_TYPES.includes(view)) {
+      dispatchSet('ui.view', view);
     }
 
-    if (TREE_TYPES.includes(massaged)) {
-      dispatchSet('ui.treeType', massaged);
+    if (TREE_TYPES.includes(view)) {
+      const treeType = lowerFirst(view.slice(0, -1));
+      dispatchSet('ui.treeType', treeType);
     }
 
-    if (textContent === 'Import JSON') {
+    if (view === 'Import JSON') {
       const renderFn = () => <ImportJson />;
       showModal({title: 'Import JSON Schema', renderFn});
     }
@@ -53,6 +53,8 @@ class UserDropdown extends Component<PropsType> {
         <div onClick={this.handleItem}>
           <a href={getUrlPrefix() + 'export'}>Export JSON</a>
         </div>
+        <div className="divider" />
+        <div onClick={this.handleItem}>Train Control</div>
         <div className="divider" />
         <div onClick={this.handleItem}>Log Out</div>
       </div>

@@ -77,7 +77,7 @@ const state: StateType = {
     typeAlerts: [],
     typeName: '',
     typeProps: [],
-    view: 'type'
+    view: 'Types'
   },
   user: {
     confirmEmail: '',

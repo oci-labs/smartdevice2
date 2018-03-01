@@ -180,8 +180,9 @@ class InstanceDetail extends Component<PropsType> {
 
   renderProperties = () => {
     const {instanceData, typeProps} = this.props;
+    console.log('instance-detail.js renderProperties: typeProps =', typeProps);
 
-    if (typeProps.length === 0) {
+    if (!typeProps || typeProps.length === 0) {
       return <div>none</div>;
     }
 

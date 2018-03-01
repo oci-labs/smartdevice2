@@ -136,8 +136,7 @@ export type PromptType = {
   title: string
 };
 
-export type PropertyKindType =
-  'boolean' | 'number' | 'percent' | 'text';
+export type PropertyKindType = 'boolean' | 'number' | 'percent' | 'text';
 
 export type PropertyType = {
   enumId: number,
@@ -250,6 +249,11 @@ export type UserType = {
   version: number
 };
 
-export type ValidationFnType = (string) => string[];
+export type ValidationFnType = string => string[];
 
-export type ViewType = 'instance' | 'server' | 'type';
+export type ViewType =
+  | 'Enums'
+  | 'Instances'
+  | 'Servers'
+  | 'Train Control'
+  | 'Types';
