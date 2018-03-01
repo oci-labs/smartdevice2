@@ -1,7 +1,7 @@
 // @flow
 
 import React, {Component} from 'react';
-import {watch} from 'redux-easy';
+import {dispatchSet, watch} from 'redux-easy';
 
 import Enums from './enums/enums';
 import Header from './header/header';
@@ -33,10 +33,12 @@ const rightMap = {
 const hasLeftNav = view => view === 'Instances' || view === 'Types';
 
 class App extends Component<PropsType> {
+  handleClick = () => dispatchSet('ui.showUserDropdown', false);
+
   render() {
     const {view} = this.props;
     return (
-      <div className="app">
+      <div className="app" onClick={this.handleClick}>
         <Header />
         <UserDropdown />
         <section id="body">

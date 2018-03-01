@@ -15,7 +15,10 @@ type PropsType = {
 class Header extends Component<PropsType> {
   refresh = () => post('mqtt/feedback');
 
-  showUserDropdown = () => dispatchSet('ui.showUserDropdown', true);
+  showUserDropdown = event => {
+    event.stopPropagation();
+    dispatchSet('ui.showUserDropdown', true);
+  };
 
   render() {
     const {mqttConnected} = this.props;
@@ -41,7 +44,7 @@ class Header extends Component<PropsType> {
           <Button
             className="user-btn fa-2x"
             icon="user"
-            onClick={() => this.showUserDropdown()}
+            onClick={e => this.showUserDropdown(e)}
           />
         </div>
       </header>
