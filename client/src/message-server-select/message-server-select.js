@@ -87,15 +87,17 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
     const {messageServers} = this.state;
     return (
       <div className="message-server">
-        <h3>Message Server for type &quot;{typeNode.name}&quot;</h3>
-        <select onChange={this.handleServerChange} value={value}>
-          <option value="0">unset</option>
-          {messageServers.map(server => (
-            <option key={server.id} value={server.id}>
-              {server.host}
-            </option>
-          ))}
-        </select>
+        <div className="heading">
+          Message Server
+          <select onChange={this.handleServerChange} value={value}>
+            <option value="0">unset</option>
+            {messageServers.map(server => (
+              <option key={server.id} value={server.id}>
+                {server.host}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     );
   }

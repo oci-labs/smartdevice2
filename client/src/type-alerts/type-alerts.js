@@ -168,7 +168,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     if (!typeNode) return;
 
     const {view} = this.props.ui;
-    if (view !== 'type') return;
+    if (view !== 'Types') return;
 
     const json = await getJson(`types/${typeNode.id}/alerts`);
     const alertTypes = ((json: any): AlertTypeType[]);
@@ -258,7 +258,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
       <section className="type-alerts">
         <MessageServerSelect typeNode={typeNode} />
 
-        <h3>Alerts for type &quot;{typeNode.name}&quot;</h3>
+        <div className="heading">Alerts</div>
         <table>
           <tbody>
             {this.renderTableInputRow()}

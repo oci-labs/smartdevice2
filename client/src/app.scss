@@ -81,6 +81,10 @@ input[type=checkbox] {
     font-weight: bold;
     padding: $padding;
   }
+
+  select {
+    font-size: 12px;
+  }
 }
 
 table {

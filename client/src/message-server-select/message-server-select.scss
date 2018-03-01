@@ -1,2 +1,11 @@
-.message-server-select {
+@import '../share.scss';
+
+.message-server {
+  div.heading {
+    border-bottom: none;
+  }
+
+  select {
+    margin-left: $padding;
+  }
 }

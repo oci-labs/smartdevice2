@@ -182,7 +182,7 @@ class TypeProperties extends Component<PropsType> {
     return (
       <section className="type-properties">
         <section>
-          <h3>Properties</h3>
+          <div className="heading">Properties</div>
           <table>
             <tbody>
               {this.renderTableInputRow()}
