@@ -1,7 +1,9 @@
 @import '../share.scss';
 
 .instance-alerts {
-  margin-top: 20px;
+  display: inline-block;
+  margin: $padding;
+  vertical-align: top;
 
   .heading {
     border-bottom: solid $underline-color 1px;

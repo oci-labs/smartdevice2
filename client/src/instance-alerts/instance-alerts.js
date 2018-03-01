@@ -62,7 +62,7 @@ class InstanceAlerts extends Component<PropsType> {
   render() {
     const {alerts} = this.props;
     if (!alerts || alerts.length === 0) {
-      return <div>none</div>;
+      return <section className="instance-alerts">none</section>;
     }
 
     const {id} = this.getNode();

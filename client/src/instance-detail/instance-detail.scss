@@ -1,10 +1,11 @@
 @import '../share.scss';
 
 .instance-detail {
+  flex-grow: 1;
+
   .breadcrumbs {
     background-color: $secondary-color;
     color: gray;
-    margin-bottom: 20px;
     padding-top: 5px;
   }
 
@@ -27,8 +28,28 @@
     padding: $padding;
   }
 
+  header {
+    background-color: $secondary-color;
+    padding: $padding;
+
+    .buttons {
+      float: right;
+    }
+
+    > div:first-child {
+      border-bottom: solid gray 1px;
+      padding-bottom: 5px;
+    }
+  }
+
   .number, .percent {
     text-align: right;
+  }
+
+  .property-table {
+    display: inline-block;
+    margin: $padding;
+    width: 300px;
   }
 
   tbody {

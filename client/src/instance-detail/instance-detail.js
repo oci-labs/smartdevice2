@@ -30,7 +30,6 @@ type PropsType = {
   enumMap: EnumMapType,
   instanceData: Object,
   instanceNodeMap: NodeMapType,
-  typeProps: PropertyType[],
   ui: UiType
 };
 
@@ -179,8 +178,7 @@ class InstanceDetail extends Component<PropsType> {
   }
 
   renderProperties = () => {
-    const {instanceData, typeProps} = this.props;
-    console.log('instance-detail.js renderProperties: typeProps =', typeProps);
+    const {instanceData, ui: {typeProps}} = this.props;
 
     if (!typeProps || typeProps.length === 0) {
       return <div>none</div>;
@@ -197,7 +195,6 @@ class InstanceDetail extends Component<PropsType> {
             tooltip="edit properties"
           />
         </caption>
-
         <tbody>
           {typeProps.map(typeProp =>
             this.renderProperty(typeProp, instanceData)
@@ -227,15 +224,16 @@ class InstanceDetail extends Component<PropsType> {
 
     return (
       <section className="instance-detail">
-        <div className="title">
-          {capitalize(typeName)} &quot;{node.name}&quot;
-        </div>
-
-        {this.breadcrumbs(node)}
-
-        {this.renderProperties()}
-
-        <InstanceAlerts />
+        <header>
+          <div className="title">
+            {capitalize(typeName)} &quot;{node.name}&quot;
+          </div>
+          {this.breadcrumbs(node)}
+        </header>
+        <section>
+          {this.renderProperties()}
+          <InstanceAlerts />
+        </section>
       </section>
     );
   }
