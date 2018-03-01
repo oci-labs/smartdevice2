@@ -73,8 +73,8 @@ class InstanceAlerts extends Component<PropsType> {
         {
           myAlerts.length === 0 ?
             'none' :
-            myAlerts.map(alert =>
-              <Alert key={alert.name} alert={alert} />)
+            myAlerts.map((alert, index) =>
+              <Alert key={alert.name + index} alert={alert} />)
         }
       </section>
     );
