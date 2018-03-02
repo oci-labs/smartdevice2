@@ -15,6 +15,8 @@ type PropsType = {
   typeNodeMap: NodeMapType
 };
 
+const PRIORITIES = ['', 'info', 'low', 'medium', 'high'];
+
 function formatTimestamp(timestamp: number) {
   const date = new Date(timestamp);
   const month = date.getMonth() + 1;
@@ -49,6 +51,8 @@ class Alert extends Component<PropsType> {
     const {alert, instanceNodeMap, typeNodeMap} = this.props;
     if (!alert) return null;
 
+    console.log('alert.js render: alert =', alert);
+
     // Get the type name for instance associated with this alert.
     const {instanceId} = alert;
     const instance = instanceNodeMap[instanceId];
@@ -61,6 +65,7 @@ class Alert extends Component<PropsType> {
 
     const classes = ['alert'];
     if (alert.sticky) classes.push('sticky');
+    if (alert.priority) classes.push(PRIORITIES[alert.priority]);
 
     return (
       <div
@@ -70,9 +75,10 @@ class Alert extends Component<PropsType> {
       >
         <div className="line1">
           {typeName} {instance.name} ({instanceId})
-          <div className="close" onClick={this.deleteAlert}>
-            &#10005;
-          </div>
+          <div
+            className="close fa fa-2x fa-times-circle"
+            onClick={this.deleteAlert}
+          />
         </div>
         <div className="line2">
           {alert.name}: {formatTimestamp(alert.timestamp)}

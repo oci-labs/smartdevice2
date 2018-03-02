@@ -1,20 +1,17 @@
 $add-color: lightgreen;
+$alert-high-color: #9D0D0D; /* red */
+$alert-info-color: #444; /* gray */
+$alert-low-color: #559D0D; /* green */
+$alert-medium-color: #E99610; /* orange */
 $error-color: #ba2316; // red
 $font-color: white;
 $input-background-color: white;
-$oci-orange: #FEB772;
 $padding: 10px;
-$selected-color: lightgreen;
-
-/* New variables are below here until
-   we determine what needs to remain. */
-$alert-urgent-color: #9D0D0D; /* red */
-$alert-medium-color: #E99610; /* orange */
-$alert-low-color: #559D0D; /* green */
-$alert-none-color: #444; /* gray */
 $primary-color: #72C7D5; /* teal */
 $secondary-color: #EBF3F5; /* light teal */
+$selected-color: lightgreen;
+$table-row-bg: #F0F0F0; /* light gray */
 $text-color: #444; /* black */
-$underline-color: #707070;
+$underline-color: #707070; /* dark gray */
 
-$delete-color: $alert-urgent-color;
+$delete-color: $alert-high-color;

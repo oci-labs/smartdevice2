@@ -107,6 +107,7 @@ table {
   }
 
   td {
+    padding: 0 4px 4px 4px;
     text-align: left;
 
     input[type=text] {
@@ -125,5 +126,9 @@ table {
 
   th {
     text-align: left;
+  }
+
+  tr:nth-child(even) {
+    background-color: #F5F5F5;
   }
 }

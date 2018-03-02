@@ -25,6 +25,7 @@ export type AlertType = {
   id: number,
   instanceId: number,
   name: string,
+  priority: number,
   timestamp: Date
 };
 
