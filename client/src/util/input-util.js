@@ -98,8 +98,9 @@ export function spaceHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
  */
 export function validNameHandler(e: SyntheticKeyboardEvent<HTMLInputElement>) {
   // $FlowFixMe - doesn't think target.value exists
-  const {keyCode, target: {value}} = e;
+  const {key, keyCode, target: {value}} = e;
 
+  if (key === 'Enter') return;
   if (isNavigation(keyCode)) return;
 
   const isEmpty = value.length === 0;

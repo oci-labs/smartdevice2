@@ -1,7 +1,8 @@
 @import '../share.scss';
 
 .enums {
-  text-align: left;
+  display: flex;
+  width: 100%;
 
   .button {
     border: none;
@@ -15,22 +16,40 @@
   }
 
   .enum-member-table {
-    margin-top: 20px;
+    .value-column {
+      text-align: right;
+      width: 45px;
+
+      input {
+        width: 100%;
+      }
+    }
   }
 
-  & > h3 {
-    margin-top: 20px !important;
+  h3 {
+    border-bottom: solid $underline-color 1px;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    text-align: left;
+  }
+
+  .left, .right {
+    display: inline-block;
+    padding: $padding;
   }
 
   .port-input {
     width: 40px;
   }
 
-  .selected-enum {
+  .right {
     background-color: $selected-color;
+    flex-grow: 1;
+    height: calc(100vh - 84px);
+    margin-left: 20px;
   }
 
-  table {
-    width: 100%;
+  .selected-enum {
+    background-color: $selected-color;
   }
 }

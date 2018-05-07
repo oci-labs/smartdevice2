@@ -23,3 +23,5 @@ npm-debug.log*
 .env.production.local
 .env.test.local
 **/*.secret
+
+.idea/

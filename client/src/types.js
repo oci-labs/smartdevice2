@@ -25,6 +25,7 @@ export type AlertType = {
   id: number,
   instanceId: number,
   name: string,
+  priority: number,
   timestamp: Date
 };
 
@@ -32,6 +33,7 @@ export type AlertTypeType = {
   name: string,
   expression: string,
   id: number,
+  priority: number,
   sticky: boolean,
   typeId: number
 };
@@ -126,8 +128,16 @@ export type NodeType = {
 
 export type PrimitiveType = boolean | number | string;
 
-export type PropertyKindType =
-  'boolean' | 'number' | 'percent' | 'text';
+export type PromptType = {
+  buttonText: string,
+  label: string,
+  message?: string,
+  okCb: Function,
+  path: string,
+  title: string
+};
+
+export type PropertyKindType = 'boolean' | 'number' | 'percent' | 'text';
 
 export type PropertyType = {
   enumId: number,
@@ -193,7 +203,7 @@ export type TrainValuesType = {
 };
 
 // These strings must correspond to the name of a database table.
-export type TreeType = 'type' | 'instance';
+export type TreeType = 'instance' | 'type';
 
 export type UiType = {
   editedName: string, // within type or instance tree
@@ -204,6 +214,7 @@ export type UiType = {
   modal: ModalType,
   newAlertExpression: string,
   newAlertName: string,
+  newAlertPriority: number,
   newAlertSticky: boolean,
   newEnumMemberName: string,
   newEnumMemberValue: number,
@@ -216,10 +227,12 @@ export type UiType = {
   selectedEnumId: number,
   selectedInstanceNodeId: number,
   selectedTypeNodeId: number,
+  showUserDropdown: boolean,
   treeType: TreeType,
   typeAlerts: AlertTypeType[],
   typeName: string,
-  typeProps: PropertyType[]
+  typeProps: PropertyType[],
+  view: ViewType
 };
 
 export type UserType = {
@@ -237,4 +250,11 @@ export type UserType = {
   version: number
 };
 
-export type ValidationFnType = (string) => string[];
+export type ValidationFnType = string => string[];
+
+export type ViewType =
+  | 'Enums'
+  | 'Instances'
+  | 'Servers'
+  | 'Train Control'
+  | 'Types';

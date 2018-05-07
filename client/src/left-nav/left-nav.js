@@ -2,17 +2,13 @@
 
 import upperFirst from 'lodash/upperFirst';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {Tab, TabList, TabPanel, Tabs} from 'react-tabs';
-import {dispatchSet} from 'redux-easy';
+import {watch} from 'redux-easy';
 
-import MessageServers from '../message-servers/message-servers';
 import TreeBuilder from '../tree/tree-builder';
 
-import type {NodeMapType, StateType, TreeType, UiType} from '../types';
+import type {NodeMapType, TreeType, UiType} from '../types';
 
 import './left-nav.css';
-import 'react-tabs/style/react-tabs.css';
 
 type PropsType = {
   instanceNodeMap: NodeMapType,
@@ -20,8 +16,6 @@ type PropsType = {
   typeNodeMap: NodeMapType,
   ui: UiType
 };
-
-const TREE_TYPES = ['', 'type', 'instance'];
 
 class LeftNav extends Component<PropsType> {
   getTree = (treeType: TreeType) => {
@@ -47,41 +41,18 @@ class LeftNav extends Component<PropsType> {
     );
   };
 
-  handleTabSelect = (index: number, lastIndex: number) => {
-    if (index === lastIndex) return;
-    dispatchSet('ui.treeType', TREE_TYPES[index]);
-  };
-
   render() {
-    const {treeType} = this.props.ui;
-    const tabIndex = treeType === 'type' ? 1 : treeType === 'instance' ? 2 : 0;
     return (
       <section className="left-nav">
-        <Tabs onSelect={this.handleTabSelect} selectedIndex={tabIndex}>
-          <TabList>
-            <Tab>Servers</Tab>
-            <Tab>Type</Tab>
-            <Tab>Instance</Tab>
-          </TabList>
-          <TabPanel>
-            <MessageServers />
-          </TabPanel>
-          <TabPanel>{this.getTree('type')}</TabPanel>
-          <TabPanel>{this.getTree('instance')}</TabPanel>
-        </Tabs>
+        {this.getTree(this.props.ui.treeType)}
       </section>
     );
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {instanceNodeMap, typeNodeMap, ui, user: {subscriptions}} = state;
-  return {
-    instanceNodeMap,
-    subscriptions,
-    typeNodeMap,
-    ui
-  };
-};
-
-export default connect(mapState)(LeftNav);
+export default watch(LeftNav, {
+  instanceNodeMap: '',
+  typeNodeMap: '',
+  ui: '',
+  subscriptions: 'user.subscriptions'
+});

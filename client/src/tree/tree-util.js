@@ -5,9 +5,9 @@ import upperFirst from 'lodash/upperFirst';
 import React from 'react';
 import {dispatch, dispatchSet, getPathValue, getState} from 'redux-easy';
 
-import {postJson} from '../util/rest-util';
+import {deleteResource, getJson, postJson} from '../util/rest-util';
 import Button from '../share/button';
-import {hideModal, showModal} from '../share/sd-modal';
+import {hideModal, showConfirm, showModal} from '../share/sd-modal';
 import {values} from '../util/flow-util';
 
 import type {AddNodePayloadType, NodeType, TreeType} from '../types';
@@ -24,10 +24,57 @@ export function addNode(kind: TreeType, name: string, parent: NodeType): void {
     return;
   }
 
-  const state = getState();
-  const {typeNodeMap} = state;
+  const childTypes = getChildTypes(parent);
 
+  // If there is more than one child type,
+  // ask the user to pick one.
+  if (childTypes.length === 1) {
+    typeId = childTypes[0].id;
+    reallyAddNode(kind, name, parent, typeId);
+  } else {
+    promptForType(name, parent, childTypes);
+  }
+}
+
+export function createNode(kind: TreeType, parent?: NodeType): void {
+  const state = getState();
+  const name = state.ui[kind + 'Name'];
+  if (!parent) {
+    const rootId = state[kind + 'RootId'];
+    parent = state[kind + 'NodeMap'][rootId];
+  }
+  addNode(kind, name, parent);
+}
+
+export async function deleteNode(
+  kind: TreeType,
+  node: NodeType
+): Promise<void> {
+  // Determine if any other nodes refer to this one.
+  const inUse = await hasDependents(kind, node.id);
+  if (inUse) {
+    showConfirm({
+      title: 'Node In Use',
+      message:
+        'Are you sure you want to delete this node?\n' +
+        'At least one other node refers to it.',
+      yesCb: () => doDelete(kind, node),
+      noCb: () => {}
+    });
+  } else {
+    doDelete(kind, node);
+  }
+}
+
+async function doDelete(kind, node) {
+  await deleteResource(`tree/${kind}/${node.id}`);
+  dispatch('deleteNode', {kind, node});
+}
+
+export function getChildTypes(parent: NodeType): NodeType[] {
   let childTypes;
+
+  const {typeNodeMap} = getState();
   if (parent.typeId) {
     // Get the type of the parent.
     const parentTypeNode: NodeType = typeNodeMap[parent.typeId];
@@ -46,14 +93,7 @@ export function addNode(kind: TreeType, name: string, parent: NodeType): void {
     childTypes = typeNodes.filter(typeNode => typeNode.parentId === rootId);
   }
 
-  // If there is more than one child type,
-  // ask the user to pick one.
-  if (childTypes.length === 1) {
-    typeId = childTypes[0].id;
-    reallyAddNode(kind, name, parent, typeId);
-  } else {
-    promptForType(name, parent, childTypes);
-  }
+  return childTypes;
 }
 
 /**
@@ -76,6 +116,11 @@ function handleTypeSelectCancel(): void {
 function handleTypeSelectOk(name, parent): void {
   reallyAddNode('instance', name, parent, typeId);
   hideModal();
+}
+
+async function hasDependents(kind: TreeType, id: number): Promise<boolean> {
+  const inUse = await getJson(`${kind}s/${id}/inuse`);
+  return inUse;
 }
 
 function promptForType(name, parent, childTypes: NodeType[]): void {
@@ -128,9 +173,12 @@ async function reallyAddNode(
     if (newTopType && lastUsed) payload.messageServerId = lastUsed;
     dispatch('addNode', payload);
 
+    hideModal();
+
     // Clear the node name input.
     dispatchSet(`ui.${kind}Name`, '');
-    dispatchSet(`ui.selected${upperFirst(kind)}NodeId`, id);
+    const path = `ui.selected${upperFirst(kind)}NodeId`;
+    dispatchSet(path, id);
   } catch (e) {
     console.error('tree-builder.js addNode:', e.message);
   }

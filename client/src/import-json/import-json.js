@@ -1,25 +1,22 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch} from 'redux-easy';
+import {dispatch, watch} from 'redux-easy';
 
 import {loadMessageServers} from '../message-servers/message-servers';
 import Button from '../share/button';
 import {hideModal, showModal} from '../share/sd-modal';
 import {loadTree} from '../tree/tree-builder';
-import {getUrlPrefix, postJson} from '../util/rest-util';
+import {postJson} from '../util/rest-util';
 
-import type {StateType} from '../types';
-
-import './import-export.css';
+import './import-json.css';
 
 type PropsType = {};
 type MyStateType = {
   file: ?File
 };
 
-class ImportExport extends Component<PropsType, MyStateType> {
+class ImportJson extends Component<PropsType, MyStateType> {
   state: MyStateType = {file: null};
 
   clear = () => {
@@ -67,14 +64,10 @@ class ImportExport extends Component<PropsType, MyStateType> {
   render() {
     const disabled = !this.state.file;
     return (
-      <section className="import-export">
-        <div>
-          <a href={getUrlPrefix() + 'export'}>
-            <Button onClick={this.clear}>Export</Button>
-          </a>
-        </div>
+      <section className="import-json">
         <div>
           <input type="file" onChange={this.loadFile} />
+          <a onClick={this.clear}>Cancel</a>
           <Button onClick={this.import} disabled={disabled}>
             Import
           </Button>
@@ -84,9 +77,4 @@ class ImportExport extends Component<PropsType, MyStateType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {ui: {jsonPath}} = state;
-  return {jsonPath};
-};
-
-export default connect(mapState)(ImportExport);
+export default watch(ImportJson, {jsonPath: 'ui.jsonPath'});

@@ -3,10 +3,10 @@
 import sortBy from 'lodash/sortBy';
 import without from 'lodash/without';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, Input, Select, watch} from 'redux-easy';
 
-import MessageServerSelect from '../message-server-select/message-server-select';
+import MessageServerSelect
+  from '../message-server-select/message-server-select';
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
 import {values} from '../util/flow-util';
@@ -16,9 +16,8 @@ import {deleteResource, getJson, postJson} from '../util/rest-util';
 import type {
   AlertTypeType,
   EnumMapType,
+  NodeMapType,
   NodeType,
-  PropertyType,
-  StateType,
   UiType
 } from '../types';
 
@@ -26,8 +25,7 @@ import './type-alerts.css';
 
 type PropsType = {
   enumMap: EnumMapType,
-  typeNode: NodeType,
-  typeProps: PropertyType[],
+  typeNodeMap: NodeMapType,
   ui: UiType
 };
 
@@ -38,6 +36,8 @@ type MyStateType = {
 const ALERT_NAME_RE = /^[A-Za-z][\w ]*$/;
 const PROPERTY_NAME_RE = /^[A-Za-z]\w*$/;
 
+const PRIORITIES = ['', 'info', 'low', 'medium', 'high'];
+
 class TypeAlerts extends Component<PropsType, MyStateType> {
   added: boolean;
 
@@ -47,9 +47,10 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
   addAlertType = async () => {
     const {
-      typeNode,
-      ui: {newAlertExpression, newAlertName, newAlertSticky}
+      ui: {newAlertExpression, newAlertName, newAlertPriority, newAlertSticky}
     } = this.props;
+
+    const typeNode = this.getTypeNode(this.props);
     if (!typeNode) return;
 
     if (!this.isValidName()) {
@@ -83,6 +84,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     const alertType = {
       name: newAlertName.trim(),
       expression: newAlertExpression,
+      priority: newAlertPriority,
       sticky: newAlertSticky,
       typeId: typeNode.id
     };
@@ -94,28 +96,16 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     dispatchSet('ui.newAlertSticky', false);
   };
 
-  alertExpressionChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    const {value} = e.target;
-    dispatchSet('ui.newAlertExpression', value);
-  };
-
-  alertNameChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui.newAlertName', e.target.value);
-  };
-
-  alertStickyChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
-    dispatchSet('ui.newAlertSticky', e.target.checked);
-  };
-
   componentWillMount() {
-    this.loadAlertTypes(this.props.typeNode);
+    const typeNode = this.getTypeNode(this.props);
+    this.loadAlertTypes(typeNode);
   }
 
   componentWillReceiveProps(nextProps: PropsType) {
-    const {typeNode} = nextProps;
+    const typeNode = this.getTypeNode(nextProps);
     if (!typeNode) return;
 
-    const currentTypeNode = this.props.typeNode;
+    const currentTypeNode = this.getTypeNode(this.props);
     const newTypeSelected =
       !currentTypeNode || typeNode.id !== currentTypeNode.id;
 
@@ -132,11 +122,12 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   };
 
   getBadNames = () => {
-    const {enumMap, typeProps, ui: {newAlertExpression}} = this.props;
+    const {enumMap, ui: {newAlertExpression}} = this.props;
 
     // Allow boolean constants.
     const validNames = new Set(['true', 'false']);
 
+    const {typeProps} = this.props.ui;
     typeProps.forEach(typeProp => {
       // Allow property names.
       validNames.add(typeProp.name);
@@ -159,6 +150,11 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     return expressionNames.filter(n => !validNames.has(n));
   };
 
+  getTypeNode = (props: PropsType) => {
+    const {typeNodeMap, ui: {selectedTypeNodeId}} = props;
+    return typeNodeMap[selectedTypeNodeId];
+  };
+
   isValidName = () => {
     const {alertTypes} = this.state;
     const {ui: {newAlertName}} = this.props;
@@ -171,8 +167,8 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   async loadAlertTypes(typeNode: ?NodeType) {
     if (!typeNode) return;
 
-    const {treeType} = this.props.ui;
-    if (treeType !== 'type') return;
+    const {view} = this.props.ui;
+    if (view !== 'Types') return;
 
     const json = await getJson(`types/${typeNode.id}/alerts`);
     const alertTypes = ((json: any): AlertTypeType[]);
@@ -186,42 +182,42 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
     this.setState({alertTypes: sortedAlertTypes});
   }
 
-  renderTableHead = () => (
-    <thead>
-      <tr>
-        <th>Alert</th>
-        <th>Condition</th>
-        <th>Sticky</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-  );
-
   renderTableInputRow = () => {
     const {ui: {newAlertExpression, newAlertName, newAlertSticky}} = this.props;
     return (
       <tr>
-        <td>
-          <input
-            type="text"
-            onChange={this.alertNameChange}
+        <td className="name-column">
+          <Input
             onKeyDown={spaceHandler}
+            path="ui.newAlertName"
+            placeholder="alert name"
             value={newAlertName}
           />
         </td>
-        <td>
-          <input
-            type="text"
-            onChange={this.alertExpressionChange}
+        <td className="expression-column">
+          <Input
+            path="ui.newAlertExpression"
+            placeholder="condition"
             value={newAlertExpression}
           />
         </td>
-        <td>
-          <input
+        <td className="priority-column">
+          <Select
+            path="ui.newAlertPriority"
+          >
+            <option value="1">info</option>
+            <option value="2">low</option>
+            <option value="3">medium</option>
+            <option value="4">high</option>
+          </Select>
+        </td>
+        <td className="sticky-column">
+          <Input
             type="checkbox"
-            onChange={this.alertStickyChange}
+            path="ui.newAlertSticky"
             checked={newAlertSticky}
           />
+          <label>Sticky</label>
         </td>
         <td className="actions-column">
           <Button
@@ -238,9 +234,10 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
 
   renderTableRow = (alertType: AlertTypeType) => (
     <tr key={alertType.name}>
-      <td>{alertType.name}</td>
-      <td>{alertType.expression}</td>
-      <td>{String(alertType.sticky)}</td>
+      <td className="name-column">{alertType.name}</td>
+      <td className="expression-column">{alertType.expression}</td>
+      <td className="priority-column">{PRIORITIES[alertType.priority]}</td>
+      <td className="sticky-column">{String(alertType.sticky)}</td>
       <td className="actions-column">
         <Button
           className="delete"
@@ -253,7 +250,7 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   );
 
   render() {
-    const {typeNode} = this.props;
+    const typeNode = this.getTypeNode(this.props);
     if (!typeNode) return null;
 
     const {alertTypes} = this.state;
@@ -261,9 +258,8 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
       <section className="type-alerts">
         <MessageServerSelect typeNode={typeNode} />
 
-        <h3>Alerts for type &quot;{typeNode.name}&quot;</h3>
+        <div className="heading">Alerts</div>
         <table>
-          {this.renderTableHead()}
           <tbody>
             {this.renderTableInputRow()}
             {alertTypes.map(alertType => this.renderTableRow(alertType))}
@@ -274,11 +270,4 @@ class TypeAlerts extends Component<PropsType, MyStateType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {enumMap, typeNodeMap, ui} = state;
-  const {selectedTypeNodeId, typeProps} = ui;
-  const typeNode = typeNodeMap[selectedTypeNodeId];
-  return {enumMap, typeNode, typeProps, ui};
-};
-
-export default connect(mapState)(TypeAlerts);
+export default watch(TypeAlerts, {enumMap: '', typeNodeMap: '', ui: ''});

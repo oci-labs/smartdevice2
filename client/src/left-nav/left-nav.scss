@@ -1,13 +1,19 @@
+@import '../share.scss';
+
 .left-nav {
+  background-color: #F1F2F2;
+  padding: $padding;
+  width: 250px;
+
   h3 {
-    color: white;
+    color: black;
   }
 
   .react-tabs {
     text-align: left;
 
     .react-tabs__tab {
-      color: white;
+      color: $text-color;
     }
 
     .react-tabs__tab--selected {

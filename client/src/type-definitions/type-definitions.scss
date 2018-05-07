@@ -1,0 +1,35 @@
+@import '../share.scss';
+
+.type-definitions {
+  flex-grow: 1;
+  text-align: left;
+
+  .breadcrumbs {
+    background-color: $secondary-color;
+    color: gray;
+    padding-top: 5px;
+  }
+
+  header {
+    background-color: $secondary-color;
+    padding: $padding;
+
+    .buttons {
+      float: right;
+    }
+
+    > div:first-child {
+      border-bottom: solid gray 1px;
+      padding-bottom: 5px;
+    }
+  }
+
+  > section {
+    display: flex;
+  }
+
+  .title {
+    color: $primary-color;
+    font-size: 24px;
+  }
+}

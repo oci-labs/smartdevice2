@@ -1,48 +1,49 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import {dispatchSet, watch} from 'redux-easy';
 
+import Enums from './enums/enums';
 import Header from './header/header';
 import InstanceDetail from './instance-detail/instance-detail';
-import InstanceHierarchy from './instance-hierarchy/instance-hierarchy';
 import LeftNav from './left-nav/left-nav';
+import MessageServers from './message-servers/message-servers';
 import SdModal from './share/sd-modal';
 import TrainControl from './train-control/train-control';
-import TypeAlerts from './type-alerts/type-alerts';
-import TypeProperties from './type-properties/type-properties';
+import TypeDefinitions from './type-definitions/type-definitions';
+import UserDropdown from './user-dropdown/user-dropdown';
 
-import type {StateType, TreeType} from './types';
+import type {ViewType} from './types';
 
 import './app.css';
 
 type PropsType = {
-  treeType: TreeType
-};
-
-const middleMap = {
-  //'': null,
-  '': <TrainControl />,
-  instance: <InstanceHierarchy />,
-  type: <TypeProperties />
+  view: ViewType
 };
 
 const rightMap = {
   '': null,
-  instance: <InstanceDetail />,
-  type: <TypeAlerts />
+  Enums: <Enums />,
+  Instances: <InstanceDetail />,
+  Servers: <MessageServers />,
+  'Train Control': <TrainControl />,
+  Types: <TypeDefinitions />
 };
 
+const hasLeftNav = view => view === 'Instances' || view === 'Types';
+
 class App extends Component<PropsType> {
+  handleClick = () => dispatchSet('ui.showUserDropdown', false);
+
   render() {
-    const {treeType} = this.props;
+    const {view} = this.props;
     return (
-      <div className="app">
+      <div className="app" onClick={this.handleClick}>
         <Header />
+        <UserDropdown />
         <section id="body">
-          <LeftNav />
-          {middleMap[treeType]}
-          {rightMap[treeType]}
+          {hasLeftNav(view) && <LeftNav />}
+          {rightMap[view]}
         </section>
         <SdModal />
       </div>
@@ -50,9 +51,4 @@ class App extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {treeType} = state.ui;
-  return {treeType};
-};
-
-export default connect(mapState)(App);
+export default watch(App, {view: 'ui.view'});

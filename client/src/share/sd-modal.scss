@@ -4,8 +4,7 @@
   $spacing: 20px;
 
   background: white;
-  border: solid #ccc 1px;
-  border-radius: 4px;
+  border: solid $primary-color 1px;
   bottom: auto;
   left: 50%;
   overflow: auto;
@@ -32,6 +31,12 @@
     padding: $spacing;
   }
 
+  .button {
+    background-color: $primary-color;
+    border-radius: 13px;
+    padding: 5px 20px;
+  }
+
   .button-row {
     margin-top: $spacing;
     text-align: right;
@@ -53,9 +58,18 @@
   }
 
   header {
-    background-color: $oci-orange;
-    border-bottom: solid lightgray 1px;
-    padding: $spacing;
+    align-items: center;
+    background-color: $primary-color;
+    color: white;
+    display: flex;
+    font-size: 15px; /*30px;*/
+    height: 40px; /*64px;*/
+    justify-content: space-between;
+    padding: 0 10px;
+  }
+
+  label {
+    margin-right: 10px;
   }
 
   p, .title {

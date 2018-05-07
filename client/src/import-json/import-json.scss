@@ -1,0 +1,16 @@
+@import '../share.scss';
+
+.import-json {
+  text-align: right;
+
+  a {
+    color: $alert-high-color;
+    font-size: 11px;
+    margin-right: 10px;
+  }
+
+  input {
+    display: block;
+    margin-bottom: 20px;
+  }
+}

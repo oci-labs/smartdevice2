@@ -90,6 +90,8 @@ async function loadType(parentId, name, dataMap) {
     messageServerId,
     properties = {}
   } = dataMap;
+  console.log('json-import.js loadType: name =', name);
+  console.log('json-import.js loadType: properties =', properties);
 
   const typeId = await post('type', {name, parentId, messageServerId});
 

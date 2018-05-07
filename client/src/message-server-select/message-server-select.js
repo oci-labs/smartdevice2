@@ -2,8 +2,7 @@
 
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch, dispatchSet} from 'redux-easy';
+import {dispatch, dispatchSet, watch} from 'redux-easy';
 
 import {getJson, putJson} from '../util/rest-util';
 
@@ -11,7 +10,6 @@ import type {
   MessageServerType,
   NodePayloadType,
   NodeType,
-  StateType,
   TreeType
 } from '../types';
 
@@ -64,6 +62,9 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
   };
 
   async loadMessageServers() {
+    //TODO: Message servers are currently associated with
+    //TODO: top-level types, but this should change so
+    //TODO: they are associated with top-level instances.
     if (this.props.treeType !== 'type') return;
 
     const json = await getJson('message_server');
@@ -86,23 +87,23 @@ class MessageServerSelect extends Component<PropsType, MyStateType> {
     const {messageServers} = this.state;
     return (
       <div className="message-server">
-        <h3>Message Server for type &quot;{typeNode.name}&quot;</h3>
-        <select onChange={this.handleServerChange} value={value}>
-          <option value="0">unset</option>
-          {messageServers.map(server => (
-            <option key={server.id} value={server.id}>
-              {server.host}
-            </option>
-          ))}
-        </select>
+        <div className="heading">
+          Message Server
+          <select onChange={this.handleServerChange} value={value}>
+            <option value="0">unset</option>
+            {messageServers.map(server => (
+              <option key={server.id} value={server.id}>
+                {server.host}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     );
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {typeRootId, ui: {treeType}} = state;
-  return {treeType, typeRootId};
-};
-
-export default connect(mapState)(MessageServerSelect);
+export default watch(MessageServerSelect, {
+  treeType: 'ui.treeType',
+  typeRootId: ''
+});

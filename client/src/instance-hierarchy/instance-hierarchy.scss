@@ -1,5 +1,11 @@
+@import '../share.scss';
+
 .instance-hierarchy {
   text-align: left;
+
+  > h3 {
+    padding: $padding;
+  }
 
   h4 {
     margin-top: 0;

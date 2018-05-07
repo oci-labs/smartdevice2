@@ -3,10 +3,9 @@
 import omit from 'lodash/omit';
 import sortBy from 'lodash/sortBy';
 // $FlowFixMe - doesn't know about Fragment yet
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {connect} from 'react-redux';
-import {dispatch, dispatchSet, Input} from 'redux-easy';
+import {dispatch, dispatchSet, Input, watch} from 'redux-easy';
 
 import Button from '../share/button';
 import {showModal} from '../share/sd-modal';
@@ -18,11 +17,14 @@ import type {
   EnumMapType,
   EnumMemberType,
   EnumType,
-  StateType,
   UiType
 } from '../types';
 
 import './enums.css';
+
+type NamedType = {
+  name: string
+};
 
 type PropsType = {
   enumMap: EnumMapType,
@@ -108,8 +110,8 @@ class Enums extends Component<PropsType> {
 
     if (propertiesUsing.length) {
       const message =
-        'This enum cannot be deleted ' +
-        'because it it being used by the following properties:' +
+        'This enum cannot be deleted because it\n' +
+        'is being used by the following properties:\n' +
         propertiesUsing.join(', ');
       showModal({
         error: true,
@@ -149,8 +151,9 @@ class Enums extends Component<PropsType> {
   };
 
   getTypesUsingEnum = async (anEnum: EnumType): Promise<string[]> => {
-    const res = await getJson('enums/used-by/' + anEnum.id);
-    return ((res: any): string[]);
+    const res = await getJson('types/enums/used-by/' + anEnum.id);
+    const types = ((res: any): NamedType[]);
+    return types.map(obj => obj.name);
   };
 
   isDuplicateMember = (enumMember: EnumMemberType): boolean => {
@@ -180,38 +183,21 @@ class Enums extends Component<PropsType> {
     dispatchSet('enumMap', enumMap);
   };
 
-  renderEnumMemberTableHead = () => (
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Value</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-  );
-
-  renderEnumTableHead = () => (
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-  );
-
   renderEnumMemberTableInputRow = () => {
-    const {ui: {newEnumMemberName, newEnumMemberValue}} = this.props;
+    const {newEnumMemberName, newEnumMemberValue} = this.props.ui;
     return (
       <tr>
-        <td>
+        <td className="name-column">
           <Input
             className="enum-member-name-input"
+            onEnter={this.addEnumMember}
             onKeyDown={validNameHandler}
             path="ui.newEnumMemberName"
+            placeholder="enum member name"
             ref={input => (this.enumMemberNameInput = input)}
           />
         </td>
-        <td>
+        <td className="value-column">
           <Input
             className="enum-member-value-input"
             path="ui.newEnumMemberValue"
@@ -235,11 +221,13 @@ class Enums extends Component<PropsType> {
     const {ui: {newEnumName}} = this.props;
     return (
       <tr>
-        <td>
+        <td className="name-column">
           <Input
             className="enum-name-input"
+            onEnter={this.addEnum}
             onKeyDown={validNameHandler}
             path="ui.newEnumName"
+            placeholder="enum name"
           />
         </td>
         <td className="actions-column">
@@ -257,8 +245,8 @@ class Enums extends Component<PropsType> {
 
   renderEnumMemberTableRow = (enumMember: EnumMemberType) => (
     <tr key={enumMember.name}>
-      <td>{enumMember.name}</td>
-      <td>{enumMember.value}</td>
+      <td className="name-column">{enumMember.name}</td>
+      <td className="value-column">{enumMember.value}</td>
       <td className="actions-column">
         <Button
           className="delete"
@@ -310,20 +298,20 @@ class Enums extends Component<PropsType> {
 
     return (
       <section className="enums">
-        <h3>Enums</h3>
-        <table className="enum-table">
-          {this.renderEnumTableHead()}
-          <tbody>
-            {this.renderEnumTableInputRow()}
-            {sortedEnums.map(anEnum => this.renderEnumTableRow(anEnum))}
-          </tbody>
-        </table>
+        <div className="left">
+          <h3>Enums</h3>
+          <table className="enum-table">
+            <tbody>
+              {this.renderEnumTableInputRow()}
+              {sortedEnums.map(anEnum => this.renderEnumTableRow(anEnum))}
+            </tbody>
+          </table>
+        </div>
 
         {selectedEnum && (
-          <Fragment>
-            <h3>Members of &quot;{selectedEnum.name}&quot;</h3>
+          <div className="right">
+            <h3>Members</h3>
             <table className="enum-member-table">
-              {this.renderEnumMemberTableHead()}
               <tbody>
                 {this.renderEnumMemberTableInputRow()}
                 {sortedEnumMembers.map(enumMember =>
@@ -331,16 +319,11 @@ class Enums extends Component<PropsType> {
                 )}
               </tbody>
             </table>
-          </Fragment>
+          </div>
         )}
       </section>
     );
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {enumMap, ui} = state;
-  return {enumMap, ui};
-};
-
-export default connect(mapState)(Enums);
+export default watch(Enums, {enumMap: '', ui: ''});

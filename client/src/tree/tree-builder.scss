@@ -1,3 +1,5 @@
+@import '../share.scss';
+
 .tree-builder {
   display: inline-block;
   text-align: left;
@@ -11,8 +13,12 @@
     margin-left: 0 !important; //TODO: Why need !important?
   }
 
+  button.fa {
+    color: $text-color;
+  }
+
   label {
-    color: white;
+    color: $text-color;
   }
 
   > .tree-node {

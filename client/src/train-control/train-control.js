@@ -1,15 +1,14 @@
 // @flow
 
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {dispatch, dispatchSet} from 'redux-easy';
+import {dispatch, dispatchSet, watch} from 'redux-easy';
 
 import Dial, {type RingType} from '../dial/dial';
 import {send} from '../websocket';
 
 import './train-control.css';
 
-import type {PrimitiveType, StateType, TrainControlType} from '../types';
+import type {PrimitiveType, TrainControlType} from '../types';
 
 type PropsType = {
   mqttConnected: boolean,
@@ -39,8 +38,6 @@ class TrainControl extends Component<PropsType> {
         <div>{mqttConnected ? 1 : 0}</div>
         <div>.</div>
         <div>{mqttConnectionAttempts}</div>
-        <div>.</div>
-        <div>-</div>
       </div>
     );
   };
@@ -256,14 +253,8 @@ class TrainControl extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): PropsType => {
-  const {mqttConnected, mqttConnectionAttempts, trainControl} = state;
-  const {lightOverride} = trainControl.detected;
-  return {
-    mqttConnected,
-    mqttConnectionAttempts,
-    trainControl: {...trainControl, lightOverride}
-  };
-};
-
-export default connect(mapState)(TrainControl);
+export default watch(TrainControl, {
+  mqttConnected: '',
+  mqttConnectionAttempts: '',
+  trainControl: ''
+});

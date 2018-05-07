@@ -2,14 +2,15 @@
 
 import React, {Component} from 'react';
 import Modal from 'react-modal'; // See https://reactcommunity.org/react-modal/.
-import {connect} from 'react-redux';
-import {dispatchSet} from 'redux-easy';
+import {dispatchSet, Input, watch} from 'redux-easy';
 
 import './sd-modal.css';
 
-import type {ConfirmType, ModalType, StateType} from '../types';
+import type {ConfirmType, ModalType, PromptType} from '../types';
 
-type PropsType = ModalType;
+type PropsType = {
+  modal: ModalType
+};
 
 let renderFn: ?Function;
 
@@ -33,8 +34,8 @@ export function showConfirm(options: ConfirmType): void {
 
   renderFn = () => (
     <div className="button-row">
-      <button onClick={handleYes}>Yes</button>
-      <button onClick={handleNo}>No</button>
+      <button className="button" onClick={handleYes}>Yes</button>
+      <button className="button" onClick={handleNo}>No</button>
     </div>
   );
 
@@ -54,6 +55,34 @@ export function showModal(options: ModalType): void {
   });
 }
 
+export function showPrompt(options: PromptType): void {
+  const {buttonText, label, message, okCb, path, title} = options;
+
+  const handleOk = () => {
+    hideModal();
+    okCb();
+  };
+
+  renderFn = () => (
+    <div>
+      <div>
+        <label>{label}</label>
+        <Input autoFocus onEnter={handleOk} path={path} />
+      </div>
+      <div className="button-row">
+        <button className="button" onClick={handleOk}>
+          {buttonText}
+        </button>
+      </div>
+    </div>
+  );
+
+  // Using a setTimeout allows this to be called from a reducer.
+  setTimeout(() => {
+    dispatchSet('ui.modal', {open: true, message, renderFn, title});
+  });
+}
+
 class SdModal extends Component<PropsType> {
   modal: ?Object = null;
 
@@ -70,7 +99,7 @@ class SdModal extends Component<PropsType> {
   onCloseModal = hideModal;
 
   renderMessage = () => {
-    const {message} = this.props;
+    const {message} = this.props.modal;
     if (!message) return null;
 
     // If message contains newlines, honor them.
@@ -85,7 +114,7 @@ class SdModal extends Component<PropsType> {
   };
 
   render() {
-    const {error, message, open, title} = this.props;
+    const {error, message, open, title} = this.props.modal;
     let className = 'sd-modal';
     if (error) className += ' error';
     return (
@@ -112,9 +141,4 @@ class SdModal extends Component<PropsType> {
   }
 }
 
-const mapState = (state: StateType): ModalType => {
-  const {ui: {modal}} = state;
-  return modal;
-};
-
-export default connect(mapState)(SdModal);
+export default watch(SdModal, {modal: 'ui.modal'});

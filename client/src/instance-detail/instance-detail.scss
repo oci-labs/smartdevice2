@@ -1,10 +1,67 @@
+@import '../share.scss';
+
 .instance-detail {
+  flex-grow: 1;
+
+  .breadcrumbs {
+    background-color: $secondary-color;
+    color: gray;
+    padding-top: 5px;
+  }
+
   .button {
     border: none;
     margin-left: 5px;
   }
 
+  caption {
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+  }
+
+  > h3 {
+    padding: $padding;
+  }
+
+  header {
+    background-color: $secondary-color;
+    padding: $padding;
+
+    .buttons {
+      float: right;
+    }
+
+    > div:first-child {
+      border-bottom: solid gray 1px;
+      padding-bottom: 5px;
+    }
+  }
+
   .number, .percent {
     text-align: right;
+  }
+
+  .property-table {
+    display: inline-block;
+    width: 300px;
+  }
+
+  > section {
+    display: inline-block;
+    padding: $padding;
+  }
+
+  .title {
+    background-color: $secondary-color;
+    border-bottom: solid gray 1px;
+    color: $primary-color;
+    font-size: 24px;
+    padding-bottom: 5px;
+  }
+
+  td:last-child {
+    text-align: right;
+    width: 100%;
   }
 }

@@ -1,19 +1,68 @@
 @import '../share.scss';
 
 .type-alerts {
+  background-color: #F0E9E9;
+  display: inline-block;
+  flex-grow: 1;
+  height: calc(100vh - 161px);
+  padding: $padding;
+  vertical-align: top;
+
   .button.fa-plus {
     color: $add-color;
+  }
+
+  h3 {
+    margin-bottom: 0;
   }
 
   .message-server {
     margin-bottom: 20px;
   }
 
-  select {
-    font-size: 18px;
-  }
-
   table {
-    width: 100%;
+    .actions-column {
+      width: 32px;
+    }
+
+    .expression-column {
+      padding-right: $padding;
+      width: 200px;
+
+      input {
+        width: 250px;
+      }
+    }
+
+    input[type=checkbox] {
+      margin-right: 0;
+      width: auto;
+    }
+
+    label {
+      font-size: 12px;
+      margin: 0 0 0 5px;
+    }
+
+    .name-column {
+      width: 100px;
+    }
+
+    .priority-column {
+      width: 70px;
+    }
+
+    select {
+      font-size: 12px;
+      font-weight: normal;
+    }
+
+    .sticky-column {
+      width: 55px;
+    }
+
+    td {
+      padding-right: 10px;
+    }
   }
 }

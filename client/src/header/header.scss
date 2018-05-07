@@ -2,26 +2,38 @@
 
 .header {
   align-items: center;
-  background-color: #222;
+  background-color: $primary-color;
   display: flex;
-  height: 60px;
+  height: 64px;
   justify-content: space-between;
-  padding: $padding;
   color: white;
 
   button {
+    margin: 0;
     outline: none;
+    padding: 0;
+  }
+
+  .fa {
+    height: 32px;
+    margin-right: 28px;
   }
 
   .import-export-btn {
   }
 
-  .logo {
-    height: 50px;
+  .left, .right {
+    align-items: center;
+    display: flex;
   }
+
+  .logo {
+    height: 48px;
+    margin: 0 32px;
+  }
+
   .title {
-    color: $oci-orange;
-    font-size: 48px;
-    padding-right: 100px;
+    color: white;
+    font-size: 24px;
   }
 }

@@ -1,18 +1,33 @@
 @import '../share.scss';
 
 .alert {
-  background-color: $alert-red;
-  border: solid $alert-red 2px;
   border-radius: 5px;
   color: white;
   font-size: 10px;
   margin-bottom: 5px;
-  padding: 5px;
+  padding: $padding;
+  width: 200px;
 
   .close {
     color: white;
     cursor: pointer;
     float: right;
+  }
+
+  &.high {
+    background-color: $alert-high-color;
+  }
+
+  &.info {
+    background-color: $alert-info-color;
+  }
+
+  &.low {
+    background-color: $alert-low-color;
+  }
+
+  &.medium {
+    background-color: $alert-medium-color;
   }
 
   &.sticky {

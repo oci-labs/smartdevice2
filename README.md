@@ -8,7 +8,7 @@ types of supported devices.
 
 ### Install Node.js
 
-This can be done by downloadind and running an installer
+This can be done by downloading and running an installer
 from https://nodejs.org.
 On a Mac with Homebrew installed,
 this can be done by running `brew install node`.

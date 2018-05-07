@@ -1,12 +1,13 @@
 // @flow
 
-import capitalize from 'lodash/capitalize';
+import upperFirst from 'lodash/upperFirst';
 import React, {Component} from 'react';
-import {dispatch, dispatchSet, getState, Input} from 'redux-easy';
+import {dispatch, dispatchSet, getState} from 'redux-easy';
 
 import TreeNode from './tree-node';
-import {addNode} from './tree-util';
+import {createNode} from './tree-util';
 import Button from '../share/button';
+import {showPrompt} from '../share/sd-modal';
 import {getJson, getText} from '../util/rest-util';
 
 import './tree-builder.css';
@@ -58,6 +59,17 @@ export async function loadTree(kind: TreeType) {
 }
 
 class TreeBuilder extends Component<PropsType> {
+  addNode = () => {
+    const {kind} = this.props;
+    showPrompt({
+      buttonText: 'Create',
+      label: 'Name',
+      okCb: () => createNode(kind),
+      path: `ui.${kind}Name`,
+      title: `Add ${upperFirst(kind)}`
+    });
+  };
+
   async componentDidMount() {
     await loadTree(this.props.kind);
     this.toggleExpandAll();
@@ -78,7 +90,7 @@ class TreeBuilder extends Component<PropsType> {
   };
 
   render() {
-    const {kind, newNodeName, nodeMap} = this.props;
+    const {kind, nodeMap} = this.props;
     const rootNode = getRootNode(kind, nodeMap);
     if (!rootNode) return null;
 
@@ -86,22 +98,13 @@ class TreeBuilder extends Component<PropsType> {
 
     return (
       <div className="tree-builder">
-        <div className="new-div">
-          <label>New {capitalize(kind)}</label>
-          <Input path={`ui.${kind}Name`} type="text" autoFocus />
-        </div>
+        <h3>{upperFirst(kind)}s</h3>
         <Button
           icon={isExpanded ? 'compress' : 'expand'}
           onClick={() => this.toggleExpandAll()}
           tooltip={isExpanded ? 'collapse all' : 'expand all'}
         />
-        <Button
-          className="add"
-          disabled={newNodeName === ''}
-          icon="plus"
-          onClick={() => addNode(kind, newNodeName, rootNode)}
-          tooltip="add"
-        />
+        <Button key="add" className="add" icon="plus" onClick={this.addNode} />
         <TreeNode {...this.props} key="tn0" level={0} node={rootNode} />
       </div>
     );

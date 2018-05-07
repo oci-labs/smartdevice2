@@ -57,6 +57,7 @@ const state: StateType = {
     },
     newAlertExpression: '',
     newAlertName: '',
+    newAlertPriority: 0,
     newAlertSticky: false,
     newEnumMemberName: '',
     newEnumMemberValue: 0,
@@ -69,12 +70,14 @@ const state: StateType = {
     selectedEnumId: -1, // 0 is a valid id
     selectedInstanceNodeId: 0,
     selectedTypeNodeId: 0,
+    showUserDropdown: false,
     // Need to start with treeType set to "type"
     // to force loading of typeNodeMap in Redux.
     treeType: 'type',
     typeAlerts: [],
     typeName: '',
-    typeProps: []
+    typeProps: [],
+    view: 'Types'
   },
   user: {
     confirmEmail: '',
