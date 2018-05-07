@@ -8,13 +8,14 @@ cache:
 script:
 - cd server
 - npm install
-- npm test
+#- npm test
 - cd ../client
 - npm install
-- npm test
+#- npm test
 - unset CI
-- cd ../server
-- npm run build
 - cd ../client
+- npm run build
+- npm run copy-to-server
+- cd ../server
 - npm run build
 - set CI
