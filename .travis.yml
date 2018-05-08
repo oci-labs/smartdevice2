@@ -14,8 +14,7 @@ script:
 #- npm test
 - unset CI
 - cd ../client
-- npm run build
-- npm run copy-to-server
+- npm run deploy
 - cd ../server
 - npm run build
 - set CI
