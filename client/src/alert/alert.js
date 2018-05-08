@@ -65,7 +65,7 @@ class Alert extends Component<PropsType> {
 
     const classes = ['alert'];
     if (alert.sticky) classes.push('sticky');
-    if (alert.priority) classes.push(PRIORITIES[alert.priority]);
+    alert.priority ? classes.push(PRIORITIES[alert.priority]) : classes.push('info');
 
     return (
       <div
