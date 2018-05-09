@@ -1,4 +1,5 @@
 # smartdevice2
+[![Build Status](https://travis-ci.org/oci-labs/smartdevice2.svg?branch=develop)](https://travis-ci.org/oci-labs/smartdevice2)
 
 This version of the SmartDevice web app provides flexibility
 in defining the organizational hierarchy and
