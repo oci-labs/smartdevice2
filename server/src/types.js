@@ -35,7 +35,8 @@ export type EnumType = {
 export type MessageServerType = {
   id: number,
   host: string,
-  port: number
+  port?: number,
+  type?: string
 };
 
 export type NodeType = {

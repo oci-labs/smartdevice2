@@ -3,12 +3,19 @@
     {
       "id": 1,
       "host": "localhost",
-      "port": 1883
+      "port": 1883,
+      "type": "mqtt"
     },
     {
       "id": 2,
       "host": "thejoveexpress.local",
-      "port": 1883
+      "port": 1883,
+      "type": "mqtt"
+    },
+    {
+      "id": 3,
+      "host": "localhost",
+      "type": "opendds"
     }
   ],
   "enums": {

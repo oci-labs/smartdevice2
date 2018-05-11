@@ -25,3 +25,6 @@ npm-debug.log*
 **/*.secret
 
 .idea/
+/lib
+GNUmakefile
+

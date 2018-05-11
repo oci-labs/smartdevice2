@@ -1,0 +1,8 @@
+{
+  "name": "smartdevice2-opendds",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "nan": "2.7.0"
+  }
+}

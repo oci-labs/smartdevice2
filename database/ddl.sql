@@ -27,6 +27,7 @@ create table message_server (
   id int auto_increment primary key,
   host text not null,
   port int,
+  type text not null,
   cleanSession text,
   clientId int,
   keepAlive boolean,
