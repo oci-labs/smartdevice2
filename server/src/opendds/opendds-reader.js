@@ -1,5 +1,6 @@
 import opendds from 'opendds';
 import path from 'path';
+import fs from 'fs';
 
 function ValveDataReader() {
   this.valveReader = null;
@@ -45,14 +46,25 @@ ValveDataReader.prototype.finalizeDds = function() {
   }
 };
 
-ValveDataReader.prototype.initializeDds = function(argsArray) {
+ValveDataReader.prototype.initializeDds = function(configFile) {
   var DOMAIN_ID = 23;
-  this.factory = opendds.initialize.apply(null, argsArray);
+  console.log('before apply');
+
+  fs.readFile(configFile, 'utf8', function(err, contents) {
+    console.log(contents);
+  });
+
+  console.log(JSON.stringify(process.env.DYLD_LIBRARY_PATH));
+  this.factory = opendds.initialize('-DCPSConfigFile', configFile);
+  console.log('after apply');
   this.library = opendds.load(path.join('..', 'lib', 'Nexmatix'));
+  console.log('Nexmatix lib loaded');
   if (!this.library) {
     throw new Error("Could not open type support library");
   }
+  console.log("creating participant");
   this.participant = this.factory.create_participant(DOMAIN_ID);
+  console.log("created participant");
   // Handle exit gracefully
   var self = this;
   process.on('SIGINT', function() {

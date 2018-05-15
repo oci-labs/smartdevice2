@@ -1,0 +1,5 @@
+workspace {
+  cmdline += -include server/node_modules/opendds
+  idl
+  publisher
+}

@@ -34,6 +34,7 @@ export async function connect(server: MessageServerType) {
   for (const type of topLevelTypes) {
     const typeServer = await getMessageServer(type.messageServerId);
     if (typeServer) {
+      console.log(JSON.stringify(server));
       if (typeServer.id === server.id && server.type === 'opendds') {
         connectToType(server, type.id);
       }
@@ -50,13 +51,13 @@ export function connectToType(server: MessageServerType, typeId: number) {
   serverMap[id] = server;
 
   const client = clientMap[id];
+  console.log(server.type);
   if (client) {
     // already connected
     subscribe(id, typeId);
   } else {
     console.log("initializing DDS");
-    dataReader.initializeDds(['../rtps_disc.ini']);
-    console.log("DDS initialized");
+    dataReader.initializeDds('../rtps_disc.ini');
 
     dataReader.subscribe(function (sample) {
       console.log("sample received");
@@ -328,6 +329,7 @@ export async function openddsService(app: express$Application): Promise<void> {
     for (const type of topLevelTypes) {
       const server = await getMessageServer(type.messageServerId);
 
+      console.log(JSON.stringify(server));
       if (server) {
         connectToType(server, type.id);
       } else {

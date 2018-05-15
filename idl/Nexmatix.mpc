@@ -1,4 +1,4 @@
-project: dcps, dcps_v8 {
+project: dcps, dcps_v8, node_library {
   libout = ../lib
   idlflags += -Wb,stub_export_include=Nexmatix_export.h \
               -Wb,stub_export_macro=Nexmatix_Export
