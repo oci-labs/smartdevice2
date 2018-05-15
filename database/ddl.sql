@@ -25,7 +25,7 @@ create table enum_member (
 
 create table message_server (
   id int auto_increment primary key,
-  host text not null,
+  host text,
   port int,
   type text not null,
   cleanSession text,

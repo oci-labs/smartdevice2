@@ -37,7 +37,7 @@ export async function connect(server: MessageServerType) {
   for (const type of topLevelTypes) {
     const typeServer = await getMessageServer(type.messageServerId);
     if (typeServer) {
-      if (typeServer.id === server.id) {
+      if (typeServer.id === server.id && server.type === 'mqtt') {
         connectToType(server, type.id);
       }
     } else {
@@ -58,7 +58,8 @@ export function connectToType(server: MessageServerType, typeId: number) {
     // already connected
     subscribe(id, typeId);
   } else {
-    const url = `mqtt://${server.host}:${server.port}`;
+    const port = server.port || 1883;
+    const url = `mqtt://${server.host}:${port}`;
     const options = {};
 
     connectionAttempts++;
@@ -100,7 +101,8 @@ export function disconnect(server: MessageServerType) {
   if (client) {
     delete clientMap[server.id];
     client.end();
-    const url = `mqtt://${server.host}:${server.port}`;
+    const port = server.port || 1883;
+    const url = `mqtt://${server.host}:${port}`;
     console.info('disconnected from', url);
   }
 }

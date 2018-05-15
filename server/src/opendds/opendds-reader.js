@@ -33,7 +33,7 @@ ValveDataReader.prototype.subscribe = function(sample_received) {
 };
 
 
-ValveDataReader.prototype.finalizeDds = function(argsArray) {
+ValveDataReader.prototype.finalizeDds = function() {
   if (this.factory) {
     console.log("finalizing DDS connection");
     if (this.participant) {

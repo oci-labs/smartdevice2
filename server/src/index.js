@@ -14,6 +14,7 @@ import {exportService} from './json-export';
 import {importService} from './json-import';
 import {messageServerService} from './message-server-service';
 import {mqttService, webSocketSetup} from './mqtt-service';
+import {openddsService} from './opendds-service';
 import {treeService} from './tree-service';
 import {typeService} from './type-service';
 
@@ -45,6 +46,7 @@ enumService(app);
 instanceService(app);
 messageServerService(app);
 mqttService(app);
+openddsService(app);
 treeService(app);
 typeService(app);
 crudService(app, 'alert');

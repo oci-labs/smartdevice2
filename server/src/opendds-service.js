@@ -1,7 +1,7 @@
 // @flow
 
 import isEqual from 'lodash/isEqual';
-import reader from './opendds/opendds-reader.js'
+import NexmatixReader from './opendds/opendds-reader.js'
 import WebSocket from 'ws';
 
 import {getDbConnection} from './database';
@@ -22,8 +22,9 @@ const SPECIAL_SUFFIXES = ['control', 'feedback'];
 const clientMap = {}; // keys are server ids
 const serverMap = {}; // keys are server ids
 
+const dataReader = new NexmatixReader();
+
 let lastChange,
-  mqttConnected = false,
   mySql,
   ws;
 
@@ -45,7 +46,6 @@ export async function connect(server: MessageServerType) {
 }
 
 export function connectToType(server: MessageServerType, typeId: number) {
-  let connectionAttempts = 0;
   const {id} = server;
   serverMap[id] = server;
 
@@ -54,39 +54,13 @@ export function connectToType(server: MessageServerType, typeId: number) {
     // already connected
     subscribe(id, typeId);
   } else {
-    const url = `mqtt://${server.host}:${server.port}`;
-    const options = {};
+    console.log("initializing DDS");
+    dataReader.initializeDds(['../rtps_disc.ini']);
+    console.log("DDS initialized");
 
-    connectionAttempts++;
-    wsSend('MQTT attempts ' + connectionAttempts);
-    const client = mqtt.connect(url, options);
-    clientMap[id] = client;
-
-    client.on('connect', () => {
-      connectionAttempts = 0;
-      console.info(`MQTT server ${url} connected.`);
-      mqttConnected = true;
-      wsSend('MQTT connected');
-      subscribe(id, typeId);
-    });
-
-    client.on('message', handleMessage.bind(null, client));
-
-    client.on('close', () => {
-      console.info(`MQTT server ${url} connection closed.`);
-      if (mqttConnected) wsSend('MQTT closed');
-      mqttConnected = false;
-    });
-    client.on('error', err => {
-      console.error(`MQTT server ${url} error:`, err);
-    });
-    client.on('offline', () => {
-      console.info(`MQTT server ${url} is offline.`);
-    });
-    client.on('reconnect', () => {
-      connectionAttempts++;
-      wsSend('MQTT attempts ' + connectionAttempts);
-      console.info(`MQTT server ${url} reconnect started.`);
+    dataReader.subscribe(function (sample) {
+      console.log("sample received");
+      wsSend(`valve ${JSON.stringify(sample)}`);
     });
   }
 }
@@ -96,7 +70,8 @@ export function disconnect(server: MessageServerType) {
   if (client) {
     delete clientMap[server.id];
     client.end();
-    const url = `mqtt://${server.host}:${server.port}`;
+    const port = server.port || 1883;
+    const url = `mqtt://${server.host}:${port}`;
     console.info('disconnected from', url);
   }
 }
@@ -344,7 +319,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
   }
 }
 
-export async function mqttService(app: express$Application): Promise<void> {
+export async function openddsService(app: express$Application): Promise<void> {
   mySql = getDbConnection();
 
   try {

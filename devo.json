@@ -14,7 +14,7 @@
     },
     {
       "id": 3,
-      "host": "localhost",
+      "host": "hostless.opendds",
       "type": "opendds"
     }
   ],
