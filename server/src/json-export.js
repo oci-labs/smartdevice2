@@ -70,7 +70,8 @@ async function getType(type: Object) {
   const alerts = _alerts.map(a => ({
     name: a.name,
     condition: a.expression,
-    sticky: Boolean(a.sticky)
+    sticky: Boolean(a.sticky),
+    priority: a.priority
   }));
 
   const {messageServerId} = type;
@@ -122,7 +123,7 @@ async function processInstances(obj: Object): Promise<void> {
 
 async function processMessageServers(obj: Object): Promise<void> {
   const servers = await getServers();
-  obj.messageServers = servers.map(({id, host, port}) => ({id, host, port}));
+  obj.messageServers = servers.map(({id, host, port, type}) => ({id, host, port, type}));
 }
 
 async function processTypes(obj: Object): Promise<void> {

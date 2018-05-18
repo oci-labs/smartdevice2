@@ -2,12 +2,10 @@
 
 import isEqual from 'lodash/isEqual';
 import NexmatixReader from './opendds/opendds-reader.js'
-import WebSocket from 'ws';
 
 import {getDbConnection} from './database';
 
 import {
-  PATH_DELIMITER,
   getInstanceId,
   updateProperty
 } from './instance-service';
@@ -16,13 +14,9 @@ import {logError} from './util/error-util';
 
 import type {MessageServerType, PrimitiveType} from './types';
 
-const ENUM_PREFIX = 'enum:';
-const SPECIAL_SUFFIXES = ['control', 'feedback'];
-
-const clientMap = {}; // keys are server ids
-const serverMap = {}; // keys are server ids
-
 const dataReader = new NexmatixReader();
+
+const serverMap = {}; // keys are server ids
 
 let lastChange,
   mySql,
@@ -47,80 +41,33 @@ export async function connect(server: MessageServerType) {
 }
 
 export function connectToType(server: MessageServerType, typeId: number) {
-  const {id} = server;
-  serverMap[id] = server;
-
-  const client = clientMap[id];
   console.log(server.type);
-  if (client) {
-    // already connected
-    subscribe(id, typeId);
-  } else {
+  if (!dataReader.participant) {
     console.log("initializing DDS");
     dataReader.initializeDds('../rtps_disc.ini');
 
-    dataReader.subscribe(function (sample) {
-      console.log("sample received");
-      wsSend(`valve ${JSON.stringify(sample)}`);
+    dataReader.subscribe(async function (sample) {
+      console.log(`sample received: ${JSON.stringify(sample)}`);
+      if (global.importInProgress) return;
+
+
+      try{
+        const path = `${sample.valveSerialId}`;
+
+        console.log(`saveProperty("${path}", "pressure", ${sample.pressure})`);
+        await saveProperty(path, "pressure", sample.pressure);
+        console.log(`saveProperty("${path}", "cycles", ${sample.cycles})`);
+        await saveProperty(path, "cycles", sample.cycles);
+        console.log(`saveProperty("${path}", "leakFault", ${sample.leakFault})`);
+        await saveProperty(path, "leakFault", sample.leakFault);
+        console.log(`saveProperty("${path}", "valveFault", ${sample.valveFault})`);
+        await saveProperty(path, "valveFault", sample.valveFault);
+      } catch (e) {
+        console.error('\nREST server error:', e.message);
+        //process.exit(1); //TODO: only for debugging
+      }
     });
   }
-}
-
-export function disconnect(server: MessageServerType) {
-  const client = clientMap[server.id];
-  if (client) {
-    delete clientMap[server.id];
-    client.end();
-    const port = server.port || 1883;
-    const url = `mqtt://${server.host}:${port}`;
-    console.info('disconnected from', url);
-  }
-}
-
-function encode(type: string, value: string, max?: string): Buffer {
-  return type === 'text'
-    ? Buffer.from(value)
-    : encodeNumber(type, Number(value), Number(max));
-}
-
-function encodeNumber(type: string, value: number, max?: number): Buffer {
-  let buffer;
-
-  switch (type) {
-    case 'boolean':
-      buffer = Buffer.alloc(1);
-      buffer.writeInt8(value, 0);
-      break;
-
-    case 'number':
-      buffer = Buffer.alloc(4);
-      buffer.writeInt32BE(value, 0);
-      break;
-
-    case 'percent': {
-      if (!max) {
-        throw new Error(
-          'mqtt-service encodeNumber: percent type requires max value'
-        );
-      }
-      buffer = Buffer.alloc(8);
-      buffer.writeInt32BE(value, 0);
-      buffer.writeInt32BE(max, 4);
-      break;
-    }
-
-    default:
-      throw new Error(
-        'mqttService encodeNumber: ' + type + 'is not a numeric type'
-      );
-  }
-
-  return buffer;
-}
-
-function getInstances(typeId: number) {
-  const sql = 'select name from instance where typeId=?';
-  return mySql.query(sql, typeId);
 }
 
 async function getMessageServer(serverId: number) {
@@ -137,74 +84,6 @@ async function getMessageServer(serverId: number) {
   return serverMap[serverId];
 }
 
-async function getServerIdForType(typeId: number): Promise<number> {
-  const sql = 'select messageServerId from type where id = ?';
-  const [row] = await mySql.query(sql, typeId);
-  return row ? row.messageServerId : 0;
-}
-
-async function getTopicType(topic: string): Promise<string> {
-  let type = '';
-
-  const parts = topic.split('/');
-  const lastPart = parts[parts.length - 1];
-
-  // "control" messages are train-specific.
-  if (lastPart === 'control') return '';
-
-  if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
-  const property = parts.pop();
-  if (parts.length === 0) return '';
-
-  let parentId = 0;
-  let row;
-
-  for (const part of parts) {
-    let sql = 'select id, parentId, typeId from instance where name = ?';
-    let args = [];
-    if (parentId) {
-      sql += ' and parentId = ?';
-      args = [parentId];
-    }
-    [row] = await mySql.query(sql, part, ...args);
-    if (!row) return '';
-    parentId = row.id;
-  }
-
-  // If we found the instance for this topic ...
-  if (row) {
-    // Try to get the type of this instance.
-    const {typeId} = row;
-    const sql =
-      'select enumId, kind from type_data where name = ? and typeId = ?';
-    [row] = await mySql.query(sql, property, typeId);
-    if (row) {
-      if (row.enumId !== null) {
-        // It is not a builtin type.
-        // Determine if it is an enumerated type.
-        const sql = 'select name from enum where id = ?';
-        [row] = await mySql.query(sql, row.enumId);
-        if (row) type = ENUM_PREFIX + row.name;
-      } else {
-        type = row.kind;
-      }
-    } else {
-      // no row found
-      console.error(
-        'mqtt-service.js getTopicType:',
-        'no type_data record found for',
-        property,
-        'with typeId =',
-        typeId
-      );
-    }
-  }
-
-  if (!type) console.error('topic', topic, 'has no type');
-
-  return type;
-}
-
 function getTopLevelTypes() {
   const sql =
     'select t1.id, t1.name, t1.messageServerId ' +
@@ -213,114 +92,7 @@ function getTopLevelTypes() {
   return mySql.query(sql);
 }
 
-function getTopLevelTypesForServer(serverId: number) {
-  const sql =
-    'select * from type t1, type t2 ' +
-    'where t1.messageServerId = ? ' +
-    'and t1.parentId = t2.id ' +
-    'and t2.name = "root"';
-  return mySql.query(sql, serverId);
-}
-
-async function getTypeTopics(typeId: number): Promise<string[]> {
-  try {
-    const instances = await getInstances(typeId);
-    return instances.map(instance => instance.name + '/#');
-  } catch (e) {
-    logError(e.message);
-    return [];
-  }
-}
-
-async function handleMessage(client, topic: string, message: Buffer) {
-  if (global.importInProgress) return;
-
-  //const ignore = topic === 'thejoveexpress/lights/ambient/feedback';
-  //if (ignore) return;
-
-  try {
-    const type = await getTopicType(topic);
-    if (!type) return;
-
-    //console.log('message length =', message.length);
-    const parts = topic.split('/');
-
-    const lastPart = parts[parts.length - 1];
-    if (SPECIAL_SUFFIXES.includes(lastPart)) parts.pop();
-
-    if (parts.length < 2) {
-      console.info('ignoring message with topic', topic);
-      return;
-    }
-
-    const property = parts.pop();
-
-    let value;
-    switch (type) {
-      case 'boolean':
-        value = Boolean(message.readInt8(0));
-        // If we get a lifecycle message with a value of true
-        // (train-specific) ...
-        if (
-          property === 'lifecycle' &&
-          lastPart === 'feedback' &&
-          value === 1
-        ) {
-          // Request messages to get the current state of everything.
-          client.publish(parts[0] + '/feedback');
-        }
-        break;
-
-      case 'number':
-        value = message.readInt32BE(0);
-        break;
-
-      case 'percent': {
-        if (message.length !== 8) {
-          console.error(
-            'received MQTT message with topic',
-            topic,
-            'which has type percent,',
-            'but length is',
-            message.length,
-            'instead of 8'
-          );
-          return;
-        }
-
-        const rawValue = message.readIntBE(0, 4);
-        const maxValue = message.readIntBE(4, 4);
-        value = 100 * (rawValue / maxValue);
-        break;
-      }
-
-      case 'text':
-        value = message.toString();
-        break;
-    }
-
-    if (type.startsWith(ENUM_PREFIX)) {
-      value = message.readInt32BE(0);
-    }
-
-    if (value !== undefined) {
-      //if (topic.includes('light') && topic.includes('power')) {
-      //console.log(topic, '=', value);
-      //}
-
-      const path = parts.join(PATH_DELIMITER);
-      await saveProperty(path, property, value);
-    } else {
-      console.error('unsupported topic', topic);
-    }
-  } catch (e) {
-    console.error('\nREST server error:', e.message);
-    console.error('REST server error: topic =', topic);
-    //process.exit(1); //TODO: only for debugging
-  }
-}
-
-export async function openddsService(app: express$Application): Promise<void> {
+export async function openddsService(app: express$Application, wsServer: any): Promise<void> {
   mySql = getDbConnection();
 
   try {
@@ -330,7 +102,7 @@ export async function openddsService(app: express$Application): Promise<void> {
       const server = await getMessageServer(type.messageServerId);
 
       console.log(JSON.stringify(server));
-      if (server) {
+      if (server && server.type === 'opendds') {
         connectToType(server, type.id);
       } else {
         console.error(
@@ -342,29 +114,7 @@ export async function openddsService(app: express$Application): Promise<void> {
     logError(e.message);
   }
 
-  // Request feedback from all current clients.
-  // This is train-specific.
-  const URL_PREFIX = '/mqtt/feedback';
-  app.post(URL_PREFIX, async (req: express$Request, res: express$Response) => {
-    await requestFeedback();
-    res.send();
-  });
-}
-
-async function requestFeedback() {
-  const topLevelTypes = await getTopLevelTypes();
-
-  for (const {id, messageServerId} of topLevelTypes) {
-    const client = clientMap[messageServerId];
-    if (client) {
-      const instances = await getInstances(id);
-      for (const instance of instances) {
-        const msg = instance.name + '/feedback';
-        console.info('mqtt-service.js: publishing', msg);
-        client.publish(msg);
-      }
-    }
-  }
+  webSocketSetup(wsServer);
 }
 
 async function saveProperty(
@@ -397,53 +147,15 @@ async function saveProperty(
   }
 }
 
-export async function subscribe(serverId: number, typeId: number) {
-  const client = clientMap[serverId];
-  if (!client) {
-    console.error('no client for server id', serverId);
-    const server = await getMessageServer(serverId);
-    connect(server);
-    return;
-  }
-
-  const topics = await getTypeTopics(typeId);
-  for (const topic of topics) {
-    client.subscribe(topic);
-    console.info('subscribed to topic', topic);
-  }
-}
-
-export async function unsubscribeFromServer(serverId: number): Promise<void> {
-  const types = await getTopLevelTypesForServer(serverId);
-  const promises = types.map(type => unsubscribeFromType(serverId, type.id));
-  await Promise.all(promises);
-}
-
-export async function unsubscribeFromType(
-  serverId: number,
-  typeId: number
-): Promise<void> {
-  if (!serverId) serverId = await getServerIdForType(typeId);
-  const client = clientMap[serverId];
-
-  const topics = await getTypeTopics(typeId);
-  for (const topic of topics) {
-    client.unsubscribe(topic);
-    console.info('unsubscribed from topic', topic);
-  }
-}
-
-export function webSocketSetup() {
-  const wsServer = new WebSocket.Server({port: 1337});
+export function webSocketSetup(wsServer: any) {
   console.info('waiting for WebSocket connection');
   wsServer.on('connection', webSocket => {
     console.info('got WebSocket connection to browser');
     ws = webSocket;
-    if (Object.keys(clientMap).length) wsSend('MQTT connected');
+    if (dataReader.participant) wsSend('OpenDDS connected');
 
     ws.on('close', () => {
       console.info('WebSocket connection to browser closed');
-      wsSend('MQTT closed');
       ws = null;
     });
 
@@ -452,25 +164,6 @@ export function webSocketSetup() {
         console.error('WebSocket error:', error.code);
       }
     });
-
-    ws.on('message', async (message: string) => {
-      if (message.startsWith('set')) {
-        const [, topic, , value, max] = message.split(' ');
-        //console.log('mqtt-service.js x: topic =', topic);
-
-        const topLevelTypes = await getTopLevelTypes();
-        for (const {messageServerId} of topLevelTypes) {
-          //TODO: Verify this is a train client?
-          const client = clientMap[messageServerId];
-          if (client) {
-            const buffer = encode('percent', value, max);
-            client.publish(topic, buffer);
-          }
-        }
-      }
-    });
-
-    requestFeedback();
   });
 }
 

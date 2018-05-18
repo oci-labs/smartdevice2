@@ -116,12 +116,13 @@ async function loadType(parentId, name, dataMap) {
   }
 
   for (const alert of alerts) {
-    const {name, condition, sticky} = alert;
+    const {name, condition, sticky, priority} = alert;
     const data = {
       typeId,
       name,
       expression: condition,
-      sticky
+      sticky,
+      priority
     };
     await post('alert_type', data);
     console.info('imported alert', name);

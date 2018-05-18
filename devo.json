@@ -15,6 +15,7 @@
     {
       "id": 3,
       "host": "hostless.opendds",
+      "port": null,
       "type": "opendds"
     }
   ],
@@ -42,12 +43,6 @@
                     "pressure": "number",
                     "temperature": "number"
                   }
-                },
-                "valve": {
-                  "properties": {
-                    "cycleCount": "number",
-                    "pressure": "number"
-                  }
                 }
               }
             }
@@ -60,7 +55,8 @@
         {
           "name": "faulted",
           "condition": "fault",
-          "sticky": true
+          "sticky": true,
+              "priority": 1
         }
       ],
       "children": {
@@ -81,17 +77,20 @@
             {
               "name": "lights off",
               "condition": "!power",
-              "sticky": true
+              "sticky": true,
+              "priority": 1
             },
             {
               "name": "too bright",
               "condition": "ambient > 70",
-              "sticky": false
+              "sticky": false,
+              "priority": 1
             },
             {
               "name": "too dim",
               "condition": "ambient < 30",
-              "sticky": false
+              "sticky": false,
+              "priority": 1
             }
           ],
           "properties": {
@@ -107,9 +106,50 @@
         "fault": "boolean",
         "lifecycle": "boolean"
       }
+    },
+    "valve": {
+      "alerts": [
+        {
+          "name": "high pressure",
+          "condition": "pressure > 70 && pressure <=80",
+          "sticky": false,
+          "priority": 3
+        },
+        {
+          "name": "leak fault",
+          "condition": "leakFault",
+          "sticky": false,
+          "priority": 1
+        },
+        {
+          "name": "valve fault",
+          "condition": "valveFault",
+          "sticky": false,
+          "priority": 1
+        },
+        {
+          "name": "very high pressure",
+          "condition": "pressure > 80",
+          "sticky": false,
+          "priority": 4
+        }
+      ],
+      "messageServerId": 3,
+      "properties": {
+        "cycles": "number",
+        "leakFault": "boolean",
+        "pressure": "number",
+        "valveFault": "boolean"
+      }
     }
   },
   "instances": {
+    "1010015": {
+      "type": "valve"
+    },
+    "5010015": {
+      "type": "valve"
+    },
     "thejoveexpress": {
       "type": "train",
       "children": {

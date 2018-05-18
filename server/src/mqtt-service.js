@@ -8,7 +8,6 @@
 
 import isEqual from 'lodash/isEqual';
 import mqtt from 'mqtt';
-import WebSocket from 'ws';
 
 import {getDbConnection} from './database';
 import {
@@ -350,7 +349,7 @@ async function handleMessage(client, topic: string, message: Buffer) {
   }
 }
 
-export async function mqttService(app: express$Application): Promise<void> {
+export async function mqttService(app: express$Application, wsServer: any): Promise<void> {
   mySql = getDbConnection();
 
   try {
@@ -378,6 +377,8 @@ export async function mqttService(app: express$Application): Promise<void> {
     await requestFeedback();
     res.send();
   });
+
+  webSocketSetup(wsServer);
 }
 
 async function requestFeedback() {
@@ -462,8 +463,7 @@ export async function unsubscribeFromType(
   }
 }
 
-export function webSocketSetup() {
-  const wsServer = new WebSocket.Server({port: 1337});
+export function webSocketSetup(wsServer: any) {
   console.info('waiting for WebSocket connection');
   wsServer.on('connection', webSocket => {
     console.info('got WebSocket connection to browser');
