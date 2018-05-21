@@ -57,6 +57,7 @@ export function connectToType(server: MessageServerType, typeId: number) {
     // already connected
     subscribe(id, typeId);
   } else {
+    if(server.type !== "mqtt") return;
     const port = server.port || 1883;
     const url = `mqtt://${server.host}:${port}`;
     const options = {};
@@ -83,9 +84,13 @@ export function connectToType(server: MessageServerType, typeId: number) {
     });
     client.on('error', err => {
       console.error(`MQTT server ${url} error:`, err);
+      if (mqttConnected) wsSend('MQTT closed');
+      mqttConnected = false;
     });
     client.on('offline', () => {
       console.info(`MQTT server ${url} is offline.`);
+      if (mqttConnected) wsSend('MQTT closed');
+      mqttConnected = false;
     });
     client.on('reconnect', () => {
       connectionAttempts++;

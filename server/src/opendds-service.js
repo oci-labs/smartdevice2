@@ -171,6 +171,6 @@ function wsSend(message: string): void {
   try {
     if (ws) ws.send(message);
   } catch (e) {
-    console.error('mqtt-service.js wsSend:', e.message);
+    console.error('opendds-service.js wsSend:', e.message);
   }
 }
