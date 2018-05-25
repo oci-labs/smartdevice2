@@ -14,6 +14,7 @@ const state: StateType = {
   messageServerMap: {},
   mqttConnected: false,
   mqttConnectionAttempts: 0,
+  openDdsSecure: false,
   trainControl: {
     trainAlive: false,
     controlled: {

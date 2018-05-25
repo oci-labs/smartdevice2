@@ -1,14 +1,11 @@
 // @flow
 
 import isEqual from 'lodash/isEqual';
-import NexmatixReader from './opendds/opendds-reader.js'
+import NexmatixReader from './opendds/opendds-reader.js';
 
 import {getDbConnection} from './database';
 
-import {
-  getInstanceId,
-  updateProperty
-} from './instance-service';
+import {getInstanceId, updateProperty} from './instance-service';
 
 import {logError} from './util/error-util';
 
@@ -18,9 +15,7 @@ const dataReader = new NexmatixReader();
 
 const serverMap = {}; // keys are server ids
 
-let lastChange,
-  mySql,
-  ws;
+let lastChange, mySql, ws, webSocketServer;
 
 export async function connect(server: MessageServerType) {
   const topLevelTypes = await getTopLevelTypes();
@@ -40,33 +35,33 @@ export async function connect(server: MessageServerType) {
   }
 }
 
+function subscribe() {
+  console.log('subscribing to opendds');
+  dataReader.subscribe(async function(sample) {
+    console.log('sample received.');
+    if (global.importInProgress) return;
+
+    try {
+      const path = `${sample.valveSerialId}`;
+
+      await saveProperty(path, 'pressure', sample.pressure);
+      await saveProperty(path, 'cycles', sample.cycles);
+      await saveProperty(path, 'leakFault', sample.leakFault);
+      await saveProperty(path, 'valveFault', sample.valveFault);
+    } catch (e) {
+      console.error('\nREST server error:', e.message);
+      //process.exit(1); //TODO: only for debugging
+    }
+  });
+  console.log('subscribed to opendds');
+}
+
 export function connectToType(server: MessageServerType, typeId: number) {
   console.log(server.type);
   if (!dataReader.participant) {
-    console.log("initializing DDS");
-    dataReader.initializeDds('../rtps_disc.ini');
-
-    dataReader.subscribe(async function (sample) {
-      console.log(`sample received: ${JSON.stringify(sample)}`);
-      if (global.importInProgress) return;
-
-
-      try{
-        const path = `${sample.valveSerialId}`;
-
-        console.log(`saveProperty("${path}", "pressure", ${sample.pressure})`);
-        await saveProperty(path, "pressure", sample.pressure);
-        console.log(`saveProperty("${path}", "cycles", ${sample.cycles})`);
-        await saveProperty(path, "cycles", sample.cycles);
-        console.log(`saveProperty("${path}", "leakFault", ${sample.leakFault})`);
-        await saveProperty(path, "leakFault", sample.leakFault);
-        console.log(`saveProperty("${path}", "valveFault", ${sample.valveFault})`);
-        await saveProperty(path, "valveFault", sample.valveFault);
-      } catch (e) {
-        console.error('\nREST server error:', e.message);
-        //process.exit(1); //TODO: only for debugging
-      }
-    });
+    dataReader.initializeDds('../rtps_disc_secure.ini');
+    dataReader.createParticipant();
+    subscribe();
   }
 }
 
@@ -92,7 +87,10 @@ function getTopLevelTypes() {
   return mySql.query(sql);
 }
 
-export async function openddsService(app: express$Application, wsServer: any): Promise<void> {
+export async function openddsService(
+  app: express$Application,
+  wsServer: any
+): Promise<void> {
   mySql = getDbConnection();
 
   try {
@@ -126,7 +124,6 @@ async function saveProperty(
 
   const instanceId = await getInstanceId(path);
   if (instanceId === 0) {
-    console.error('no instance found for', path);
     return;
   }
 
@@ -148,6 +145,7 @@ async function saveProperty(
 }
 
 export function webSocketSetup(wsServer: any) {
+  webSocketServer = wsServer;
   console.info('waiting for WebSocket connection');
   wsServer.on('connection', webSocket => {
     console.info('got WebSocket connection to browser');
@@ -162,6 +160,34 @@ export function webSocketSetup(wsServer: any) {
     ws.on('error', error => {
       if (error.code !== 'ECONNRESET') {
         console.error('WebSocket error:', error.code);
+      }
+      console.error(`WebSocket error... ${JSON.stringify(error)}`);
+    });
+
+    ws.on('message', async (message: string) => {
+      if (message.startsWith('OpenDDS')) {
+        const [, command, secure] = message.split(' ');
+
+        try {
+          if (command === 'reconnect') {
+            console.log('OpenDDS disconnect');
+            dataReader.deleteParticipant();
+
+            if (secure === 'secure') {
+              console.log('OpenDDS connect: secure');
+              dataReader.createParticipant();
+              wsSend('OpenDDS connected secure');
+              subscribe();
+            } else {
+              console.log('OpenDDS connect: insecure');
+              dataReader.createParticipant(false);
+              wsSend('OpenDDS connected insecure');
+              subscribe();
+            }
+          }
+        } catch (e) {
+          console.log(`Something went wrong: ${JSON.stringify(e)}`);
+        }
       }
     });
   });

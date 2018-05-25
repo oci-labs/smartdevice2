@@ -22,10 +22,8 @@ function configure(ws) {
     setTimeout(websocketSetup, 5000);
   };
 
-  /*
   ws.onerror = error =>
     console.error('WebSocket error:', error);
-  */
 
   ws.onmessage = message => {
     const data = String(message.data);
@@ -40,6 +38,14 @@ function configure(ws) {
         console.log(`mqtt connected: ${String(connected)}`);
         dispatchSet('mqttConnected', connected);
         dispatchSet('mqttConnectionAttempts', 0);
+      }
+      return;
+    }
+
+    if (data.startsWith('OpenDDS ')) {
+      const [, command, secure] = data.split(' ');
+      if (command === 'connected') {
+        dispatchSet('openDdsSecure', secure === "secure");
       }
       return;
     }
