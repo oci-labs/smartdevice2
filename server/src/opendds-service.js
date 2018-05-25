@@ -11,6 +11,9 @@ import {logError} from './util/error-util';
 
 import type {MessageServerType, PrimitiveType} from './types';
 
+// Quick and dirty for the demo...
+const secure = !!process.env.DDS_SECURE;
+
 const dataReader = new NexmatixReader();
 
 const serverMap = {}; // keys are server ids
@@ -59,7 +62,11 @@ function subscribe() {
 export function connectToType(server: MessageServerType, typeId: number) {
   console.log(server.type);
   if (!dataReader.participant) {
-    dataReader.initializeDds('../rtps_disc_secure.ini');
+    if (secure) {
+      dataReader.initializeDds('../rtps_disc_secure.ini');
+    } else {
+      dataReader.initializeDds('../rtps_disc.ini');
+    }
     dataReader.createParticipant();
     subscribe();
   }
@@ -166,24 +173,17 @@ export function webSocketSetup(wsServer: any) {
 
     ws.on('message', async (message: string) => {
       if (message.startsWith('OpenDDS')) {
-        const [, command, secure] = message.split(' ');
+        const [, command] = message.split(' ');
 
         try {
           if (command === 'reconnect') {
             console.log('OpenDDS disconnect');
             dataReader.deleteParticipant();
 
-            if (secure === 'secure') {
-              console.log('OpenDDS connect: secure');
-              dataReader.createParticipant();
-              wsSend('OpenDDS connected secure');
-              subscribe();
-            } else {
-              console.log('OpenDDS connect: insecure');
-              dataReader.createParticipant(false);
-              wsSend('OpenDDS connected insecure');
-              subscribe();
-            }
+            console.log(`OpenDDS connect: secure = ${String(secure)}`);
+            dataReader.createParticipant(secure);
+            wsSend('OpenDDS connected');
+            subscribe();
           }
         } catch (e) {
           console.log(`Something went wrong: ${JSON.stringify(e)}`);

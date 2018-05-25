@@ -42,7 +42,7 @@ app.set('etag', 'strong');
 
 //const healthCheckPath = /^\/$/;
 
-const wsServer = new WebSocket.Server({port: 1337});
+const wsServer = new WebSocket.Server({port: process.env.WS_PORT || 1337});
 
 alertService(app);
 enumService(app);
@@ -74,5 +74,5 @@ app.use(morgan('dev'));
 app.use(/^\/$/, healthCheck());
 
 const HOST = '0.0.0.0';
-const PORT = 3001; //process.argv.pop();
+const PORT = process.env.PORT || 3001; //process.argv.pop();
 app.listen(PORT, HOST, () => console.info('listening on', PORT));

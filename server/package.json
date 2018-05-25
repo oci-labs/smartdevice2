@@ -22,15 +22,17 @@
     "lint": "eslint --quiet src --ext .js",
     "postinstall": "flow-typed install",
     "Xprepush": "npm run verify",
-    "start": "cross-env DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS-Security/lib node build/index.js",
-    "start-dev": "cross-env FOO=bar DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS-Security/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
+    "start":
+      "cross-env DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS/lib node build/index.js",
+    "start-secure":
+      "cross-env PORT=4001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS-Security/lib node build/index.js",
+    "start-dev":
+      "cross-env FOO=bar DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS-Security/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
     "test": "jest",
     "verify": "npm-run-all lint flow test-no-watch"
   },
   "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.js"
-    ],
+    "collectCoverageFrom": ["src/**/*.js"],
     "coverageThreshold": {
       "global": {
         "branches": 90,

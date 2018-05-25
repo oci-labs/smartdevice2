@@ -39,7 +39,7 @@ export async function getText(urlSuffix: string): Promise<mixed> {
 // when we are ready for production deployment.
 export function getUrlPrefix() {
   const {hostname} = window.location;
-  return `http://${hostname}:3001/`;
+  return `http://${hostname}:4001/`;
 }
 
 export async function patchJson(
