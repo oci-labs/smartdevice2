@@ -64,10 +64,11 @@ export function connectToType(server: MessageServerType, typeId: number) {
   if (!dataReader.participant) {
     if (secure) {
       dataReader.initializeDds('../rtps_disc_secure.ini');
+      dataReader.createParticipant(true);
     } else {
       dataReader.initializeDds('../rtps_disc.ini');
+      dataReader.createParticipant(false);
     }
-    dataReader.createParticipant();
     subscribe();
   }
 }
