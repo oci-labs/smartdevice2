@@ -1,6 +1,6 @@
 {
   "db": {
-    "database": "smartdevice",
+    "database": "smartdevice_secure",
     "debug": false,
     "host": "localhost",
     "password": "",

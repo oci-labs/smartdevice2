@@ -10,6 +10,7 @@
     "dbi": "mysql --user root -p smartdevice",
     "dbi-pi": "sudo mysql --user root -p smartdevice",
     "dbsetup": "mysql --user root < ../database/ddl.sql",
+    "dbsetup-secure": "mysql --user root < ../database/ddl-secure.sql",
     "dbsetup-pi": "sudo mysql < ./ddl.sql",
     "dbstart": "mysql.server start",
     "dbstop": "mysql.server stop",
@@ -23,11 +24,11 @@
     "postinstall": "flow-typed install",
     "Xprepush": "npm run verify",
     "start":
-      "cross-env DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS/lib node build/index.js",
+      "cross-env DYLD_LIBRARY_PATH=$DDS_ROOT/lib node build/index.js",
     "start-secure":
-      "cross-env PORT=4001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS-Security/lib node build/index.js",
+      "cross-env PORT=4001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=$DDS_ROOT/lib node build/index.js",
     "start-dev":
-      "cross-env FOO=bar DYLD_LIBRARY_PATH=/Users/mkimberlin/projects/OpenDDS-Security/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
+      "cross-env FOO=bar DYLD_LIBRARY_PATH=$DDS_ROOT/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
     "test": "jest",
     "verify": "npm-run-all lint flow test-no-watch"
   },
