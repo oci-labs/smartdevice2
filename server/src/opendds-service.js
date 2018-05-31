@@ -158,7 +158,8 @@ export function webSocketSetup(wsServer: any) {
   wsServer.on('connection', webSocket => {
     console.info('got WebSocket connection to browser');
     ws = webSocket;
-    if (dataReader.participant) wsSend('OpenDDS connected');
+    if (dataReader.participant)
+      wsSend(`OpenDDS connected${secure ? ' secure' : ''}`);
 
     ws.on('close', () => {
       console.info('WebSocket connection to browser closed');
@@ -183,7 +184,7 @@ export function webSocketSetup(wsServer: any) {
 
             console.log(`OpenDDS connect: secure = ${String(secure)}`);
             dataReader.createParticipant(secure);
-            wsSend('OpenDDS connected');
+            wsSend(`OpenDDS connected${secure ? ' secure' : ''}`);
             subscribe();
           }
         } catch (e) {
