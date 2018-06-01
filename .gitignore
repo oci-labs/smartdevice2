@@ -29,3 +29,5 @@ npm-debug.log*
 GNUmakefile
 
 /bin
+/OpenDDS
+/node-opendds

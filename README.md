@@ -40,6 +40,10 @@ See `MosquittoNotes.txt` in the top directory
 for steps to start the MQTT server on a Mac.
 On a RaspberryPi, `sudo apt-get install mosquitto`.
 
+## OpenDDS Setup
+
+For setup of the OpenDDS Prerequisites, see the [OpenDDS instructions](OPENDDS.md).
+
 ## Local Train Software Setup
 * open a terminal window
 * `java -jar TheJoveExpress.jar`
@@ -57,6 +61,7 @@ On a RaspberryPi, `sudo apt-get install mosquitto`.
   - It can be restored by importing a .json file.
 * `npm run build` (initially and for each new version)
 * `npm run start-dev`
+  - If you are using OpenDDS and are on a Mac, only `npm run start` and `npm start-secure` will work
 
 ## Local Client Setup
 * open a terminal window

@@ -7,12 +7,19 @@
 #include <iostream>
 #include <ace/Get_Opt.h>
 
+#ifdef __VXWORKS__
+# include <openssl/err.h>
+# include <openssl/rand.h>
+#endif
+
 #define NO_LISTENER 0, 0
 
 namespace {
   const DDS::DomainId_t DOMAIN_ID = 23;
   const char* TOPIC_NAME = "Valve";
   int sleep_time_in_sec = 1;
+  bool bogus_data = false;
+  std::string governance_file = "security/governance_signed.p7s";
 }
 
 const char DDSSEC_PROP_IDENTITY_CA[] = "dds.sec.auth.identity_ca";
@@ -25,16 +32,7 @@ const char DDSSEC_PROP_PERM_DOC[] = "dds.sec.access.permissions";
 int
 parse_args(int argc, ACE_TCHAR *argv[])
 {
-  //
-  // Command-line Options:
-  //
-  //    -w <number of topics>
-  //    -s <samples per topic>
-  //    -z <sec>  -- don't check the sample counts, just sleep this much
-  //                 and exit
-  //
-
-  ACE_Get_Opt get_opts(argc, argv, ACE_TEXT("t:"));
+  ACE_Get_Opt get_opts(argc, argv, ACE_TEXT("t:bg:"));
 
   int c;
   while ((c = get_opts()) != -1) {
@@ -42,6 +40,14 @@ parse_args(int argc, ACE_TCHAR *argv[])
     case 't':
       sleep_time_in_sec = ACE_OS::atoi(get_opts.opt_arg());
       std::cout << "sleep time = " << sleep_time_in_sec << " sec" << std::endl;
+      break;
+    case 'b':
+      bogus_data = true;
+      std::cout << "sending bogus data" << std::endl;
+      break;
+    case 'g':
+      governance_file = ACE_TEXT_ALWAYS_CHAR(get_opts.opt_arg());
+      std::cout << "using governance file: " << governance_file << std::endl;
       break;
     case '?':
     default:
@@ -52,6 +58,17 @@ parse_args(int argc, ACE_TCHAR *argv[])
   }
 
   return 0;
+}
+
+std::string cert_dir()
+{
+  const char* const cert_dir_env = getenv("CERT_DIR");
+  if (cert_dir_env) {
+    return cert_dir_env;
+  }
+
+  const std::string dds_root(getenv("DDS_ROOT"));
+  return dds_root + "/tests/security/certs";
 }
 
 void append(DDS::PropertySeq& props, const char* name, const std::string& value)
@@ -65,37 +82,42 @@ void append(DDS::PropertySeq& props, const char* name, const std::string& value)
 
 int main(int argc, char* argv[])
 {
+#ifdef __VXWORKS__
+  // For demo purposes only, not cryptographically secure
+  unsigned char buf[32];
+  static const unsigned long PRNG =
+    ERR_PACK(ERR_LIB_RAND, RAND_F_RAND_BYTES, RAND_R_PRNG_NOT_SEEDED);
+  while (RAND_bytes(buf, sizeof buf) == 0 && ERR_get_error() == PRNG) {
+    RAND_seed(buf, sizeof buf);
+  }
+#endif
   try {
     const DDS::DomainParticipantFactory_var dpf =
       TheParticipantFactoryWithArgs(argc, argv);
 
+    if (parse_args(argc, argv))
+      return 1;
+
     DDS::DomainParticipantQos qos;
     dpf->get_default_participant_qos(qos);
 
-    // Enable Security
-    const std::string dds_root(getenv("DDS_ROOT"));
-    const std::string dds_certs(dds_root + "/tests/security/certs");
     if (TheServiceParticipant->get_security()) {
+      const std::string dds_certs = cert_dir();
       DDS::PropertySeq& props = qos.property.value;
       append(props, DDSSEC_PROP_IDENTITY_CA,
         dds_certs + "/opendds_identity_ca_cert.pem");
       append(props, DDSSEC_PROP_PERM_CA,
         dds_certs + "/opendds_identity_ca_cert.pem");
-      append(props, DDSSEC_PROP_PERM_GOV_DOC,
-				"security/governance_signed.p7s");
+      append(props, DDSSEC_PROP_PERM_GOV_DOC, governance_file);
       append(props, DDSSEC_PROP_IDENTITY_CERT,
         dds_certs + "/mock_participant_1/opendds_participant_cert.pem");
       append(props, DDSSEC_PROP_IDENTITY_PRIVKEY,
         dds_certs + "/mock_participant_1/opendds_participant_private_key.pem");
-      append(props, DDSSEC_PROP_PERM_DOC,
-				"security/permissions_1_signed.p7s");
+      append(props, DDSSEC_PROP_PERM_DOC, "security/permissions_1_signed.p7s");
     }
 
     const DDS::DomainParticipant_var participant =
       dpf->create_participant(DOMAIN_ID, qos, NO_LISTENER);
-
-    if (parse_args(argc, argv))
-      return 1;
 
     const Nexmatix::ValveDataTypeSupport_var vd_ts =
       new Nexmatix::ValveDataTypeSupportImpl;
@@ -114,7 +136,7 @@ int main(int argc, char* argv[])
     const DDS::DataWriter_var vd_dw =
       pub->create_datawriter(vd_topic, vd_qos, NO_LISTENER);
 
-    DemoData demo;
+    DemoData demo(bogus_data);
     ShutdownHandler sh;
     Service_Shutdown shutdown(sh);
     std::cerr << "Starting to write valve data.\n";
