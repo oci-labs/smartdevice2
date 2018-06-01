@@ -145,6 +145,7 @@ export function send(message: string): void {
 
 export function websocketSetup() {
   const {hostname} = window.location;
-  ws = new WebSocket(`ws://${hostname}:1447`);
+  const port = window.location.hash.startsWith('#secure') ? '1447' : '1337';
+  ws = new WebSocket(`ws://${hostname}:${port}`);
   configure(ws);
 }

@@ -74,5 +74,5 @@ app.use(morgan('dev'));
 app.use(/^\/$/, healthCheck());
 
 const HOST = '0.0.0.0';
-const PORT = process.env.PORT || 3001; //process.argv.pop();
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3001; //process.argv.pop();
 app.listen(PORT, HOST, () => console.info('listening on', PORT));

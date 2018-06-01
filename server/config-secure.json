@@ -1,8 +1,9 @@
 {
   "db": {
-    "database": "smartdevice",
+    "database": "smartdevice_secure",
     "debug": false,
     "host": "localhost",
+    "insecureAuth": true,
     "password": "",
     "port": 3306,
     "user": "root"

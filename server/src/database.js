@@ -4,7 +4,11 @@ import MySqlConnection from 'mysql-easier';
 import objectMapper from 'object-mapper';
 
 // Get database configuration from a JSON file.
-let config = require('../config.json');
+// Quick and dirty for the demo...
+const secure = !!process.env.DDS_SECURE;
+let config = secure
+  ? require('../config-secure.json')
+  : require('../config.json');
 
 // ALlow values to be overridden by environment variables.
 // This specifies how environment variable names
