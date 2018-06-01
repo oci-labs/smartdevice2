@@ -65,21 +65,3 @@ export V8_ROOT=/usr/local
 export NAN_ROOT=`pwd`/node_modules/nan
 source OpenDDS/setenv.sh
 ```
-
-### Running the Publisher
-
-Once you have the application running and all of your definitions imported,
-the following command will send "bogus" data from an insecure OpenDDS publisher:
-
-```
-bin/NexmatixMockPublisher -b -DCPSConfigFile rtps_disc.ini
-```
-
-In order to publish valid data from a secure OpenDDS publisher, run the following:
-
-```
-bin/NexmatixMockPublisher -DCPSConfigFile rtps_disc_secure.ini
-```
-
-Note: These commands can only be run a "prepared" OpenDDS terminal.
-See the previous section [Resetting Your OpenDDS Environment](#resetting-your-opendds-environment).

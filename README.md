@@ -53,14 +53,6 @@ sudo apt-get install mosquitto`.
 
 For setup of the OpenDDS prerequisites, see the [OpenDDS instructions](OPENDDS.md).
 
-## Local Train Simulator
-
-To publish simulated train events run:
-
-```
-java -jar TheJoveExpress.jar
-```
-
 ## Local Server Setup
 
 ### Download Supporting Libraries
@@ -184,6 +176,33 @@ From the user interface:
 2.  Define properties to each type
 3.  Define alerts for each type
 4.  Create instances of each type
+
+## Local Train Simulator (MQTT)
+
+To publish simulated train events run:
+
+```
+java -jar TheJoveExpress.jar
+```
+
+## Local Valve Simulator (OpenDDS)
+
+Once you have the application running and all of your definitions imported,
+the following command will send "bogus" data from an insecure OpenDDS publisher.
+You must have first completed all of the necessary [OpenDDS instructions](OPENDDS.md).
+
+```
+bin/NexmatixMockPublisher -b -DCPSConfigFile rtps_disc.ini
+```
+
+In order to publish valid data from a secure OpenDDS publisher, run the following:
+
+```
+bin/NexmatixMockPublisher -DCPSConfigFile rtps_disc_secure.ini
+```
+
+Note: These commands can only be run a "prepared" OpenDDS terminal.
+See: [Resetting Your OpenDDS Environment](OPENDDS.md#resetting-your-opendds-environment).
 
 ## Experimental
 
