@@ -1,0 +1,56 @@
+{
+  "messageServers": [
+    {
+      "id": 1,
+      "host": "hostless.opendds",
+      "port": null,
+      "type": "opendds"
+    }
+  ],
+  "enums": {},
+  "types": {
+    "valve": {
+      "alerts": [
+        {
+          "name": "high pressure",
+          "condition": "pressure > 70 && pressure <=80",
+          "sticky": false,
+          "priority": 3
+        },
+        {
+          "name": "leak fault",
+          "condition": "leakFault",
+          "sticky": false,
+          "priority": 1
+        },
+        {
+          "name": "valve fault",
+          "condition": "valveFault",
+          "sticky": false,
+          "priority": 1
+        },
+        {
+          "name": "very high pressure",
+          "condition": "pressure > 80",
+          "sticky": false,
+          "priority": 4
+        }
+      ],
+      "messageServerId": 1,
+      "properties": {
+        "cycles": "number",
+        "leakFault": "boolean",
+        "pressure": "number",
+        "valveFault": "boolean"
+      }
+    }
+  },
+  "instances": {
+    "1010015": {
+      "type": "valve"
+    },
+    "5010015": {
+      "type": "valve"
+    }
+  }
+}

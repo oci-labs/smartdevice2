@@ -5,6 +5,8 @@ OpenDDS subscriber, as well as a secure and insecure publisher.
 
 ## Prerequisites
 
+All command blocks assume that you are operating from the project root directory.
+
 ### Setup OpenDDS (security branch)
 
 MacOS:
@@ -55,6 +57,8 @@ make
 If you need a new terminal and have run all of the build steps, you can reset the
 environment necessary to run the Publisher or Server with OpenDDS support by executing
 the following commands again:
+
+MacOS or Linux:
 
 ```
 export V8_ROOT=/usr/local

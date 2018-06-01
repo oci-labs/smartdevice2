@@ -1,0 +1,150 @@
+{
+  "messageServers": [
+    {
+      "id": 1,
+      "host": "localhost",
+      "port": 1883,
+      "type": "mqtt"
+    },
+    {
+      "id": 2,
+      "host": "thejoveexpress.local",
+      "port": 1883,
+      "type": "mqtt"
+    },
+    {
+      "id": 3,
+      "host": "hostless.opendds",
+      "port": null,
+      "type": "opendds"
+    }
+  ],
+  "enums": {
+    "Direction": {
+      "reverse": -1,
+      "forward": 1,
+      "idle": 0
+    },
+    "LightOverride": {
+      "off": 0,
+      "on": 1,
+      "auto": 2
+    }
+  },
+  "types": {
+    "train": {
+      "alerts": [
+        {
+          "name": "faulted",
+          "condition": "fault",
+          "sticky": true,
+          "priority": 1
+        }
+      ],
+      "children": {
+        "billboard": {
+          "properties": {
+            "text": "text"
+          }
+        },
+        "engine": {
+          "properties": {
+            "calibration": "percent",
+            "power": "percent",
+            "state": "Direction"
+          }
+        },
+        "lights": {
+          "alerts": [
+            {
+              "name": "lights off",
+              "condition": "!power",
+              "sticky": true,
+              "priority": 1
+            },
+            {
+              "name": "too bright",
+              "condition": "ambient > 70",
+              "sticky": false,
+              "priority": 1
+            },
+            {
+              "name": "too dim",
+              "condition": "ambient < 30",
+              "sticky": false,
+              "priority": 1
+            }
+          ],
+          "properties": {
+            "ambient": "percent",
+            "calibration": "percent",
+            "override": "LightOverride",
+            "power": "boolean"
+          }
+        }
+      },
+      "messageServerId": 1,
+      "properties": {
+        "fault": "boolean",
+        "lifecycle": "boolean"
+      }
+    },
+    "valve": {
+      "alerts": [
+        {
+          "name": "high pressure",
+          "condition": "pressure > 70 && pressure <=80",
+          "sticky": false,
+          "priority": 3
+        },
+        {
+          "name": "leak fault",
+          "condition": "leakFault",
+          "sticky": false,
+          "priority": 1
+        },
+        {
+          "name": "valve fault",
+          "condition": "valveFault",
+          "sticky": false,
+          "priority": 1
+        },
+        {
+          "name": "very high pressure",
+          "condition": "pressure > 80",
+          "sticky": false,
+          "priority": 4
+        }
+      ],
+      "messageServerId": 3,
+      "properties": {
+        "cycles": "number",
+        "leakFault": "boolean",
+        "pressure": "number",
+        "valveFault": "boolean"
+      }
+    }
+  },
+  "instances": {
+    "1010015": {
+      "type": "valve"
+    },
+    "5010015": {
+      "type": "valve"
+    },
+    "thejoveexpress": {
+      "type": "train",
+      "children": {
+        "billboard": {
+          "type": "billboard"
+        },
+        "engine": {
+          "type": "engine"
+        },
+        "lights": {
+          "type": "lights"
+        }
+      }
+    }
+  }
+}

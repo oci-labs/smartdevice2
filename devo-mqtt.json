@@ -11,12 +11,6 @@
       "host": "thejoveexpress.local",
       "port": 1883,
       "type": "mqtt"
-    },
-    {
-      "id": 3,
-      "host": "hostless.opendds",
-      "port": null,
-      "type": "opendds"
     }
   ],
   "enums": {
@@ -32,31 +26,13 @@
     }
   },
   "types": {
-    "site": {
-      "children": {
-        "department": {
-          "children": {
-            "machine": {
-              "children": {
-                "compressor": {
-                  "properties": {
-                    "pressure": "number",
-                    "temperature": "number"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "train": {
       "alerts": [
         {
           "name": "faulted",
           "condition": "fault",
           "sticky": true,
-              "priority": 1
+          "priority": 1
         }
       ],
       "children": {
@@ -106,50 +82,9 @@
         "fault": "boolean",
         "lifecycle": "boolean"
       }
-    },
-    "valve": {
-      "alerts": [
-        {
-          "name": "high pressure",
-          "condition": "pressure > 70 && pressure <=80",
-          "sticky": false,
-          "priority": 3
-        },
-        {
-          "name": "leak fault",
-          "condition": "leakFault",
-          "sticky": false,
-          "priority": 1
-        },
-        {
-          "name": "valve fault",
-          "condition": "valveFault",
-          "sticky": false,
-          "priority": 1
-        },
-        {
-          "name": "very high pressure",
-          "condition": "pressure > 80",
-          "sticky": false,
-          "priority": 4
-        }
-      ],
-      "messageServerId": 3,
-      "properties": {
-        "cycles": "number",
-        "leakFault": "boolean",
-        "pressure": "number",
-        "valveFault": "boolean"
-      }
     }
   },
   "instances": {
-    "1010015": {
-      "type": "valve"
-    },
-    "5010015": {
-      "type": "valve"
-    },
     "thejoveexpress": {
       "type": "train",
       "children": {
