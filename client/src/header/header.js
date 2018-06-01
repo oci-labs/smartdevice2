@@ -17,7 +17,10 @@ type PropsType = {
 class Header extends Component<PropsType> {
   refresh = () => post('mqtt/feedback');
 
-  toggleSecure = () => send(`OpenDDS reconnect ${this.props.openDdsSecure ? 'insecure': 'secure'}`);
+  toggleSecure = () =>
+    send(
+      `OpenDDS reconnect ${this.props.openDdsSecure ? 'insecure' : 'secure'}`
+    );
 
   showUserDropdown = event => {
     event.stopPropagation();
@@ -31,7 +34,7 @@ class Header extends Component<PropsType> {
     const secureStatus = openDdsSecure ? 'secured' : 'not secured';
     const messageBrokerStatus = mqttConnected ? 'connected' : 'not running';
     return (
-      <header className="header">
+      <header className={openDdsSecure ? 'header secure' : 'header'}>
         <div className="left">
           <img className="logo" alt="OCI logo" src="images/oci-logo.svg" />
           <div className="title">Devo</div>
