@@ -139,7 +139,7 @@ npm run start-secure
 
 The secure server will run on port 4001.
 
-## Setup UI Server
+## Setup Client Server
 
 ```
 cd client
@@ -147,7 +147,9 @@ npm install
 npm run start
 ```
 
-A new tab will open in the default web browser.
+A new tab will open in the default web browser for the local URL http://localhost:3000/.
+If you would like to connect to the **optional** "secure" backend server for the purpose of an OpenDDS
+security demo, you can open a new browser window and navigate to http://localhost:3000/#secure
 
 ## Importing Data Definitions
 
