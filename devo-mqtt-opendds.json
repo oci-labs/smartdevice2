@@ -93,7 +93,7 @@
       "alerts": [
         {
           "name": "high pressure",
-          "condition": "pressure > 70 && pressure <=80",
+          "condition": "pressure > 70 && pressure <= 100",
           "sticky": false,
           "priority": 3
         },
@@ -111,7 +111,7 @@
         },
         {
           "name": "very high pressure",
-          "condition": "pressure > 80",
+          "condition": "pressure > 100",
           "sticky": false,
           "priority": 4
         }
