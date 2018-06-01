@@ -64,6 +64,14 @@ cd server
 npm install
 ```
 
+#### Re-Link OpenDDS Bindings
+
+This is only necessary if you are utilizing OpenDDS support.
+
+```
+npm link ../node-opendds/
+```
+
 ### Setup the Database
 
 If MySQL is not yet running:
@@ -83,11 +91,12 @@ Then kill some processes listed.
 
 #### Load the Default Database Definition
 
-* `npm run dbsetup` (initially and only after schema changes)
+```
+npm run dbsetup
+```
 
-  * This uses database/ddl.sql.
-  * WARNING: This will delete all data in the database.
-  * It can be restored by importing a .json file.
+This uses database/ddl.sql.
+  * WARNING: This will delete all data in the database. It can be restored by [importing a data definition file](#importing-data-definitions).
 
 #### Load the "Secure" Database Definition (Optional)
 
@@ -97,6 +106,10 @@ of the application for the purposes of an OpenDDS security demo.
 ```
 npm run dbsetup-secure
 ```
+
+This uses database/ddl-secure.sql.
+  * WARNING: This will delete all data in the database. It can be restored by [importing a data definition file](#importing-data-definitions).
+
 
 ### Build and Run Server
 
