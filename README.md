@@ -59,6 +59,7 @@ For setup of the OpenDDS Prerequisites, see the [OpenDDS instructions](OPENDDS.m
   - This uses database/ddl.sql.
   - WARNING: This will delete all data in the database.
   - It can be restored by importing a .json file.
+* Optional: `npm run dbsetup-secure`
 * `npm run build` (initially and for each new version)
 * `npm run start-dev`
   - If you are using OpenDDS and are on a Mac, only `npm run start` and `npm start-secure` will work

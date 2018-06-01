@@ -32,6 +32,7 @@ export V8_ROOT=/usr/local
 export NAN_ROOT=`pwd`/node_modules/nan
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 npm install -g node-gyp
+npm install
 node-gyp configure build
 cd ..
 ```
@@ -47,4 +48,16 @@ npm link ../node-opendds/
 cd ..
 mwc.pl -type gnuace OpenddsDemo.mwc
 make
+```
+
+### Resetting Your OpenDDS Environment
+
+If you need a new terminal and have run all of the build steps, you can reset the
+environment necessary to run the Publisher or Server with OpenDDS support by executing
+the following commands again:
+
+```
+export V8_ROOT=/usr/local
+export NAN_ROOT=`pwd`/node_modules/nan
+source OpenDDS/setenv.sh
 ```
