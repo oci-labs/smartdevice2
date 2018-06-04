@@ -47,7 +47,7 @@ class Header extends Component<PropsType> {
           <Button
             className={`fa-2x`}
             icon={lockIcon}
-            onClick={() => this.toggleSecure()}
+            // onClick={() => this.toggleSecure()}
             tooltip={`OpenDDs is ${secureStatus}`}
           />
           <Button
