@@ -2,11 +2,15 @@
 
 .header {
   align-items: center;
-  background-color: $primary-color;
+  background-color: $error-color;
   display: flex;
   height: 64px;
   justify-content: space-between;
   color: white;
+
+  .secure {
+    background-color: $primary-color;
+  }
 
   button {
     margin: 0;
@@ -22,7 +26,8 @@
   .import-export-btn {
   }
 
-  .left, .right {
+  .left,
+  .right {
     align-items: center;
     display: flex;
   }
