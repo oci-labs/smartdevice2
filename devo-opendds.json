@@ -18,18 +18,6 @@
           "priority": 3
         },
         {
-          "name": "leak fault",
-          "condition": "leakFault",
-          "sticky": false,
-          "priority": 1
-        },
-        {
-          "name": "valve fault",
-          "condition": "valveFault",
-          "sticky": false,
-          "priority": 1
-        },
-        {
           "name": "very high pressure",
           "condition": "pressure > 100",
           "sticky": false,
