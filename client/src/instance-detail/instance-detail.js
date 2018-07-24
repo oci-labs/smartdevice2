@@ -13,6 +13,9 @@ import {createNode, deleteNode, getChildTypes} from '../tree/tree-util';
 import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
 import {getTypeNode, loadTypeNode} from '../util/node-util';
+import ReactChartkick, {LineChart, ColumnChart} from 'react-chartkick';
+import Chart from 'chart.js';
+import * as moment from 'moment';
 
 import type {
   AlertType,
@@ -74,7 +77,6 @@ class InstanceDetail extends Component<PropsType> {
 
   alertIsFor(instanceId: number, alertInstanceId: number) {
     if (alertInstanceId === instanceId) return true;
-
     const {instanceNodeMap} = this.props;
     const node = instanceNodeMap[instanceId];
     const {children} = node;
@@ -85,8 +87,7 @@ class InstanceDetail extends Component<PropsType> {
     const {instanceNodeMap} = this.props;
     const crumbs = [<span key="self">{instanceNode.name}</span>];
 
-    const selectInstance = id =>
-      dispatchSet('ui.selectedInstanceNodeId', id);
+    const selectInstance = id => dispatchSet('ui.selectedInstanceNodeId', id);
 
     while (true) {
       const {parentId} = instanceNode;
@@ -96,7 +97,8 @@ class InstanceDetail extends Component<PropsType> {
       if (name === 'root') break;
       crumbs.unshift(<span key={parentId}> &gt; </span>);
       crumbs.unshift(
-        <a className="breadcrumb"
+        <a
+          className="breadcrumb"
           key={parentId + name}
           onClick={() => selectInstance(parentId)}
         >
@@ -229,7 +231,10 @@ class InstanceDetail extends Component<PropsType> {
   }
 
   renderProperties = () => {
-    const {instanceData, ui: {typeProps}} = this.props;
+    const {
+      instanceData,
+      ui: {typeProps}
+    } = this.props;
 
     if (!typeProps || typeProps.length === 0) {
       return <div className="property-table">none</div>;
@@ -249,15 +254,72 @@ class InstanceDetail extends Component<PropsType> {
   renderProperty = (typeProp: PropertyType, instanceData: Object) => {
     const {kind, name} = typeProp;
     const value = instanceData[name];
+    const setBoolean = () => {
+      dispatchSet('isInChart', true);
+    };
     return (
       <tr key={name}>
-        <td>{name}</td>
+        <form>
+          <input
+            type="checkbox"
+            name="propertyType"
+            value={name}
+            onClick={setBoolean}
+          />
+          <label htmlFor={name}>{name}</label>
+        </form>
+        {/* <td>{name}</td> */}
         <td className={kind}>{String(this.formatValue(kind, value))}</td>
       </tr>
     );
   };
 
   render() {
+    const {chartData, isInChart} = this.props;
+    // const {ambient, calibration, override, power} = this.isInChart;
+    const ambientVal = chartData ? chartData.ambient : null;
+    const calibration = chartData ? chartData.calibration : null;
+    const now = moment().valueOf();
+    const data = [];
+    const millisecond = [];
+    const calData = [];
+
+    for (const key in calibration) {
+      if (calibration.hasOwnProperty(key)) {
+        calData.push(calibration[key]);
+      }
+    }
+
+    for (const key in ambientVal) {
+      if (ambientVal.hasOwnProperty(key)) {
+        millisecond.push(key);
+        data.push(ambientVal[key]);
+      }
+    }
+
+    const ambientData = {};
+    const calibrationData = {};
+
+    for (let j = 0; j < data.length; j++) {
+      this['data' + j] = data[j];
+      // console.log(millisecond[j] + ' --> ' + data[j]);
+      if (millisecond[j] === undefined) {
+        millisecond[j] = moment().valueOf();
+      }
+      ambientData[moment(Number(millisecond[j])).format('h:mm:ss')] = data[j];
+      calibrationData[
+        moment(Number(millisecond[j])).format('h:mm:ss')
+      ] = calData;
+    }
+
+    const ambientDisplay = {};
+    if (isInChart === true) {
+      ambientDisplay.name = 'Ambient';
+      ambientDisplay.data = ambientData;
+    } else {
+      ambientDisplay.name = 'Ambient';
+      ambientDisplay.data = '';
+    }
     const node = this.getNode(this.props);
     if (!node) return null;
 
@@ -281,11 +343,28 @@ class InstanceDetail extends Component<PropsType> {
               icon="cog"
               onClick={() => this.editProperties()}
               tooltip="edit properties"
+              value="test"
             />
           </div>
           {this.renderProperties()}
         </section>
         <InstanceAlerts />
+        <LineChart
+          suffix="%"
+          data={[ambientDisplay, {name: 'Calibration', data: calibrationData}]}
+          height="300px"
+          width="500px"
+          xtitle="Property Values"
+          dataset={{pointStyle: 'dash', pointRadius: 1}}
+        />
+        {/* <ColumnChart
+          suffix="%"
+          data={calibration}
+          height="300px"
+          width="500px"
+          xtitle="Calibration"
+          dataset={{pointStyle: 'dash', pointRadius: 1}}
+        /> */}
       </section>
     );
   }
@@ -295,5 +374,7 @@ export default watch(InstanceDetail, {
   enumMap: '',
   instanceData: '',
   instanceNodeMap: '',
-  ui: ''
+  ui: '',
+  chartData: '',
+  isInChart: ''
 });

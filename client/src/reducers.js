@@ -17,6 +17,7 @@ import type {
   StateType,
   TreeType
 } from './types';
+import * as moment from 'moment';
 
 function setTopProp(state: StateType, prop: string, value: mixed): StateType {
   return {...state, [prop]: value};
@@ -58,30 +59,27 @@ function validNewName(nodeMap: NodeMapType, parentId: number, name: string) {
   return !inUse;
 }
 
-addReducer(
-  'addEnumMember',
-  (state: StateType, enumMember: EnumMemberType) => {
-    const {enumId, id} = enumMember;
+addReducer('addEnumMember', (state: StateType, enumMember: EnumMemberType) => {
+  const {enumId, id} = enumMember;
 
-    const {enumMap, ui} = state;
-    const anEnum = enumMap[enumId];
-    if (!anEnum) {
-      console.error('invalid enum id', enumId);
-      return state;
-    }
-
-    const newMemberMap = {...anEnum.memberMap};
-    newMemberMap[id] = enumMember;
-    const newEnum = {...anEnum, memberMap: newMemberMap};
-    const newEnumMap = {...enumMap, [enumId]: newEnum};
-    const newUi = {
-      ...ui,
-      newEnumMemberName: '',
-      newEnumMemberValue: ui.newEnumMemberValue + 1
-    };
-    return {...state, enumMap: newEnumMap, ui: newUi};
+  const {enumMap, ui} = state;
+  const anEnum = enumMap[enumId];
+  if (!anEnum) {
+    console.error('invalid enum id', enumId);
+    return state;
   }
-);
+
+  const newMemberMap = {...anEnum.memberMap};
+  newMemberMap[id] = enumMember;
+  const newEnum = {...anEnum, memberMap: newMemberMap};
+  const newEnumMap = {...enumMap, [enumId]: newEnum};
+  const newUi = {
+    ...ui,
+    newEnumMemberName: '',
+    newEnumMemberValue: ui.newEnumMemberValue + 1
+  };
+  return {...state, enumMap: newEnumMap, ui: newUi};
+});
 
 addReducer(
   'addNode',
@@ -239,6 +237,57 @@ addReducer('setInstanceProperty', (state: StateType, change: ChangeType) => {
   return setTopProp(state, 'instanceData', newInstanceData);
 });
 
+const removeSmallest = chartData => {
+  const little = Object.keys(chartData).reduce((result, key) => {
+    let smallest;
+    if (result === -1) {
+      smallest = key;
+    } else {
+      smallest = key < result ? key : result;
+    }
+    return smallest;
+  }, -1);
+  if (Object.keys(chartData).length > 20) {
+    Reflect.deleteProperty(chartData, little);
+  }
+};
+
+addReducer('setChartValue', (state: StateType, change: ChangeType) => {
+  const {instanceData, ui, chartData = {}} = state;
+  const {selectedInstanceNodeId} = ui;
+  const {instanceId, property, value} = change;
+  const propertyData = {
+    ...chartData[property],
+    [moment().valueOf()]: value
+  };
+  removeSmallest(propertyData);
+
+  if (instanceId !== selectedInstanceNodeId) return state;
+
+  const newChartData = {
+    ...chartData,
+    [property]: propertyData
+  };
+  return setTopProp(state, 'chartData', newChartData);
+});
+
+addReducer('setPropertyValue', (state: StateType, change: ChangeType) => {
+  const {instanceData, ui, propertyBoolean = {}} = state;
+  const {selectedInstanceNodeId} = ui;
+  const {instanceId, property, value} = change;
+  const propertyData = {
+    ...propertyBoolean[property],
+    [property]: true
+  };
+  if (instanceId !== selectedInstanceNodeId) return state;
+
+  const newPropertyBoolean = {
+    ...propertyBoolean,
+    [property]: propertyData
+  };
+  return setTopProp(state, 'isInChart', newPropertyBoolean);
+});
+
 addReducer(
   'setSelectedChildNodeId',
   (state: StateType, nodeId: number): StateType => {
@@ -342,18 +391,15 @@ addReducer(
   }
 );
 
-addReducer(
-  'trainReset',
-  (state: StateType): StateType => {
-    const {trainControl} = state;
-    const {defaults} = trainControl;
-    return {
-      ...state,
-      trainControl: {
-        ...trainControl,
-        controlled: {...defaults},
-        detected: {...defaults}
-      }
-    };
-  }
-);
+addReducer('trainReset', (state: StateType): StateType => {
+  const {trainControl} = state;
+  const {defaults} = trainControl;
+  return {
+    ...state,
+    trainControl: {
+      ...trainControl,
+      controlled: {...defaults},
+      detected: {...defaults}
+    }
+  };
+});
