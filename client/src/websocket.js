@@ -47,6 +47,7 @@ function configure(ws) {
       const {selectedInstanceNodeId} = getState().ui;
       if (instanceId === selectedInstanceNodeId) {
         dispatch('setInstanceProperty', change);
+        dispatch('setChartValue', change);
       }
 
       // Train-specific code
@@ -88,7 +89,9 @@ function getTrainProperty(change) {
     const {name} = typeNode;
     return name === 'engine'
       ? 'detected.idleCalibration'
-      : name === 'lights' ? 'detected.lightCalibration' : null;
+      : name === 'lights'
+        ? 'detected.lightCalibration'
+        : null;
   }
   if (property === 'lifecycle') return 'trainAlive';
 }
