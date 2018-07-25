@@ -44,6 +44,12 @@ export type ChangeType = {
   value: PrimitiveType
 };
 
+export type ChartPropertyToggleType = {
+  instanceId: number,
+  property: string,
+  value: PrimitiveType
+};
+
 export type ConfirmType = {
   message: string,
   noCb: Function,

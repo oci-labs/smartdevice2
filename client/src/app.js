@@ -39,42 +39,12 @@ class App extends Component<PropsType> {
   handleClick = () => dispatchSet('ui.showUserDropdown', false);
 
   render() {
-    const {view, instanceData, chartData} = this.props;
-    // const instanceVal = instanceData.ambient;
-    // const ambientVal = chartData ? chartData.ambient : null;
-    // const now = moment().valueOf();
-    // const data = [];
-    // const millisecond = [];
-
-    // for (const key in ambientVal) {
-    //   if (ambientVal.hasOwnProperty(key)) {
-    //     // console.log(key + ' -> ' + ambientVal[key]);
-    //     millisecond.push(key);
-    //     data.push(ambientVal[key]);
-    //   }
-    // }
-    // for (let i = 0; i < millisecond.length; i++) {
-    //   this['millisecond' + i] = millisecond[i];
-    // }
-    //
-    // const objectTesting = {};
-    // for (let j = 0; j < data.length; j++) {
-    //   this['data' + j] = data[j];
-    //   objectTesting[moment(Number(millisecond[j])).format('h:mm:ss')] = data[j];
-    // }
+    const {view} = this.props;
 
     return (
       <div className="app" onClick={this.handleClick}>
         <Header />
         <UserDropdown />
-        {/* <LineChart
-          suffix="%"
-          data={objectTesting}
-          height="300px"
-          width="500px"
-          xtitle="Ambient Values"
-          dataset={{pointStyle: 'dash', pointRadius: 1}}
-        /> */}
         <section id="body">
           {hasLeftNav(view) && <LeftNav />}
           {rightMap[view]}

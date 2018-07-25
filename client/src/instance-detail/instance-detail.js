@@ -3,7 +3,7 @@
 import capitalize from 'lodash/capitalize';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
-import {dispatchSet, watch} from 'redux-easy';
+import {dispatchSet, watch, dispatch} from 'redux-easy';
 
 import InstanceAlerts from '../instance-alerts/instance-alerts';
 import PropertyForm from '../property-form/property-form';
@@ -13,7 +13,7 @@ import {createNode, deleteNode, getChildTypes} from '../tree/tree-util';
 import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
 import {getTypeNode, loadTypeNode} from '../util/node-util';
-import ReactChartkick, {LineChart, ColumnChart} from 'react-chartkick';
+import {LineChart, ColumnChart} from 'react-chartkick';
 import Chart from 'chart.js';
 import * as moment from 'moment';
 
@@ -195,8 +195,8 @@ class InstanceDetail extends Component<PropsType> {
     reloadAlerts();
 
     this.loadEnums();
-    this.loadTypeProps(typeNode);
-    this.loadInstanceData(instanceNode);
+    const properties = await this.loadTypeProps(typeNode);
+    this.loadInstanceData(instanceNode, properties);
   }
 
   async loadEnums() {
@@ -209,7 +209,7 @@ class InstanceDetail extends Component<PropsType> {
     dispatchSet('enumMap', enumMap);
   }
 
-  async loadInstanceData(instanceNode: NodeType) {
+  async loadInstanceData(instanceNode: NodeType, properties) {
     let data = await getData(instanceNode);
     // Change the shape of this data
     // from an array of InstanceDataType objects
@@ -219,6 +219,21 @@ class InstanceDetail extends Component<PropsType> {
       return map;
     }, {});
     dispatchSet('instanceData', data);
+    const initialChartData = data
+      ? Object.keys(data).reduce((chartData, key) => {
+        const propertyType = properties.find(prop => prop.name === key);
+
+        const value =
+            propertyType && propertyType.kind === 'boolean'
+              ? Boolean(data[key])
+              : data[key];
+        return {
+          ...chartData,
+          [key]: {[moment().valueOf()]: value}
+        };
+      }, {})
+      : {};
+    dispatchSet('chartData', initialChartData);
   }
 
   async loadTypeProps(typeNode: ?NodeType) {
@@ -228,11 +243,13 @@ class InstanceDetail extends Component<PropsType> {
     const properties = ((json: any): PropertyType[]);
     const sortedProperties = sortBy(properties, ['name']);
     dispatchSet('ui.typeProps', sortedProperties);
+    return sortedProperties;
   }
 
   renderProperties = () => {
     const {
       instanceData,
+      chartProperties,
       ui: {typeProps}
     } = this.props;
 
@@ -244,18 +261,26 @@ class InstanceDetail extends Component<PropsType> {
       <table className="property-table">
         <tbody>
           {typeProps.map(typeProp =>
-            this.renderProperty(typeProp, instanceData)
+            this.renderProperty(
+              typeProp,
+              instanceData,
+              chartProperties[typeProp.name]
+            )
           )}
         </tbody>
       </table>
     );
   };
 
-  renderProperty = (typeProp: PropertyType, instanceData: Object) => {
+  renderProperty = (
+    typeProp: PropertyType,
+    instanceData: Object,
+    showProperty: Boolean
+  ) => {
     const {kind, name} = typeProp;
     const value = instanceData[name];
     const setBoolean = () => {
-      dispatchSet('isInChart', true);
+      dispatch('toggleChartProperty', {property: name});
     };
     return (
       <tr key={name}>
@@ -263,7 +288,8 @@ class InstanceDetail extends Component<PropsType> {
           <input
             type="checkbox"
             name="propertyType"
-            value={name}
+            value={showProperty}
+            // onChange={event => onChange(event.target.value)}
             onClick={setBoolean}
           />
           <label htmlFor={name}>{name}</label>
@@ -274,57 +300,65 @@ class InstanceDetail extends Component<PropsType> {
     );
   };
 
+  constructPropertyData = (name, values, type) => {
+    const propertyData = {
+      name,
+      data: {}
+    };
+
+    propertyData.data = Object.keys(values).reduce((data, key) => {
+      // console.log(moment(key).format('ss'));
+      let value = values[key];
+
+      if (type.kind === 'boolean') {
+        value = Number(values[key]);
+      } else if (type.kind === 'percent') {
+        value = Number(values[key] / 100);
+      }
+      data[moment(Number(key)).format('h:mm:ss')] = value;
+      return data;
+    }, propertyData.data);
+
+    return propertyData;
+  };
+
+  constructChartData = (data, typeProps) => {
+    const chartData = Object.keys(data).map(property => {
+      const type = typeProps.find(prop => prop.name === property);
+      return this.constructPropertyData(property, data[property], type);
+    });
+    return chartData;
+  };
+
+  //TODO: Need to use properties to check boolean and render or not render sections of chart
+  // constructChartData = (data, typeProps, properties) => {
+  //   const chartData = Object.keys(data).map(property => {
+  //     const type = typeProps.find(prop => prop.name === property);
+  //     return this.constructPropertyData(property, data[property], type);
+  //   });
+  //   return chartData;
+  // };
+
   render() {
-    const {chartData, isInChart} = this.props;
-    // const {ambient, calibration, override, power} = this.isInChart;
-    const ambientVal = chartData ? chartData.ambient : null;
-    const calibration = chartData ? chartData.calibration : null;
-    const now = moment().valueOf();
-    const data = [];
-    const millisecond = [];
-    const calData = [];
+    const {
+      chartData,
+      chartProperties,
+      instanceData,
+      ui: {typeProps}
+    } = this.props;
 
-    for (const key in calibration) {
-      if (calibration.hasOwnProperty(key)) {
-        calData.push(calibration[key]);
-      }
-    }
+    // const formattedData = this.constructChartData(
+    //   chartData,
+    //   typeProps,
+    //   chartProperties
+    // );
+    const formattedData = this.constructChartData(chartData, typeProps);
 
-    for (const key in ambientVal) {
-      if (ambientVal.hasOwnProperty(key)) {
-        millisecond.push(key);
-        data.push(ambientVal[key]);
-      }
-    }
-
-    const ambientData = {};
-    const calibrationData = {};
-
-    for (let j = 0; j < data.length; j++) {
-      this['data' + j] = data[j];
-      // console.log(millisecond[j] + ' --> ' + data[j]);
-      if (millisecond[j] === undefined) {
-        millisecond[j] = moment().valueOf();
-      }
-      ambientData[moment(Number(millisecond[j])).format('h:mm:ss')] = data[j];
-      calibrationData[
-        moment(Number(millisecond[j])).format('h:mm:ss')
-      ] = calData;
-    }
-
-    const ambientDisplay = {};
-    if (isInChart === true) {
-      ambientDisplay.name = 'Ambient';
-      ambientDisplay.data = ambientData;
-    } else {
-      ambientDisplay.name = 'Ambient';
-      ambientDisplay.data = '';
-    }
     const node = this.getNode(this.props);
     if (!node) return null;
 
     const typeNode = getTypeNode(node);
-    const typeName = typeNode.name;
+    const typeName = typeNode ? typeNode.name : null;
 
     return (
       <section className="instance-detail">
@@ -350,21 +384,12 @@ class InstanceDetail extends Component<PropsType> {
         </section>
         <InstanceAlerts />
         <LineChart
-          suffix="%"
-          data={[ambientDisplay, {name: 'Calibration', data: calibrationData}]}
+          data={formattedData}
           height="300px"
           width="500px"
           xtitle="Property Values"
           dataset={{pointStyle: 'dash', pointRadius: 1}}
         />
-        {/* <ColumnChart
-          suffix="%"
-          data={calibration}
-          height="300px"
-          width="500px"
-          xtitle="Calibration"
-          dataset={{pointStyle: 'dash', pointRadius: 1}}
-        /> */}
       </section>
     );
   }
@@ -376,5 +401,5 @@ export default watch(InstanceDetail, {
   instanceNodeMap: '',
   ui: '',
   chartData: '',
-  isInChart: ''
+  chartProperties: ''
 });

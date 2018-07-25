@@ -3,7 +3,12 @@
 import {dispatch, dispatchSet, getState} from 'redux-easy';
 
 import {reloadAlerts} from './instance-detail/instance-detail';
-import {getInstanceNode, getTypeNode} from './util/node-util';
+import {
+  getInstanceNode,
+  getTypeNode,
+  getPropType,
+  getInstanceData
+} from './util/node-util';
 
 let ws;
 
@@ -44,10 +49,24 @@ function configure(ws) {
       const change = JSON.parse(data);
       const {instanceId, value} = change;
 
+      if (getPropType(change.property) === 'boolean') {
+        change.value = Boolean(change.value);
+      }
+
       const {selectedInstanceNodeId} = getState().ui;
       if (instanceId === selectedInstanceNodeId) {
         dispatch('setInstanceProperty', change);
         dispatch('setChartValue', change);
+        const instanceData = getInstanceData();
+        Object.keys(instanceData)
+          .filter(key => key !== change.property)
+          .forEach(prop => {
+            dispatch('setChartValue', {
+              ...change,
+              property: prop,
+              value: instanceData[prop]
+            });
+          });
       }
 
       // Train-specific code

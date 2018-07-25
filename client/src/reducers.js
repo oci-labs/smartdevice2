@@ -15,7 +15,8 @@ import type {
   NodeType,
   SetNodesPayloadType,
   StateType,
-  TreeType
+  TreeType,
+  ChartPropertyToggleType
 } from './types';
 import * as moment from 'moment';
 
@@ -238,7 +239,7 @@ addReducer('setInstanceProperty', (state: StateType, change: ChangeType) => {
 });
 
 const removeSmallest = chartData => {
-  const little = Object.keys(chartData).reduce((result, key) => {
+  const littleGuy = Object.keys(chartData).reduce((result, key) => {
     let smallest;
     if (result === -1) {
       smallest = key;
@@ -248,12 +249,12 @@ const removeSmallest = chartData => {
     return smallest;
   }, -1);
   if (Object.keys(chartData).length > 20) {
-    Reflect.deleteProperty(chartData, little);
+    Reflect.deleteProperty(chartData, littleGuy);
   }
 };
 
 addReducer('setChartValue', (state: StateType, change: ChangeType) => {
-  const {instanceData, ui, chartData = {}} = state;
+  const {ui, chartData} = state;
   const {selectedInstanceNodeId} = ui;
   const {instanceId, property, value} = change;
   const propertyData = {
@@ -271,22 +272,19 @@ addReducer('setChartValue', (state: StateType, change: ChangeType) => {
   return setTopProp(state, 'chartData', newChartData);
 });
 
-addReducer('setPropertyValue', (state: StateType, change: ChangeType) => {
-  const {instanceData, ui, propertyBoolean = {}} = state;
-  const {selectedInstanceNodeId} = ui;
-  const {instanceId, property, value} = change;
-  const propertyData = {
-    ...propertyBoolean[property],
-    [property]: true
-  };
-  if (instanceId !== selectedInstanceNodeId) return state;
+addReducer(
+  'toggleChartProperty',
+  (state: StateType, change: ChartPropertyToggleType) => {
+    const {chartProperties} = state;
+    const {property} = change;
 
-  const newPropertyBoolean = {
-    ...propertyBoolean,
-    [property]: propertyData
-  };
-  return setTopProp(state, 'isInChart', newPropertyBoolean);
-});
+    const newChartProperties = {
+      ...chartProperties,
+      [property]: chartProperties[property] ? !chartProperties[property] : true
+    };
+    return setTopProp(state, 'chartProperties', newChartProperties);
+  }
+);
 
 addReducer(
   'setSelectedChildNodeId',
