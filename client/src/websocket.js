@@ -12,6 +12,9 @@ import {
 
 let ws;
 
+const chartableProperties = ['boolean', 'number', 'percent'];
+const isChartable = kind => chartableProperties.includes(kind);
+
 function configure(ws) {
   ws.onclose = () => {
     console.info('got WebSocket close');
@@ -48,25 +51,29 @@ function configure(ws) {
       // $FlowFixMe - doesn't think data is a string
       const change = JSON.parse(data);
       const {instanceId, value} = change;
+      const propType = getPropType(change.property);
+      if (isChartable(propType)) {
+        if (propType === 'boolean') {
+          change.value = Boolean(change.value);
+        }
 
-      if (getPropType(change.property) === 'boolean') {
-        change.value = Boolean(change.value);
-      }
-
-      const {selectedInstanceNodeId} = getState().ui;
-      if (instanceId === selectedInstanceNodeId) {
-        dispatch('setInstanceProperty', change);
-        dispatch('setChartValue', change);
-        const instanceData = getInstanceData();
-        Object.keys(instanceData)
-          .filter(key => key !== change.property)
-          .forEach(prop => {
-            dispatch('setChartValue', {
-              ...change,
-              property: prop,
-              value: instanceData[prop]
+        const {selectedInstanceNodeId} = getState().ui;
+        if (instanceId === selectedInstanceNodeId) {
+          dispatch('setInstanceProperty', change);
+          dispatch('setChartValue', change);
+          const instanceData = getInstanceData();
+          Object.keys(instanceData)
+            .filter(key => key !== change.property)
+            .forEach(prop => {
+              if (isChartable(getPropType(prop))) {
+                dispatch('setChartValue', {
+                  ...change,
+                  property: prop,
+                  value: instanceData[prop]
+                });
+              }
             });
-          });
+        }
       }
 
       // Train-specific code

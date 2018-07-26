@@ -248,7 +248,7 @@ const removeSmallest = chartData => {
     }
     return smallest;
   }, -1);
-  if (Object.keys(chartData).length > 20) {
+  if (Object.keys(chartData).length > 30) {
     Reflect.deleteProperty(chartData, littleGuy);
   }
 };

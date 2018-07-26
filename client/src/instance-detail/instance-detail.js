@@ -219,10 +219,13 @@ class InstanceDetail extends Component<PropsType> {
       return map;
     }, {});
     dispatchSet('instanceData', data);
+    const types = ['boolean', 'number', 'percent'];
     const initialChartData = data
       ? Object.keys(data).reduce((chartData, key) => {
         const propertyType = properties.find(prop => prop.name === key);
-
+        if (!types.includes(propertyType.kind)) {
+          return chartData;
+        }
         const value =
             propertyType && propertyType.kind === 'boolean'
               ? Boolean(data[key])
@@ -242,7 +245,17 @@ class InstanceDetail extends Component<PropsType> {
     const json = await getJson(`types/${typeNode.id}/data`);
     const properties = ((json: any): PropertyType[]);
     const sortedProperties = sortBy(properties, ['name']);
+
+    const initialChartProps = sortedProperties.reduce(
+      (chartProps, property) => {
+        chartProps[property.name] = false;
+        return chartProps;
+      },
+      {}
+    );
+
     dispatchSet('ui.typeProps', sortedProperties);
+    dispatchSet('chartProperties', initialChartProps);
     return sortedProperties;
   }
 
@@ -250,12 +263,14 @@ class InstanceDetail extends Component<PropsType> {
     const {
       instanceData,
       chartProperties,
+      chartData,
       ui: {typeProps}
     } = this.props;
 
     if (!typeProps || typeProps.length === 0) {
       return <div className="property-table">none</div>;
     }
+    // console.log(typeProps);
 
     return (
       <table className="property-table">
@@ -310,9 +325,11 @@ class InstanceDetail extends Component<PropsType> {
       // console.log(moment(key).format('ss'));
       let value = values[key];
 
-      if (type.kind === 'boolean') {
+      if (type && type.kind === 'boolean') {
         value = Number(values[key]);
-      } else if (type.kind === 'percent') {
+        // } else if (type.kind === 'LightOverride') {
+        //   value = Number(values[key]);
+      } else if (type && type.kind === 'percent') {
         value = Number(values[key] / 100);
       }
       data[moment(Number(key)).format('h:mm:ss')] = value;
@@ -322,22 +339,25 @@ class InstanceDetail extends Component<PropsType> {
     return propertyData;
   };
 
-  constructChartData = (data, typeProps) => {
-    const chartData = Object.keys(data).map(property => {
-      const type = typeProps.find(prop => prop.name === property);
-      return this.constructPropertyData(property, data[property], type);
-    });
-    return chartData;
-  };
-
-  //TODO: Need to use properties to check boolean and render or not render sections of chart
-  // constructChartData = (data, typeProps, properties) => {
+  // constructChartData = (data, typeProps) => {
   //   const chartData = Object.keys(data).map(property => {
   //     const type = typeProps.find(prop => prop.name === property);
   //     return this.constructPropertyData(property, data[property], type);
   //   });
   //   return chartData;
   // };
+
+  constructChartData = (data, typeProps, properties) => {
+    const chartData = Object.keys(data).map(property => {
+      const type = typeProps.find(prop => prop.name === property);
+      // properties = {} ? return this.constructPropertyData(property, '', type) : properties && properties[property] === false ? return this.con
+      if (properties && properties[property] === false) {
+        return this.constructPropertyData(property, '', type);
+      }
+      return this.constructPropertyData(property, data[property], type);
+    });
+    return chartData;
+  };
 
   render() {
     const {
@@ -347,12 +367,12 @@ class InstanceDetail extends Component<PropsType> {
       ui: {typeProps}
     } = this.props;
 
-    // const formattedData = this.constructChartData(
-    //   chartData,
-    //   typeProps,
-    //   chartProperties
-    // );
-    const formattedData = this.constructChartData(chartData, typeProps);
+    const formattedData = this.constructChartData(
+      chartData,
+      typeProps,
+      chartProperties
+    );
+    // const formattedData = this.constructChartData(chartData, typeProps);
 
     const node = this.getNode(this.props);
     if (!node) return null;

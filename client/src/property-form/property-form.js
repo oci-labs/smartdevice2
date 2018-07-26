@@ -38,7 +38,7 @@ class PropertyForm extends Component<PropsType> {
   getInstanceNode = () => {
     const {instanceNodeMap, ui} = this.props;
     return instanceNodeMap[ui.selectedChildNodeId];
-  }
+  };
 
   renderTableHead = () => (
     <thead>
@@ -67,6 +67,7 @@ class PropertyForm extends Component<PropsType> {
 
     Object.keys(instanceData).forEach(property => {
       const value = instanceData[property];
+      console.log(value);
       const change = {
         instanceId: node.id,
         property,
