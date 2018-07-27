@@ -6,11 +6,7 @@ import {dispatchSet, watch} from 'redux-easy';
 import Alert from '../alert/alert';
 import {getJson} from '../util/rest-util';
 
-import type {
-  AlertType,
-  NodeMapType,
-  UiType
-} from '../types';
+import type {AlertType, NodeMapType, UiType} from '../types';
 
 import './instance-alerts.css';
 
@@ -70,12 +66,11 @@ class InstanceAlerts extends Component<PropsType> {
     return (
       <section className="instance-alerts">
         <div className="heading">Alerts</div>
-        {
-          myAlerts.length === 0 ?
-            'none' :
-            myAlerts.map((alert, index) =>
-              <Alert key={alert.name + index} alert={alert} />)
-        }
+        {myAlerts.length === 0
+          ? 'none'
+          : myAlerts.map((alert, index) => (
+            <Alert key={alert.name + index} alert={alert} />
+          ))}
       </section>
     );
   }

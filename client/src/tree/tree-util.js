@@ -80,7 +80,7 @@ export function getChildTypes(parent: NodeType): NodeType[] {
     const parentTypeNode: NodeType = typeNodeMap[parent.typeId];
 
     // Get all child types of the parent type.
-    const childTypeIds = parentTypeNode.children;
+    const childTypeIds = parentTypeNode ? parentTypeNode.children : [];
     childTypes = childTypeIds.map(id => typeNodeMap[id]);
   } else {
     // Find the root type node.

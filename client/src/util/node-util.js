@@ -15,6 +15,19 @@ export function getTypeNode(instanceNode: NodeType): NodeType {
   return typeNodeMap[instanceNode.typeId];
 }
 
+export function getPropType(property) {
+  const {
+    ui: {typeProps}
+  } = getState();
+  const typeDef = typeProps.find(prop => prop.name === property);
+  return typeDef ? typeDef.kind : 'number';
+}
+
+export function getInstanceData() {
+  const {instanceData} = getState();
+  return instanceData;
+}
+
 export async function loadTypeNode(instanceNode: NodeType): Promise<?NodeType> {
   if (!instanceNode) return null;
 

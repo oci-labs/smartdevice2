@@ -38,7 +38,7 @@ class PropertyForm extends Component<PropsType> {
   getInstanceNode = () => {
     const {instanceNodeMap, ui} = this.props;
     return instanceNodeMap[ui.selectedChildNodeId];
-  }
+  };
 
   renderTableHead = () => (
     <thead>

@@ -7,6 +7,8 @@ const state: StateType = {
   enumMap: {},
   errors: new Set(),
   instanceData: {},
+  chartProperties: {},
+  chartData: {},
   instanceNodeMap: {},
   instanceRootId: 0,
   messageServerMap: {},

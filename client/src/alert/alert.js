@@ -51,7 +51,7 @@ class Alert extends Component<PropsType> {
     const {alert, instanceNodeMap, typeNodeMap} = this.props;
     if (!alert) return null;
 
-    console.log('alert.js render: alert =', alert);
+    // console.log('alert.js render: alert =', alert);
 
     // Get the type name for instance associated with this alert.
     const {instanceId} = alert;
@@ -65,7 +65,9 @@ class Alert extends Component<PropsType> {
 
     const classes = ['alert'];
     if (alert.sticky) classes.push('sticky');
-    alert.priority ? classes.push(PRIORITIES[alert.priority]) : classes.push('info');
+    alert.priority
+      ? classes.push(PRIORITIES[alert.priority])
+      : classes.push('info');
 
     return (
       <div
