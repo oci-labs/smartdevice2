@@ -242,24 +242,6 @@ class InstanceDetail extends Component<PropsType> {
     }, {});
     dispatchSet('instanceData', data);
     this.initialChartData(data, properties);
-    // const types = ['boolean', 'number', 'percent'];
-    // const initialChartData = data
-    //   ? Object.keys(data).reduce((chartData, key) => {
-    //     const propertyType = properties.find(prop => prop.name === key);
-    //     if (!types.includes(propertyType.kind)) {
-    //       return chartData;
-    //     }
-    //     const value =
-    //         propertyType && propertyType.kind === 'boolean'
-    //           ? Boolean(data[key])
-    //           : data[key];
-    //     return {
-    //       ...chartData,
-    //       [key]: {[moment().valueOf()]: value}
-    //     };
-    //   }, {})
-    //   : {};
-    // dispatchSet('chartData', initialChartData);
   }
 
   async loadTypeProps(typeNode: ?NodeType) {
@@ -293,7 +275,6 @@ class InstanceDetail extends Component<PropsType> {
     if (!typeProps || typeProps.length === 0) {
       return <div className="property-table">none</div>;
     }
-    // console.log(typeProps);
 
     return (
       <table className="property-table">
@@ -327,12 +308,10 @@ class InstanceDetail extends Component<PropsType> {
             type="checkbox"
             name="propertyType"
             value={showProperty}
-            // onChange={event => onChange(event.target.value)}
             onClick={setBoolean}
           />
           <label htmlFor={name}>{name}</label>
         </form>
-        {/* <td>{name}</td> */}
         <td className={kind}>{String(this.formatValue(kind, value))}</td>
       </tr>
     );
@@ -345,13 +324,10 @@ class InstanceDetail extends Component<PropsType> {
     };
 
     propertyData.data = Object.keys(values).reduce((data, key) => {
-      // console.log(moment(key).format('ss'));
       let value = values[key];
 
       if (type && type.kind === 'boolean') {
         value = Number(values[key]);
-        // } else if (type.kind === 'LightOverride') {
-        //   value = Number(values[key]);
       } else if (type && type.kind === 'percent') {
         value = Number(values[key] / 100);
       }
@@ -365,7 +341,6 @@ class InstanceDetail extends Component<PropsType> {
   constructChartData = (data, typeProps, properties) => {
     const chartData = Object.keys(data).map(property => {
       const type = typeProps.find(prop => prop.name === property);
-      // properties = {} ? return this.constructPropertyData(property, '', type) : properties && properties[property] === false ? return this.con
       if (properties && properties[property] === false) {
         return this.constructPropertyData(property, '', type);
       }
@@ -387,7 +362,6 @@ class InstanceDetail extends Component<PropsType> {
       typeProps,
       chartProperties
     );
-    // const formattedData = this.constructChartData(chartData, typeProps);
 
     const node = this.getNode(this.props);
     if (!node) return null;
