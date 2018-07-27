@@ -13,7 +13,7 @@ import {createNode, deleteNode, getChildTypes} from '../tree/tree-util';
 import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
 import {getTypeNode, loadTypeNode} from '../util/node-util';
-import {LineChart, ColumnChart} from 'react-chartkick';
+import {LineChart} from 'react-chartkick';
 import Chart from 'chart.js';
 import * as moment from 'moment';
 
