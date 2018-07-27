@@ -12,9 +12,6 @@ import SdModal from './share/sd-modal';
 import TrainControl from './train-control/train-control';
 import TypeDefinitions from './type-definitions/type-definitions';
 import UserDropdown from './user-dropdown/user-dropdown';
-// import ReactChartkick, {LineChart, ColumnChart} from 'react-chartkick';
-// import Chart from 'chart.js';
-// import * as moment from 'moment';
 
 import type {ViewType} from './types';
 

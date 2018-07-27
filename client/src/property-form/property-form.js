@@ -67,7 +67,6 @@ class PropertyForm extends Component<PropsType> {
 
     Object.keys(instanceData).forEach(property => {
       const value = instanceData[property];
-      console.log(value);
       const change = {
         instanceId: node.id,
         property,

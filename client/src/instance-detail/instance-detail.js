@@ -209,6 +209,28 @@ class InstanceDetail extends Component<PropsType> {
     dispatchSet('enumMap', enumMap);
   }
 
+
+  initialChartData = (data, properties) => {
+    const types = ['boolean', 'number', 'percent'];
+    const initialData = data ? Object.keys(data).reduce((chartData, key) => {
+        const propertyType = properties.find(prop => prop.name === key);
+        if (!types.includes(propertyType.kind)) {
+          return chartData;
+        }
+        const value =
+          propertyType && propertyType.kind === 'boolean'
+            ? Boolean(data[key])
+            : data[key];
+        return {
+          ...chartData,
+          [key]: {[moment().valueOf()]: value}
+        };
+      }, {})
+      : {};
+    dispatchSet('chartData', initialData);
+  };
+
+
   async loadInstanceData(instanceNode: NodeType, properties) {
     let data = await getData(instanceNode);
     // Change the shape of this data
@@ -219,24 +241,25 @@ class InstanceDetail extends Component<PropsType> {
       return map;
     }, {});
     dispatchSet('instanceData', data);
-    const types = ['boolean', 'number', 'percent'];
-    const initialChartData = data
-      ? Object.keys(data).reduce((chartData, key) => {
-        const propertyType = properties.find(prop => prop.name === key);
-        if (!types.includes(propertyType.kind)) {
-          return chartData;
-        }
-        const value =
-            propertyType && propertyType.kind === 'boolean'
-              ? Boolean(data[key])
-              : data[key];
-        return {
-          ...chartData,
-          [key]: {[moment().valueOf()]: value}
-        };
-      }, {})
-      : {};
-    dispatchSet('chartData', initialChartData);
+    this.initialChartData(data, properties);
+    // const types = ['boolean', 'number', 'percent'];
+    // const initialChartData = data
+    //   ? Object.keys(data).reduce((chartData, key) => {
+    //     const propertyType = properties.find(prop => prop.name === key);
+    //     if (!types.includes(propertyType.kind)) {
+    //       return chartData;
+    //     }
+    //     const value =
+    //         propertyType && propertyType.kind === 'boolean'
+    //           ? Boolean(data[key])
+    //           : data[key];
+    //     return {
+    //       ...chartData,
+    //       [key]: {[moment().valueOf()]: value}
+    //     };
+    //   }, {})
+    //   : {};
+    // dispatchSet('chartData', initialChartData);
   }
 
   async loadTypeProps(typeNode: ?NodeType) {
@@ -338,14 +361,6 @@ class InstanceDetail extends Component<PropsType> {
 
     return propertyData;
   };
-
-  // constructChartData = (data, typeProps) => {
-  //   const chartData = Object.keys(data).map(property => {
-  //     const type = typeProps.find(prop => prop.name === property);
-  //     return this.constructPropertyData(property, data[property], type);
-  //   });
-  //   return chartData;
-  // };
 
   constructChartData = (data, typeProps, properties) => {
     const chartData = Object.keys(data).map(property => {
