@@ -3,7 +3,7 @@
 import capitalize from 'lodash/capitalize';
 import sortBy from 'lodash/sortBy';
 import React, {Component} from 'react';
-import {dispatchSet, watch} from 'redux-easy';
+import {dispatchSet, watch, dispatch} from 'redux-easy';
 
 import InstanceAlerts from '../instance-alerts/instance-alerts';
 import PropertyForm from '../property-form/property-form';
@@ -13,6 +13,9 @@ import {createNode, deleteNode, getChildTypes} from '../tree/tree-util';
 import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
 import {getTypeNode, loadTypeNode} from '../util/node-util';
+import {LineChart} from 'react-chartkick';
+import Chart from 'chart.js';
+import * as moment from 'moment';
 
 import type {
   AlertType,
@@ -74,7 +77,6 @@ class InstanceDetail extends Component<PropsType> {
 
   alertIsFor(instanceId: number, alertInstanceId: number) {
     if (alertInstanceId === instanceId) return true;
-
     const {instanceNodeMap} = this.props;
     const node = instanceNodeMap[instanceId];
     const {children} = node;
@@ -85,8 +87,7 @@ class InstanceDetail extends Component<PropsType> {
     const {instanceNodeMap} = this.props;
     const crumbs = [<span key="self">{instanceNode.name}</span>];
 
-    const selectInstance = id =>
-      dispatchSet('ui.selectedInstanceNodeId', id);
+    const selectInstance = id => dispatchSet('ui.selectedInstanceNodeId', id);
 
     while (true) {
       const {parentId} = instanceNode;
@@ -96,7 +97,8 @@ class InstanceDetail extends Component<PropsType> {
       if (name === 'root') break;
       crumbs.unshift(<span key={parentId}> &gt; </span>);
       crumbs.unshift(
-        <a className="breadcrumb"
+        <a
+          className="breadcrumb"
           key={parentId + name}
           onClick={() => selectInstance(parentId)}
         >
@@ -193,8 +195,8 @@ class InstanceDetail extends Component<PropsType> {
     reloadAlerts();
 
     this.loadEnums();
-    this.loadTypeProps(typeNode);
-    this.loadInstanceData(instanceNode);
+    const properties = await this.loadTypeProps(typeNode);
+    this.loadInstanceData(instanceNode, properties);
   }
 
   async loadEnums() {
@@ -207,7 +209,29 @@ class InstanceDetail extends Component<PropsType> {
     dispatchSet('enumMap', enumMap);
   }
 
-  async loadInstanceData(instanceNode: NodeType) {
+
+  initialChartData = (data, properties) => {
+    const types = ['boolean', 'number', 'percent'];
+    const initialData = data ? Object.keys(data).reduce((chartData, key) => {
+        const propertyType = properties.find(prop => prop.name === key);
+        if (!types.includes(propertyType.kind)) {
+          return chartData;
+        }
+        const value =
+          propertyType && propertyType.kind === 'boolean'
+            ? Boolean(data[key])
+            : data[key];
+        return {
+          ...chartData,
+          [key]: {[moment().valueOf()]: value}
+        };
+      }, {})
+      : {};
+    dispatchSet('chartData', initialData);
+  };
+
+
+  async loadInstanceData(instanceNode: NodeType, properties) {
     let data = await getData(instanceNode);
     // Change the shape of this data
     // from an array of InstanceDataType objects
@@ -217,6 +241,7 @@ class InstanceDetail extends Component<PropsType> {
       return map;
     }, {});
     dispatchSet('instanceData', data);
+    this.initialChartData(data, properties);
   }
 
   async loadTypeProps(typeNode: ?NodeType) {
@@ -225,11 +250,27 @@ class InstanceDetail extends Component<PropsType> {
     const json = await getJson(`types/${typeNode.id}/data`);
     const properties = ((json: any): PropertyType[]);
     const sortedProperties = sortBy(properties, ['name']);
+
+    const initialChartProps = sortedProperties.reduce(
+      (chartProps, property) => {
+        chartProps[property.name] = false;
+        return chartProps;
+      },
+      {}
+    );
+
     dispatchSet('ui.typeProps', sortedProperties);
+    dispatchSet('chartProperties', initialChartProps);
+    return sortedProperties;
   }
 
   renderProperties = () => {
-    const {instanceData, ui: {typeProps}} = this.props;
+    const {
+      instanceData,
+      chartProperties,
+      chartData,
+      ui: {typeProps}
+    } = this.props;
 
     if (!typeProps || typeProps.length === 0) {
       return <div className="property-table">none</div>;
@@ -239,30 +280,94 @@ class InstanceDetail extends Component<PropsType> {
       <table className="property-table">
         <tbody>
           {typeProps.map(typeProp =>
-            this.renderProperty(typeProp, instanceData)
+            this.renderProperty(
+              typeProp,
+              instanceData,
+              chartProperties[typeProp.name]
+            )
           )}
         </tbody>
       </table>
     );
   };
 
-  renderProperty = (typeProp: PropertyType, instanceData: Object) => {
+  renderProperty = (
+    typeProp: PropertyType,
+    instanceData: Object,
+    showProperty: Boolean
+  ) => {
     const {kind, name} = typeProp;
     const value = instanceData[name];
+    const setBoolean = () => {
+      dispatch('toggleChartProperty', {property: name});
+    };
     return (
       <tr key={name}>
-        <td>{name}</td>
+        <form>
+          <input
+            type="checkbox"
+            name="propertyType"
+            value={showProperty}
+            onClick={setBoolean}
+          />
+          <label htmlFor={name}>{name}</label>
+        </form>
         <td className={kind}>{String(this.formatValue(kind, value))}</td>
       </tr>
     );
   };
 
+  constructPropertyData = (name, values, type) => {
+    const propertyData = {
+      name,
+      data: {}
+    };
+
+    propertyData.data = Object.keys(values).reduce((data, key) => {
+      let value = values[key];
+
+      if (type && type.kind === 'boolean') {
+        value = Number(values[key]);
+      } else if (type && type.kind === 'percent') {
+        value = Number(values[key] / 100);
+      }
+      data[moment(Number(key)).format('h:mm:ss')] = value;
+      return data;
+    }, propertyData.data);
+
+    return propertyData;
+  };
+
+  constructChartData = (data, typeProps, properties) => {
+    const chartData = Object.keys(data).map(property => {
+      const type = typeProps.find(prop => prop.name === property);
+      if (properties && properties[property] === false) {
+        return this.constructPropertyData(property, '', type);
+      }
+      return this.constructPropertyData(property, data[property], type);
+    });
+    return chartData;
+  };
+
   render() {
+    const {
+      chartData,
+      chartProperties,
+      instanceData,
+      ui: {typeProps}
+    } = this.props;
+
+    const formattedData = this.constructChartData(
+      chartData,
+      typeProps,
+      chartProperties
+    );
+
     const node = this.getNode(this.props);
     if (!node) return null;
 
     const typeNode = getTypeNode(node);
-    const typeName = typeNode.name;
+    const typeName = typeNode ? typeNode.name : null;
 
     return (
       <section className="instance-detail">
@@ -281,11 +386,19 @@ class InstanceDetail extends Component<PropsType> {
               icon="cog"
               onClick={() => this.editProperties()}
               tooltip="edit properties"
+              value="test"
             />
           </div>
           {this.renderProperties()}
         </section>
         <InstanceAlerts />
+        <LineChart
+          data={formattedData}
+          height="300px"
+          width="500px"
+          xtitle="Property Values"
+          dataset={{pointStyle: 'dash', pointRadius: 1}}
+        />
       </section>
     );
   }
@@ -295,5 +408,7 @@ export default watch(InstanceDetail, {
   enumMap: '',
   instanceData: '',
   instanceNodeMap: '',
-  ui: ''
+  ui: '',
+  chartData: '',
+  chartProperties: ''
 });

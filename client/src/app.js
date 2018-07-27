@@ -37,6 +37,7 @@ class App extends Component<PropsType> {
 
   render() {
     const {view} = this.props;
+
     return (
       <div className="app" onClick={this.handleClick}>
         <Header />
@@ -51,4 +52,8 @@ class App extends Component<PropsType> {
   }
 }
 
-export default watch(App, {view: 'ui.view'});
+export default watch(App, {
+  view: 'ui.view',
+  instanceData: '',
+  chartData: ''
+});
