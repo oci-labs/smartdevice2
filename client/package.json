@@ -24,7 +24,10 @@
     "watch-css": "npm run build-css && node-sass src/ -o src/ --watch"
   },
   "jest": {
-    "collectCoverageFrom": ["src/**/*.js", "!src/index.js"],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/index.js"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 80,
