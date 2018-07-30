@@ -219,6 +219,72 @@ See: [Resetting Your OpenDDS Environment](OPENDDS.md#resetting-your-opendds-envi
 
 ## Experimental
 
+### Building on Node Version Manager (Ubuntu)
+
+#### Install NVM 
+
+NVM can be setup by running the following commands in the Ubuntu Terminal.
+```
+sudo apt-get update
+sudo apt-get install build-essential libssl-dev
+curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh -o install_nvm.sh
+bash install_nvm.sh
+source ~/.profile
+nvm --version
+```
+
+#### Get the latest code
+
+```
+git pull
+```
+
+#### Download Supporting Libraries
+
+This should be done any time updates have been made to the supporting libraries.
+
+```
+cd server
+npm install npm@latest -g
+```
+
+#### Re-Link OpenDDS Bindings
+
+This is only necessary if you are utilizing OpenDDS support.
+
+```
+npm link ../node-opendds/
+```
+
+#### Setup and Start the Server
+
+This should be done initially and for any updates to the server application code or libraries.
+```
+npm run build
+npm start-dev
+```
+The server will run on port 3001.
+
+#### Run "Secure" Server (Optional)
+
+If you intend to run a second instance to demonstrate OpenDDS security:
+
+```
+npm run start-secure
+```
+
+The secure server will run on port 4001.
+
+#### Setup Client Server
+
+```
+cd client
+npm install
+npm run test
+npm run build
+```
+
+
 ### Building on Raspberry Pi
 
 #### SSH to the Pi

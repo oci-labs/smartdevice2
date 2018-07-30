@@ -1,6 +1,6 @@
 // @flow
 
-import cloneDeep from 'lodash/clonedeep';
+import cloneDeep from 'lodash.clonedeep';
 import {reducer, reduxSetup} from 'redux-easy';
 
 import initialState from './initial-state';
@@ -146,10 +146,6 @@ describe('reducer', () => {
     const action = {type: 'setSelectedChildNodeId', payload: nodeId};
     let newState = reducer(state, action);
     expect(newState.ui.selectedChildNodeId).toBe(nodeId);
-
-    // Toggle off.
-    newState = reducer(newState, action);
-    expect(newState.ui.selectedChildNodeId).toBe(0);
   });
 
   test('setSelectedNode', () => {
@@ -164,9 +160,5 @@ describe('reducer', () => {
     const action = {type: 'setSelectedNode', payload};
     let newState = reducer(state, action);
     expect(newState.ui.selectedTypeNodeId).toBe(id);
-
-    // Toggle off.
-    newState = reducer(newState, action);
-    expect(newState.ui.selectedTypeNodeId).toBe(0);
   });
 });
