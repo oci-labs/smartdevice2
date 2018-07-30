@@ -61,12 +61,12 @@ ValveDataReader.prototype.createParticipant = function(secure = true) {
       value: [
         {
           name: 'dds.sec.auth.identity_ca',
-          value: 'file:' + ddsCerts + '/opendds_identity_ca_cert.pem'
+          value: 'file:' + ddsCerts + '/identity/identity_ca_cert.pem'
         },
 
         {
           name: 'dds.sec.access.permissions_ca',
-          value: 'file:' + ddsCerts + '/opendds_identity_ca_cert.pem'
+          value: 'file:' + ddsCerts + '/permissions/permissions_ca_cert.pem'
         },
 
         {
@@ -76,18 +76,12 @@ ValveDataReader.prototype.createParticipant = function(secure = true) {
 
         {
           name: 'dds.sec.auth.identity_certificate',
-          value:
-            'file:' +
-            ddsCerts +
-            '/mock_participant_2/opendds_participant_cert.pem'
+          value: 'file:' +  ddsCerts + '/identity/test_participant_02_cert.pem'
         },
 
         {
           name: 'dds.sec.auth.private_key',
-          value:
-            'file:' +
-            ddsCerts +
-            '/mock_participant_2/opendds_participant_private_key.pem'
+          value: 'file:' + ddsCerts + '/identity/test_participant_02_private_key.pem'
         },
 
         {

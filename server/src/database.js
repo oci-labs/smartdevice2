@@ -6,9 +6,18 @@ import objectMapper from 'object-mapper';
 // Get database configuration from a JSON file.
 // Quick and dirty for the demo...
 const secure = !!process.env.DDS_SECURE;
-let config = secure
+let config
+
+if(process.env.NODE_ENV==='production'){
+  config = secure
+  ? require('./config-secure.json')
+  : require('./config.json');
+}
+else if(process.env.NODE_ENV==='development'){
+  config = secure
   ? require('../config-secure.json')
   : require('../config.json');
+}
 
 // ALlow values to be overridden by environment variables.
 // This specifies how environment variable names

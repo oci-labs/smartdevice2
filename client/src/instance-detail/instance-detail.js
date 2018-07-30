@@ -14,7 +14,6 @@ import {values} from '../util/flow-util';
 import {getJson} from '../util/rest-util';
 import {getTypeNode, loadTypeNode} from '../util/node-util';
 import {LineChart} from 'react-chartkick';
-import Chart from 'chart.js';
 import * as moment from 'moment';
 
 import type {
@@ -268,7 +267,6 @@ class InstanceDetail extends Component<PropsType> {
     const {
       instanceData,
       chartProperties,
-      chartData,
       ui: {typeProps}
     } = this.props;
 
@@ -353,7 +351,6 @@ class InstanceDetail extends Component<PropsType> {
     const {
       chartData,
       chartProperties,
-      instanceData,
       ui: {typeProps}
     } = this.props;
 

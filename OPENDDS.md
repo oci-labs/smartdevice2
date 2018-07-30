@@ -22,6 +22,24 @@ make -sj4 OpenDDS_Security OpenDDS_Rtps_Udp Svc_Utils OpenDDS_InfoRepoDiscovery
 cd ..
 ```
 
+Ubuntu:
+
+```
+git clone -b security https://github.com/objectcomputing/OpenDDS.git
+cd OpenDDS
+sudo apt-get install libxerces-c-dev
+wget https://www.openssl.org/source/openssl-1.1.0f.tar.gz
+tar xzvf openssl-1.1.0f.tar.gz
+cd openssl-1.1.0f
+./config -W1,--enable-new-dtags, -rpath,'$(LIBPATH)'
+make -s && sudo make install
+cd ..
+./configure --xerces3 --ssl=/usr --macros=CCFLAGS+=-std=c++11
+source ./setenv.sh
+make -sj4 OpenDDS_Security OpenDDS_Rtps_Udp Svc_Utils OpenDDS_InfoRepoDiscovery
+cd ..
+```
+
 ### Setup the Node.js bindings for OpenDDS (security branch)
 
 MacOS (with Xcode installed):
@@ -39,9 +57,23 @@ node-gyp configure build
 cd ..
 ```
 
+Ubuntu:
+
+```
+git clone -b security https://github.com/oci-labs/node-opendds.git
+cd node-opendds
+sudo apt-get install libv8-dev
+export V8_ROOT=~/.nvm/versions/node/$(node -v)
+export NAN_ROOT=`pwd`/node_modules/nan
+npm install -g node-gyp
+npm install
+node-gyp configure build
+cd ..
+```
+
 ### Build Publisher and Shared Libraries
 
-MacOS:
+MacOS or Linux:
 
 ```
 cd server

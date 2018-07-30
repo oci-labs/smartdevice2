@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {reduxSetup} from 'redux-easy';
 
-import App from './App';
+import App from './app';
 import initialState from './initial-state';
 
 global.fetch = require('jest-fetch-mock');
