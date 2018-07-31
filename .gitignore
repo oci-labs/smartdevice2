@@ -31,3 +31,9 @@ GNUmakefile
 /bin
 /OpenDDS
 /node-opendds
+
+.vs/
+*.sln
+*.vcxproj*
+*.log
+*.cmd
