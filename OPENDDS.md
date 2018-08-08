@@ -27,8 +27,8 @@ Ubuntu:
 ```
 git clone -b security https://github.com/objectcomputing/OpenDDS.git
 cd OpenDDS
-apt-get install libxerces-c-dev
-apt-get install openssl
+sudo apt-get install libxerces-c-dev
+sudo apt-get install openssl
 ./configure --xerces3 --ssl=/usr --macros=CCFLAGS+=-std=c++11
 source ./setenv.sh
 make -sj4 OpenDDS_Security OpenDDS_Rtps_Udp Svc_Utils OpenDDS_InfoRepoDiscovery
@@ -57,7 +57,7 @@ Ubuntu:
 ```
 git clone -b security https://github.com/oci-labs/node-opendds.git
 cd node-opendds
-apt-get install libv8-dev
+sudo apt-get install libv8-dev
 export V8_ROOT=/usr
 export NAN_ROOT=`pwd`/node_modules/nan
 npm install -g node-gyp
