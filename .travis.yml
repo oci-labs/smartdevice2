@@ -1,6 +1,6 @@
 sudo: required
 language: node_js
-node_js: "stable"
+node_js: "8"
 services:
     - docker
 cache:
@@ -56,3 +56,4 @@ script:
   - docker build -t smartdevice2 .
   - docker run smartdevice2 env
   - docker run smartdevice2 ldd node_modules/opendds/build/Release/node_opendds.node
+  - docker run smartdevice2
