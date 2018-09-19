@@ -38,8 +38,8 @@
     }
   },
   "dependencies": {
-    "cross-env": "^5.1.6",
     "chart.js": "^2.7.2",
+    "cross-env": "^5.1.6",
     "font-awesome": "^4.7.0",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
@@ -50,7 +50,7 @@
     "react-hash-route": "^1.1.0",
     "react-modal": "^3.4.4",
     "react-redux": "^5.0.7",
-    "react-scripts": "^1.1.4",
+    "react-scripts": "^1.1.5",
     "react-tabs": "^2.2.2",
     "redux": "^3.7.2",
     "redux-easy": "^2.6.2"
