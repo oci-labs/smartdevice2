@@ -1,20 +1,56 @@
+sudo: required
 language: node_js
-node_js:
-- 8.11.1
+node_js: "8"
+services:
+    - docker
 cache:
   directories:
-  - server/node_modules
-  - client/node_modules
+    - server/node_modules
+    - client/node_modules
 script:
-- cd server
-- npm install
-#- npm test
-- cd ../client
-- npm install
-#- npm test
-- unset CI
-- cd ../client
-- npm run deploy
-- cd ../server
-- npm run build
-- set CI
+  - wget https://cmake.org/files/v3.9/cmake-3.9.1-Linux-x86_64.sh
+  - sudo sh cmake-3.9.1-Linux-x86_64.sh -- --skip-license --prefix=/usr
+  #Setup OpenDDS (security branch)
+  - git clone --recursive -b security https://github.com/objectcomputing/OpenDDS.git
+  - cd OpenDDS
+  - sudo apt-get install libxerces-c-dev
+   #installing OpenSSL 1.1.0 with wget because it is not available in apt-get
+  - wget https://www.openssl.org/source/openssl-1.1.0f.tar.gz   
+  - tar xzvf openssl-1.1.0f.tar.gz
+  - cd openssl-1.1.0f
+  - ./config -Wl,--enable-new-dtags,-rpath,'$(LIBRPATH)'
+  - make -s && sudo make install
+  - cd ..
+  - ./configure --security --xerces3 --ssl=/usr --macros=CCFLAGS+=-std=c++11
+  - source ./setenv.sh
+  - make -sj4 OpenDDS_Security OpenDDS_Rtps_Udp Svc_Utils OpenDDS_InfoRepoDiscovery
+  - cd ..
+  #Setup the Node.js bindings for OpenDDS (security branch)
+  - git clone https://github.com/oci-labs/node-opendds.git
+  - cd node-opendds
+  - sudo apt-get install libv8-dev
+  - export V8_ROOT=~/.nvm/versions/node/$(node -v)
+  - export NAN_ROOT=`pwd`/node_modules/nan
+  - npm install -g node-gyp
+  - npm install
+  - node-gyp configure build
+  - cd ..
+  - npm install
+  #Build Publisher and Shared Libraries
+  - cd server
+  - npm install npm@latest -g
+  - npm link ../node-opendds/
+  - cd ..
+  - mwc.pl -type gnuace OpenddsDemo.mwc
+  - make
+  #Build and Run Server, Client
+  - cd server
+  - npm install
+  - npm run build
+  - cd ../client
+  - npm install
+  - npm run test
+  - npm run build
+  - cd ..
+  #Build Docker Image using Dockerfile
+  - docker build -t smartdevice2 .

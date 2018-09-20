@@ -23,9 +23,9 @@
     "lint": "eslint --quiet src --ext .js",
     "postinstall": "flow-typed install",
     "Xprepush": "npm run verify",
-    "start": "cross-env DYLD_LIBRARY_PATH=$DDS_ROOT/lib node build/index.js",
-    "start-secure": "cross-env PORT=4001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=$DDS_ROOT/lib node build/index.js",
-    "start-dev": "cross-env FOO=bar DYLD_LIBRARY_PATH=$DDS_ROOT/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
+    "start": "cross-env NODE_ENV=production DYLD_LIBRARY_PATH=$DDS_ROOT/lib node index.js",
+    "start-secure": "cross-env NODE_ENV=production PORT=4001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=$DDS_ROOT/lib node index.js",
+    "start-dev": "cross-env NODE_ENV=development FOO=bar DYLD_LIBRARY_PATH=$DDS_ROOT/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
     "test": "jest",
     "verify": "npm-run-all lint flow test-no-watch"
   },
@@ -45,14 +45,17 @@
   "dependencies": {
     "babel-cli": "^6.26.0",
     "cors": "^2.8.4",
+    "cross-env": "^5.1.5",
     "express": "^4.16.3",
     "express-healthcheck": "^0.1.0",
     "json-dup-key-validator": "^1.0.2",
     "morgan": "^1.9.0",
     "mqtt": "^2.17.0",
     "mysql-easier": "^1.4.1",
+    "npm": "^6.4.0",
     "object-mapper": "^5.0.0",
     "opendds": "0.0.7",
+    "rekuire": "^0.1.9",
     "ws": "^4.1.0"
   },
   "devDependencies": {
@@ -61,7 +64,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-watch": "^2.0.7",
-    "cross-env": "^5.1.5",
     "eslint": "^4.19.1",
     "eslint-plugin-flowtype": "^2.46.3",
     "eslint-plugin-html": "^4.0.3",
