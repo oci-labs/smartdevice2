@@ -54,6 +54,3 @@ script:
   - cd ..
   #Build Docker Image using Dockerfile
   - docker build -t smartdevice2 .
-  - docker run smartdevice2 env
-  - docker run smartdevice2 ldd node_modules/opendds/build/Release/node_opendds.node
-  - docker run smartdevice2
