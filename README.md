@@ -353,32 +353,119 @@ exit
 
 Start server again
 
-### Running with Docker
+### Dockerize and deploy on Google Cloud Platform
 
-* images run in containers
-* to build an image, use the `docker build` command
-  * see examples below
-  * the instructions for how to build an image
-    are typically placed in a file named `Dockerfile`
-* to run an existing image in a new container,
-  use the `docker run` command
-  * see examples below
-* to verify that an image exists
-  * `docker images | grep {image-name}`
-* to verify that a container exists and get its id
-  * `docker ps | grep {container-name}`
-* to view logs of a container
-  * `docker logs {container-name}`
-* to get a shell in a container
-  * `docker exec -it {container-name} bash`
-    * if you get an error saying that `bash` isn't found,
-      try `sh` instead
-* to stop a container
-  * `docker stop {container-name}`
-* to remove a stopped container
-  * `docker rm {container-name}`
-* to remove an image
-  * `docker rmi -f {image-name}`
+#### Install and Setup Docker
+Follow this link to [setup and install Docker](https://docker-curriculum.com) on your computer.
+
+#### GCloud SDK on Ubuntu
+Follow this link to [setup and install GCloud SDK](https://cloud.google.com/sdk/docs/quickstart-debian-ubuntu) on your computer.
+
+
+#### Running with Docker
+
+ - It should be noted that, Docker images run in containers
+ - To build an image, use the docker build command. The instructions for how to build an image are typically placed in a file named `Dockerfile`.
+```
+        docker build -t {image-name} <path to dockerfile>
+```
+ - To run an existing image in a new container, use the docker run command.
+```
+        docker run {image-name}
+```
+ - To view list of container running options,
+```
+        docker run --help 
+```
+ - To verify that an image exists,
+ ```
+        docker images | grep {image-name}
+```
+ - To verify that a container exists and get its id
+ ```
+        docker ps | grep {container-name}
+```
+ - To view logs of a container
+ ```
+        docker logs {container-name}
+```
+ - To get a shell in a container (if you get an error saying that bash isn't found, try `sh` instead )
+```
+        docker exec -it {container-name} /bin/bash
+```
+ - To stop a container
+```
+        docker stop {container-name}
+```
+ - To remove a stopped container
+ ```
+        docker rm {container-name}
+```
+ - To remove an image
+ ```
+        docker rmi -f {image-name}
+```
+- To view list of all containers,
+```
+        docker ps -a
+```
+
+### Build and run docker images
+#### devo
+```
+docker build -t gcr.io/oci-devo/devo:v1 <path to dockerfile>
+docker run -p 3001:3001 gcr.io/oci-devo/devo:v1
+```
+#### devo - secure
+```
+docker build -t gcr.io/oci-devo/devo-secure:v1 <path to dockerfile>
+docker run -p 3001:3001 gcr.io/oci-devo/devo-secure:v1
+```
+The docker image exposes port 3001 that is used allow communication with containers outside the network or host machine.
+
+### Push docker images to GCloud Container Registry
+#### devo
+```
+gcloud docker -- push gcr.io/oci-devo/devo:v1
+```
+#### devo - secure
+```
+gcloud docker -- push gcr.io/oci-devo/devo-secure:v1
+```
+This can be cross-checked by viewing the Container Registry on Google Cloud Console.
+
+### Goocle Cloud Setup
+#### devo-database
+The Cloud SQL on Google Cloud Platform hosts the instance named "devo-database". This insance contains the Mysql databases "smartdevice" and "smartdevice-secure".
+
+#### Instance Details - 
+ - backendType: SECOND_GEN
+ - connectionName: oci-devo:us-central1:devo-database
+ - databaseVersion: MYSQL_5_7
+ - gceZone: us-central1-b
+ - instanceType: CLOUD_SQL_INSTANCE
+ - kind: sql#instance
+ - name: devo-database
+ - project: oci-devo
+ - region: us-central1
+
+More details can be fetched by running `gcloud sql instances describe devo-database`.
+
+#### Authorized networks to connect to instance "devo-database" (Public IP) -
+| Device | Description |
+| ------ | ------ |
+| OCI-LAN | OCI-LAN Network |
+| devo-compute-engine-instance | Compute Engine Instance |
+| devo-secure-compute-engine-instance | Compute Engine Instance |
+
+#### Compute Engine Instances
+devo and devo-secure run on compute engine instance 
+
+#### Firewall Rules
+| Name | Type | Targets | Filters | Ports | action | Network |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| devo-egress-firewall | Egress | devo-firewall-egress | IP ranges: 0.0.0.0/0 | tcp:3001 | Allow | Default |
+| devo-firewall | Ingress | devo-firewall-ingress | IP ranges: 0.0.0.0/0 | tcp:3001 | Allow | Default |
 
 #### MySQL
 
@@ -576,3 +663,19 @@ Start server again
   * select "Container Registry" from hamburger menu
 * to see list of running instances
   * `gcloud compute instances list`
+
+### Note
+#### 1. Why `Debian-Stretch` over `Alpine` or smaller base images?
+`Alpine Linux` is smaller than most distribution base images (~5MB), and thus leads to much slimmer Docker images in general. This variant is highly recommended when final image size being as small as possible is desired. The main caveat to note is that it uses `musl libc` instead of `glibc`, so certain softwares might run into issues depending on the depth of their libc requirements. The cloned `OpenDDS` module requires the base image to work on `glibc`.
+
+Another issue with Alpine image is that is does not support Shared Libraries (Required by OpenDDS module). Hence Alpine Linux was dropped from the choice of base image. `node:8-stretch` runs on Glibc, supports shared-bibraries and also supports the required version of GCC.
+
+#### 2. Get access to Database
+The password has been changed intentionally while committing the project to GitHub. [Contact Michael Kimberlin, Pramukh Bagur for more info]
+
+To get access to db, replace all iterations of `PASSWORD` with the actual db password in the following files-
+ - /smartdevice2/server/config/config-prod.json
+ - /smartdevice2/server/config/config-secure-prod.json
+
+#### 3. Docker Images
+To create a Docker image build of devo and devo-secure, we have copied the build files instead of running `npm install` in Dockerfile.

@@ -10,13 +10,13 @@ let config
 
 if(process.env.NODE_ENV==='production'){
   config = secure
-  ? require('./config-secure.json')
-  : require('./config.json');
+  ? require('./config-secure-prod.json')
+  : require('./config-prod.json');
 }
 else if(process.env.NODE_ENV==='development'){
   config = secure
-  ? require('../config-secure.json')
-  : require('../config.json');
+  ? require('../config/config-secure-dev.json')
+  : require('../config/config-dev.json');
 }
 
 // ALlow values to be overridden by environment variables.

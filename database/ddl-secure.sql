@@ -197,4 +197,5 @@ values (1, 'Object Computing, Inc.');
 
 insert into user (id, email, firstName, lastName, organizationId) values
   (1, 'mark@objectcomputing.com', 'Mark', 'Volkmann', 1),
-  (2, 'stanleyk@objectcomputing.com', 'Kevin', 'Stanley', 1);
+  (2, 'stanleyk@objectcomputing.com', 'Kevin', 'Stanley', 1),
+  (3, 'bagurp@objectcomputing.com', 'Pramukh', 'Bagur', 1);

@@ -53,4 +53,4 @@ script:
   - npm run build
   - cd ..
   #Build Docker Image using Dockerfile
-  - docker build -t smartdevice2 .
+  - docker build -t gcr.io/oci-devo/devo:v1 .

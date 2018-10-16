@@ -1,0 +1,11 @@
+{
+  "db": {
+    "database": "smartdevice_secure",
+    "debug": false,
+    "host": "35.184.86.216",
+    "insecureAuth": true,
+    "password": "PASSWORD",
+    "port": 3306,
+    "user": "root"
+  }
+}

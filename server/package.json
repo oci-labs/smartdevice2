@@ -24,8 +24,9 @@
     "postinstall": "flow-typed install",
     "Xprepush": "npm run verify",
     "start": "cross-env NODE_ENV=production DYLD_LIBRARY_PATH=$DDS_ROOT/lib node index.js",
-    "start-secure": "cross-env NODE_ENV=production PORT=4001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=$DDS_ROOT/lib node index.js",
+    "start-secure": "cross-env NODE_ENV=production PORT=3001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=$DDS_ROOT/lib node index.js",
     "start-dev": "cross-env NODE_ENV=development FOO=bar DYLD_LIBRARY_PATH=$DDS_ROOT/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
+    "start-secure-dev": "cross-env NODE_ENV=development PORT=3001 WS_PORT=1447 DDS_SECURE=true DYLD_LIBRARY_PATH=$DDS_ROOT/lib babel-watch --message 'restarting' --ignore node_modules -- src/index.js",
     "test": "jest",
     "verify": "npm-run-all lint flow test-no-watch"
   },

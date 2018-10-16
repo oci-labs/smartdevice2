@@ -16,24 +16,14 @@ RUN apt-get update && \
 COPY server/node_modules/ ./node_modules/
 COPY OpenDDS/ ./OpenDDS/
 COPY node-opendds/ ./node-opendds/
-COPY .babelrc server/config.json server/config-secure.json server/package.json ./
+COPY .babelrc deploy.sh server/config/config-prod.json server/config/config-secure-prod.json server/package.json ./
 COPY server/build/ ./
-COPY client/public/ ./public/
-
-# Set environment variables
-ENV SSL_ROOT=/usr \
-    CMAKE_ROOT=/usr \
-    XERCESCROOT=/usr \
-    DANCE_ROOT=unused \
-    CIAO_ROOT=unused \
-    DDS_ROOT=/usr/src/app/OpenDDS \
-    V8_ROOT=~/.nvm/versions/node/v8.12.0 \
-    ACE_ROOT=/usr/src/app/OpenDDS/ACE_wrappers \
-    MPC_ROOT=/usr/src/app/OpenDDS/ACE_wrappers/MPC \
-    TAO_ROOT=/usr/src/app/OpenDDS/ACE_wrappers/TAO \
-    NAN_ROOT=/usr/src/app/node-opendds/node_modules/nan \
-    PATH=${PATH}:/usr/src/app/OpenDDS/ACE_wrappers/bin:/usr/src/app/OpenDDS/bin \
-    LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/src/app/OpenDDS/ACE_wrappers/lib:/usr/src/app/OpenDDS/lib:/usr/bin:/usr/bin
+COPY server/public/ ./public
 
 EXPOSE 3001
-CMD ["npm", "start"]
+RUN ["chmod", "+x", "/usr/src/app/deploy.sh"]
+ENTRYPOINT ["/usr/src/app/deploy.sh"]
+
+#CMD ["secure_smartdevice"]
+# CMD sends parameter to ENTRYPOINT. Comment CMD to build devo docker image (unsecure)
+
