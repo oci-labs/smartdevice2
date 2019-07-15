@@ -3,9 +3,17 @@
 import {dispatch, dispatchSet, getState} from 'redux-easy';
 
 import {reloadAlerts} from './instance-detail/instance-detail';
-import {getInstanceNode, getTypeNode} from './util/node-util';
+import {
+  getInstanceNode,
+  getTypeNode,
+  getPropType,
+  getInstanceData
+} from './util/node-util';
 
 let ws;
+
+const chartableProperties = ['boolean', 'number', 'percent'];
+const isChartable = kind => chartableProperties.includes(kind);
 
 function configure(ws) {
   ws.onclose = () => {
@@ -43,10 +51,29 @@ function configure(ws) {
       // $FlowFixMe - doesn't think data is a string
       const change = JSON.parse(data);
       const {instanceId, value} = change;
+      const propType = getPropType(change.property);
+      if (isChartable(propType)) {
+        if (propType === 'boolean') {
+          change.value = Boolean(change.value);
+        }
 
-      const {selectedInstanceNodeId} = getState().ui;
-      if (instanceId === selectedInstanceNodeId) {
-        dispatch('setInstanceProperty', change);
+        const {selectedInstanceNodeId} = getState().ui;
+        if (instanceId === selectedInstanceNodeId) {
+          dispatch('setInstanceProperty', change);
+          dispatch('setChartValue', change);
+          const instanceData = getInstanceData();
+          Object.keys(instanceData)
+            .filter(key => key !== change.property)
+            .forEach(prop => {
+              if (isChartable(getPropType(prop))) {
+                dispatch('setChartValue', {
+                  ...change,
+                  property: prop,
+                  value: instanceData[prop]
+                });
+              }
+            });
+        }
       }
 
       // Train-specific code
@@ -88,7 +115,9 @@ function getTrainProperty(change) {
     const {name} = typeNode;
     return name === 'engine'
       ? 'detected.idleCalibration'
-      : name === 'lights' ? 'detected.lightCalibration' : null;
+      : name === 'lights'
+        ? 'detected.lightCalibration'
+        : null;
   }
   if (property === 'lifecycle') return 'trainAlive';
 }

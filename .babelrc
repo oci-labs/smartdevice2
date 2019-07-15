@@ -1,13 +1,16 @@
 {
-  "presets": [
-    ["env", {
-      "targets": {
-        "node": 9
+  presets: [
+    [
+      'env',
+      {
+        targets: {
+          node: 9
+        }
       }
-    }]
+    ]
   ],
-  "plugins": [
-    "transform-flow-strip-types",
-    ["transform-object-rest-spread", {"useBuiltIns": true}]
+  plugins: [
+    'transform-flow-strip-types',
+    ['transform-object-rest-spread', {useBuiltIns: true}]
   ]
 }

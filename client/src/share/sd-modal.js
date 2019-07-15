@@ -34,8 +34,12 @@ export function showConfirm(options: ConfirmType): void {
 
   renderFn = () => (
     <div className="button-row">
-      <button className="button" onClick={handleYes}>Yes</button>
-      <button className="button" onClick={handleNo}>No</button>
+      <button className="button" onClick={handleYes}>
+        Yes
+      </button>
+      <button className="button" onClick={handleNo}>
+        No
+      </button>
     </div>
   );
 
@@ -118,25 +122,27 @@ class SdModal extends Component<PropsType> {
     let className = 'sd-modal';
     if (error) className += ' error';
     return (
-      <Modal
-        ariaHideApp={false}
-        className={className}
-        isOpen={open}
-        onRequestClose={this.onCloseModal}
-        ref={modal => (this.modal = modal)}
-        shouldCloseOnOverlayClick={false}
-      >
-        <header>
-          <div className="title">{title}</div>
-          <div className="close" onClick={this.onCloseModal}>
-            &#10005;
-          </div>
-        </header>
-        <section className="body">
-          {message ? this.renderMessage() : null}
-          {renderFn ? renderFn() : null}
-        </section>
-      </Modal>
+      <div>
+        <Modal
+          ariaHideApp={false}
+          className={className}
+          isOpen={open}
+          onRequestClose={this.onCloseModal}
+          ref={modal => (this.modal = modal)}
+          shouldCloseOnOverlayClick={false}
+        >
+          <header>
+            <div className="title">{title}</div>
+            <div className="close" onClick={this.onCloseModal}>
+              &#10005;
+            </div>
+          </header>
+          <section className="body">
+            {message ? this.renderMessage() : null}
+            {renderFn ? renderFn() : null}
+          </section>
+        </Modal>
+      </div>
     );
   }
 }
